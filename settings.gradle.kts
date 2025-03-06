@@ -21,4 +21,11 @@ dependencyResolutionManagement {
 
 rootProject.name = "Pantry Plan"
 include(":app")
+
 include(":feature:pantry")
+include(":feature:recipes")
+include(":feature:meal-planner")
+
+include(":core:models")
+include(":core:database")
+include(":core:data-access")
