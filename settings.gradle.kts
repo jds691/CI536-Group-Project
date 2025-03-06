@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Pantry Plan"
 include(":app")
- 
+include(":feature:pantry")
