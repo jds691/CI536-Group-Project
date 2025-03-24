@@ -44,6 +44,9 @@ dependencies {
     implementation(project(":feature:recipes"))
     implementation(project(":feature:meal-planner"))
 
+    api(libs.androidx.compose.material.iconsExtended)
+    api(libs.androidx.compose.material3.navigationSuite)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
