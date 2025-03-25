@@ -18,7 +18,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import com.example.pantryplan.feature.pantry.navigation.PantryRoute
+import com.example.pantryplan.feature.pantry.navigation.pantryScreen
 import com.example.pantryplan.navigation.TopLevelDestination
+import com.example.pantryplan.ui.rememberPantryPlanAppState
 import com.example.pantryplan.ui.theme.PantryPlanTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,13 +30,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val appState = rememberPantryPlanAppState()
+
             PantryPlanTheme {
                 PantryPlanNavigationSuiteScaffold {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        Greeting(
-                            name = "Android",
-                            modifier = Modifier.padding(innerPadding)
-                        )
+                        NavHost(
+                                navController = appState.navController,
+                                startDestination = PantryRoute,
+                                modifier = Modifier.padding(innerPadding)
+                        ) {
+                            pantryScreen()
+                        }
                     }
                 }
             }
