@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -33,21 +34,41 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun MealPlannerScreen(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.fillMaxSize()
+        verticalArrangement = Arrangement
+            .spacedBy(4.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
     ) {
-        TodaysMeals(
-            modifier = modifier.padding(horizontal = 16.dp)
+        TodaysMeals()
+
+        Macros()
+
+        NextThreeDays()
+
+        Tips()
+    }
+}
+
+@Composable
+internal fun Macros(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = "Macros",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
         )
 
-        NextThreeDays(
-            modifier = modifier.padding(horizontal = 16.dp)
-        )
+        // TODO: Add macros card here
     }
 }
 
@@ -67,7 +88,9 @@ internal fun TodaysMeals(modifier: Modifier = Modifier) {
 
         HorizontalUncontainedCarousel(
             state = carouselState,
-            modifier = Modifier.width(412.dp).height(221.dp),
+            modifier = Modifier
+                .width(412.dp)
+                .height(221.dp),
             itemWidth = 316.dp,
             itemSpacing = 8.dp,
             flingBehavior = CarouselDefaults.singleAdvanceFlingBehavior(carouselState)
@@ -170,6 +193,26 @@ internal fun NextThreeDays(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+internal fun Tips(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = "Tips",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Text(
+            text = "No tips currently available.",
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+    }
+}
+
 @Preview(
     group = "Today's Meals",
     showBackground = true
@@ -180,10 +223,28 @@ fun TodaysMealsPreview() {
 }
 
 @Preview(
+    group = "Macros",
+    showBackground = true
+)
+@Composable
+fun MacrosPreview() {
+    Macros()
+}
+
+@Preview(
     group = "Next Three Days",
     showBackground = true
 )
 @Composable
 fun NextThreeDaysPreview() {
     NextThreeDays()
+}
+
+@Preview(
+    group = "Tips",
+    showBackground = true
+)
+@Composable
+fun TipsPreview() {
+    Tips()
 }
