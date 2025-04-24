@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -34,9 +33,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.pantryplan.core.models.Allergen
+import com.example.pantryplan.core.models.NutritionInfo
+import com.example.pantryplan.core.models.Recipe
+import java.util.EnumSet
 
 @Composable
 fun MealPlannerScreen(modifier: Modifier = Modifier) {
@@ -74,8 +76,34 @@ internal fun Macros(modifier: Modifier = Modifier) {
 
 @Composable
 internal fun TodaysMeals(modifier: Modifier = Modifier) {
-    // TODO: Replace '3' with the amount of meals desired by the user
-    val carouselState = rememberCarouselState { 3 }
+    val meal = Recipe(
+        title = "Egg wif Hat",
+        description = "The immortal one.",
+        tags = listOf(),
+        allergens = EnumSet.of(Allergen.EGGS),
+        imageUrl = null,
+        instructions = listOf(),
+        ingredients = listOf(),
+        prepTime = 0.0f,
+        cookTime = 0.0f,
+        nutrition = NutritionInfo(
+            calories = 1_000_000,
+            fats = 0.0f,
+            saturatedFats = 0.0f,
+            carbohydrates = 0.0f,
+            sugar = 0.0f,
+            fiber = 0.0f,
+            protein = 0.0f,
+            sodium = 0.0f
+        )
+    )
+
+    // TODO: Create this list from the recommender system
+    val meals = listOf(
+        meal
+    )
+
+    val carouselState = rememberCarouselState { meals.size }
 
     Column(
         modifier = modifier
@@ -95,8 +123,8 @@ internal fun TodaysMeals(modifier: Modifier = Modifier) {
             itemSpacing = 8.dp,
             flingBehavior = CarouselDefaults.singleAdvanceFlingBehavior(carouselState)
         ) { mealIndex ->
-            // TODO: Pass a meal into here by it's index from the recommender
             CarouselMealCard(
+                meal = meals[mealIndex],
                 modifier = Modifier
                     .maskClip(MaterialTheme.shapes.extraLarge)
             )
@@ -105,35 +133,42 @@ internal fun TodaysMeals(modifier: Modifier = Modifier) {
 }
 
 @Composable
-internal fun CarouselMealCard(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
+internal fun CarouselMealCard(
+    meal: Recipe,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
     Box(
         modifier = modifier
             .clickable(onClick = onClick)
     ){
-        // TODO: Check if the provided meal has an image passed into it via if
-        Image(
-            painter = painterResource(R.drawable.default_food_thumbnail),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .width(316.dp)
-                .height(205.dp)
+        if (meal.imageUrl != null) {
+            // TODO: Show image async loaded (afaik not supported by Compose natively)
+        } else {
+            Image(
+                painter = painterResource(R.drawable.default_food_thumbnail),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .width(316.dp)
+                    .height(205.dp)
 
-                // Slight gradient overlay as shown in Figma
-                .drawWithContent {
-                    drawContent()
+                    // Slight gradient overlay as shown in Figma
+                    .drawWithContent {
+                        drawContent()
 
-                    drawRect(
-                        Brush.linearGradient(
-                            listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent),
+                        drawRect(
+                            Brush.linearGradient(
+                                listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent),
 
-                            // Rotates the gradient by 90 degrees
-                            start = Offset(0f, Float.POSITIVE_INFINITY),
-                            end = Offset(0f, 0f)
+                                // Rotates the gradient by 90 degrees
+                                start = Offset(0f, Float.POSITIVE_INFINITY),
+                                end = Offset(0f, 0f)
+                            )
                         )
-                    )
-                }
-        )
+                    }
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -142,12 +177,12 @@ internal fun CarouselMealCard(modifier: Modifier = Modifier, onClick: () -> Unit
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "Meal Name",
+                text = meal.title,
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White
             )
             Text(
-                text = "Meal Metadata",
+                text = "${meal.nutrition.calories} kcal",
                 style = MaterialTheme.typography.labelSmall,
                 color = Color.White
             )
@@ -183,6 +218,8 @@ internal fun NextThreeDays(modifier: Modifier = Modifier) {
             }
         }
 
+        // TODO: Show a list of cards that navigate to a specific meal then clicked
+
         when(selectedIndex) {
             0 -> Text("Unable to retrieve upcoming meals for today.")
             1 -> Text("Unable to retrieve upcoming meals for tomorrow.")
@@ -204,12 +241,9 @@ internal fun Tips(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.primary
         )
 
-        Text(
-            text = "No tips currently available.",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
+        Text("No tips currently available.")
+
+        // TODO: Show a list of cards that can navigate to various tips
     }
 }
 
