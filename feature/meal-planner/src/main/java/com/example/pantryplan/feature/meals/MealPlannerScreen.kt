@@ -146,7 +146,7 @@ internal fun CarouselMealCard(
             // TODO: Show image async loaded (afaik not supported by Compose natively)
         } else {
             Image(
-                painter = painterResource(R.drawable.default_food_thumbnail),
+                painter = painterResource(R.drawable.default_recipe_thumbnail),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
