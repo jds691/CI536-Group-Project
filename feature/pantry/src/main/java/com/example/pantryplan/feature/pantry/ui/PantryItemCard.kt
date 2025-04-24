@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,7 +41,7 @@ fun dateDiffInDays(date1Millis: Long, date2Millis: Long): Long {
 }
 
 @Composable
-fun PantryItemCard(item: PantryItem) {
+fun PantryItemCard(item: PantryItem, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
     fun createStatus(): Pair<String, Color> {
         val formatter = RelativeDateTimeFormatter.getInstance()
 
@@ -89,9 +90,14 @@ fun PantryItemCard(item: PantryItem) {
     val (status, statusColour) = createStatus()
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(80.dp),
+        colors = CardDefaults.elevatedCardColors(),
+        shape = CardDefaults.elevatedShape,
+        elevation = CardDefaults.elevatedCardElevation(),
+
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier.fillMaxHeight(),
