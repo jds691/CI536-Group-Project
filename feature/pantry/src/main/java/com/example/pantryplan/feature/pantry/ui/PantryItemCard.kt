@@ -60,7 +60,7 @@ fun PantryItemCard(item: PantryItem, modifier: Modifier = Modifier, onClick: () 
                         RelativeDateTimeFormatter.RelativeUnit.DAYS
                     )
                 }.",
-                if (days <= 2) Color.Yellow else Color.Green
+                if (days <= 2) Color(255, 102, 0) else Color.Green
             )
 
             PantryItemState.FROZEN -> Pair(
