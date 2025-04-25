@@ -2,9 +2,12 @@ package com.example.pantryplan.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -56,9 +59,16 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
                 val destination = appState.currentTopLevelDestination
                 if (destination != null) {
                     CenterAlignedTopAppBar(
-                        title = {
-                            Text(stringResource(destination.titleTextId))
-                        },
+                        title = { Text(stringResource(destination.titleTextId)) },
+                        actions = {
+                            IconButton(onClick = { /* TODO: Navigate to settings. */ }) {
+                                Icon(
+                                    imageVector = Icons.Default.AccountCircle,
+                                    // TODO: Replace with a string resource from settings feature.
+                                    contentDescription = "Settings"
+                                )
+                            }
+                        }
                     )
                 }
             },
