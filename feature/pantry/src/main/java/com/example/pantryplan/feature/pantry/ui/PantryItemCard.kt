@@ -41,6 +41,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.R
+import kotlinx.coroutines.delay
 import java.util.Date
 import java.util.UUID
 import kotlin.math.abs
@@ -124,6 +126,8 @@ fun PantryItemCard(
     onDelete: () -> Unit = {},
 ) {
     val (status, statusColour) = createStatus(item)
+
+    var refreshToggle by remember { mutableStateOf(false) }
 
     val showDeleteAlert = remember { mutableStateOf(false) }
     val isResetting = remember { mutableStateOf(false) }
@@ -224,6 +228,12 @@ fun PantryItemCard(
             showAlert = showDeleteAlert,
             onDelete = onDelete
         )
+    }
+
+    // Refreshes the UI every minute to have an accurate status number
+    LaunchedEffect(refreshToggle) {
+        delay(1_000 * 60) // 1 Minute
+        refreshToggle = !refreshToggle
     }
 
     LaunchedEffect(isResetting.value) {
