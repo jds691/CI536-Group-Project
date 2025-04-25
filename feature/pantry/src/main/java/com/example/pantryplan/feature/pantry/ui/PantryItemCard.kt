@@ -159,13 +159,11 @@ fun PantryItemCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.End,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
                 ) {
-                    Box {}
-
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete",
@@ -238,12 +236,18 @@ fun PantryItemCard(
 
     // If card is not at the start, but the card is fully in one direction e.g. SwipeToDismissBoxValue.EndToStart
     // Effectively checks if the card needs to be reset to the center
-    if (!isResetting.value && !showDeleteAlert.value && dismissState.currentValue != SwipeToDismissBoxValue.Settled && dismissState.progress == 1.0f) {
+    val swipeNeedsReset =
+        dismissState.currentValue != SwipeToDismissBoxValue.Settled && dismissState.progress == 1.0f
+
+    if (!isResetting.value && !showDeleteAlert.value && swipeNeedsReset) {
         isResetting.value = true
     }
 
     // If card has been fully slided to the end
-    if (!isResetting.value && !showDeleteAlert.value && dismissState.targetValue == SwipeToDismissBoxValue.EndToStart && dismissState.progress == 1.0f) {
+    val slideFinished =
+        dismissState.targetValue == SwipeToDismissBoxValue.EndToStart && dismissState.progress == 1.0f
+
+    if (!isResetting.value && !showDeleteAlert.value && slideFinished) {
         showDeleteAlert.value = true
     }
 }
