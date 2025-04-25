@@ -9,32 +9,38 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.pantryplan.R
 import com.example.pantryplan.feature.meals.navigation.MealPlannerRoute
 import com.example.pantryplan.feature.pantry.navigation.PantryRoute
 import com.example.pantryplan.feature.recipes.navigation.RecipesRoute
+import com.example.pantryplan.feature.meals.R as mealsR
+import com.example.pantryplan.feature.pantry.R as pantryR
+import com.example.pantryplan.feature.recipes.R as recipesR
 import kotlin.reflect.KClass
 
 enum class TopLevelDestination (
-    @StringRes val label: Int,
+    @StringRes val iconTextId: Int,
+    @StringRes val titleTextId: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
     val route: KClass<*>,
 ){
     PANTRY(
-        R.string.pantry,
+        pantryR.string.feature_pantry_title,
+        pantryR.string.feature_pantry_title,
         Icons.Filled.Place,
         Icons.Outlined.Place,
         PantryRoute::class
     ),
     RECIPES(
-        R.string.recipes,
+        recipesR.string.feature_recipes_title,
+        recipesR.string.feature_recipes_title,
         Icons.Rounded.Bookmark,
         Icons.Outlined.BookmarkBorder,
         RecipesRoute::class
     ),
     MEAL_PLANNER(
-        R.string.mealplan,
+        mealsR.string.feature_meals_icon,
+        mealsR.string.feature_meals_title,
         Icons.Filled.Notifications,
         Icons.Outlined.Notifications,
         MealPlannerRoute::class
