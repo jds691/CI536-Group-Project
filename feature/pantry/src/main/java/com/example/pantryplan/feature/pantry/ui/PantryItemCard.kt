@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 
 package com.example.pantryplan.feature.pantry.ui
 
@@ -12,24 +12,35 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -113,6 +124,9 @@ fun PantryItemCard(
     }
 
     val (status, statusColour) = createStatus()
+
+    val showDeleteAlert = remember { mutableStateOf(false) }
+    val isResetting = remember { mutableStateOf(false) }
 
     val dismissState = rememberSwipeToDismissBoxState()
     SwipeToDismissBox(
@@ -204,6 +218,52 @@ fun PantryItemCard(
                 }
             }
         }
+    }
+
+    if (showDeleteAlert.value) {
+        BasicAlertDialog(
+            onDismissRequest = {
+                showDeleteAlert.value = false
+            }
+        ) {
+            Surface(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .wrapContentHeight(),
+                shape = AlertDialogDefaults.shape,
+                tonalElevation = AlertDialogDefaults.TonalElevation,
+                color = AlertDialogDefaults.containerColor
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(text = "This area typically contains the supportive text " + "which presents the details regarding the Dialog's purpose.")
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    TextButton(onClick = {
+                        showDeleteAlert.value = false
+                        onDelete()
+                    }) { Text("Confirm") }
+
+                    TextButton(onClick = {
+                        showDeleteAlert.value = false
+                    }) { Text("Cancel") }
+                }
+            }
+        }
+    }
+
+    if (isResetting.value) {
+        LaunchedEffect(Unit) {
+            dismissState.reset()
+            isResetting.value = false
+        }
+    }
+
+    if (!isResetting.value && !showDeleteAlert.value && dismissState.currentValue != SwipeToDismissBoxValue.Settled && dismissState.progress == 1.0f) {
+        isResetting.value = true
+    }
+
+    if (!isResetting.value && !showDeleteAlert.value && dismissState.targetValue == SwipeToDismissBoxValue.EndToStart && dismissState.progress == 1.0f) {
+        showDeleteAlert.value = true
     }
 }
 
