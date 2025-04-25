@@ -39,6 +39,11 @@ class PantryPlanAppState (
         @Composable
         get() {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
+            /* Sometimes, switching between TopLevelDestinations causes the current back stack entry
+             * to briefly read 'null' before actually changing to the new destination.
+             * This causes the top bar to disappear for a few frames. To mitigate this, we fallback
+             * to the previous back stack entry whenever the current entry is null.
+             */
             navBackStackEntry?.let { return it.destination }
             return navController.previousBackStackEntry?.destination
         }
