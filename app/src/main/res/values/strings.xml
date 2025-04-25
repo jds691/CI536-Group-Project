@@ -1,6 +1,3 @@
 <resources>
     <string name="app_name">Pantry Plan</string>
-    <string name="pantry">Pantry</string>
-    <string name="recipes">Recipes</string>
-    <string name="mealplan">Meal Plan</string>
 </resources>

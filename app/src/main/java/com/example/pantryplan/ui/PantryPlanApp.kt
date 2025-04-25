@@ -43,9 +43,9 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
                     onClick = { appState.navigateToTopLevelDestination(topLevelDestination) },
                     icon = { Icon(
                         if (selected) topLevelDestination.selectedIcon else topLevelDestination.unselectedIcon,
-                        contentDescription = stringResource(topLevelDestination.label)
+                        contentDescription = stringResource(topLevelDestination.iconTextId)
                     )},
-                    label = { Text(stringResource(topLevelDestination.label)) },
+                    label = { Text(stringResource(topLevelDestination.iconTextId)) },
                 )
             }
         }
@@ -57,7 +57,7 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
                 if (destination != null) {
                     CenterAlignedTopAppBar(
                         title = {
-                            Text(stringResource(destination.label))
+                            Text(stringResource(destination.titleTextId))
                         },
                     )
                 }
