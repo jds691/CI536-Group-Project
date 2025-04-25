@@ -1,19 +1,35 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.example.pantryplan.feature.pantry.ui
 
 import android.icu.text.RelativeDateTimeFormatter
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Card
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,7 +57,14 @@ fun dateDiffInDays(date1Millis: Long, date2Millis: Long): Long {
 }
 
 @Composable
-fun PantryItemCard(item: PantryItem, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
+fun PantryItemCard(
+    item: PantryItem,
+    modifier: Modifier = Modifier,
+
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
+    onDelete: () -> Unit = {},
+) {
     fun createStatus(): Pair<String, Color> {
         val formatter = RelativeDateTimeFormatter.getInstance()
 
@@ -50,6 +73,8 @@ fun PantryItemCard(item: PantryItem, modifier: Modifier = Modifier, onClick: () 
         else
         // Days since the expiry has passed
             dateDiffInDays(item.expiryDate.time, Date().time)
+
+        // TODO: When Theme.kt is updated to support the extended colours, replace the status colour
 
         return when (item.state) {
             PantryItemState.SEALED, PantryItemState.OPENED -> Pair(
@@ -89,49 +114,96 @@ fun PantryItemCard(item: PantryItem, modifier: Modifier = Modifier, onClick: () 
 
     val (status, statusColour) = createStatus()
 
-    Card(
+    val dismissState = rememberSwipeToDismissBoxState()
+    SwipeToDismissBox(
+        state = dismissState,
+        enableDismissFromStartToEnd = false,
+        backgroundContent = {
+            val backgroundColour by animateColorAsState(
+                when (dismissState.targetValue) {
+                    SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.surface
+                    SwipeToDismissBoxValue.EndToStart -> Color.Red
+                    else -> Color.Unspecified
+                }
+            )
+
+            val iconColour by animateColorAsState(
+                when (dismissState.targetValue) {
+                    SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.surface
+                    SwipeToDismissBoxValue.EndToStart -> Color.White
+                    else -> Color.Unspecified
+                }
+            )
+
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = backgroundColour,
+                        shape = CardDefaults.elevatedShape
+                    )
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Box {}
+
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = iconColour
+                    )
+                }
+            }
+        },
         modifier = modifier
             .fillMaxWidth()
-            .height(80.dp),
-        colors = CardDefaults.elevatedCardColors(),
-        shape = CardDefaults.elevatedShape,
-        elevation = CardDefaults.elevatedCardElevation(),
-
-        onClick = onClick
+            .height(80.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxHeight(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
-            verticalAlignment = Alignment.CenterVertically,
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick
+                )
         ) {
-            if (item.imageUrl != null) {
-                //TODO: Place food item image in card when there is an active image passed in
-            } else {
-                Image(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1.0f),
-                    painter = painterResource(R.drawable.beefburger),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
-            }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
-                horizontalAlignment = Alignment.Start,
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = item.name,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = status,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = statusColour
-                )
+                if (item.imageUrl != null) {
+                    //TODO: Place food item image in card when there is an active image passed in
+                } else {
+                    Image(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .aspectRatio(1.0f),
+                        painter = painterResource(R.drawable.beefburger),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    Text(
+                        text = item.name,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = status,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = statusColour
+                    )
+                }
             }
         }
-
     }
 }
 
