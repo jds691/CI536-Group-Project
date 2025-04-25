@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +37,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,6 +67,53 @@ fun dateDiffInDays(date1Millis: Long, date2Millis: Long): Long {
     return hours / 24
 }
 
+fun createStatus(item: PantryItem): Pair<String, Color> {
+    val formatter = RelativeDateTimeFormatter.getInstance()
+
+    val days: Long = if (item.expiresAfter != null)
+        dateDiffInDays(item.expiryDate.time + item.expiresAfter!!, item.expiryDate.time)
+    else
+    // Days since the expiry has passed
+        dateDiffInDays(item.expiryDate.time, Date().time)
+
+    // TODO: When Theme.kt is updated to support the extended colours, replace the status colour
+
+    return when (item.state) {
+        PantryItemState.SEALED, PantryItemState.OPENED -> Pair(
+            "Expires ${
+                formatter.format(
+                    days.toDouble(),
+                    RelativeDateTimeFormatter.Direction.NEXT,
+                    RelativeDateTimeFormatter.RelativeUnit.DAYS
+                )
+            }.",
+            if (days <= 2) Color(255, 102, 0) else Color.Green
+        )
+
+        PantryItemState.FROZEN -> Pair(
+            if (days == 0L) "Frozen today." else "Frozen ${
+                formatter.format(
+                    abs(days.toDouble()),
+                    RelativeDateTimeFormatter.Direction.LAST,
+                    RelativeDateTimeFormatter.RelativeUnit.DAYS
+                )
+            }.",
+            Color.Cyan
+        )
+
+        PantryItemState.EXPIRED -> Pair(
+            if (days == 0L) "Expired today." else "Expired ${
+                formatter.format(
+                    abs(days.toDouble()),
+                    RelativeDateTimeFormatter.Direction.LAST,
+                    RelativeDateTimeFormatter.RelativeUnit.DAYS
+                )
+            }.",
+            Color.Red
+        )
+    }
+}
+
 @Composable
 fun PantryItemCard(
     item: PantryItem,
@@ -76,54 +123,7 @@ fun PantryItemCard(
     onLongClick: () -> Unit = {},
     onDelete: () -> Unit = {},
 ) {
-    fun createStatus(): Pair<String, Color> {
-        val formatter = RelativeDateTimeFormatter.getInstance()
-
-        val days: Long = if (item.expiresAfter != null)
-            dateDiffInDays(item.expiryDate.time + item.expiresAfter!!, item.expiryDate.time)
-        else
-        // Days since the expiry has passed
-            dateDiffInDays(item.expiryDate.time, Date().time)
-
-        // TODO: When Theme.kt is updated to support the extended colours, replace the status colour
-
-        return when (item.state) {
-            PantryItemState.SEALED, PantryItemState.OPENED -> Pair(
-                "Expires ${
-                    formatter.format(
-                        days.toDouble(),
-                        RelativeDateTimeFormatter.Direction.NEXT,
-                        RelativeDateTimeFormatter.RelativeUnit.DAYS
-                    )
-                }.",
-                if (days <= 2) Color(255, 102, 0) else Color.Green
-            )
-
-            PantryItemState.FROZEN -> Pair(
-                if (days == 0L) "Frozen today." else "Frozen ${
-                    formatter.format(
-                        abs(days.toDouble()),
-                        RelativeDateTimeFormatter.Direction.LAST,
-                        RelativeDateTimeFormatter.RelativeUnit.DAYS
-                    )
-                }.",
-                Color.Cyan
-            )
-
-            PantryItemState.EXPIRED -> Pair(
-                if (days == 0L) "Expired today." else "Expired ${
-                    formatter.format(
-                        abs(days.toDouble()),
-                        RelativeDateTimeFormatter.Direction.LAST,
-                        RelativeDateTimeFormatter.RelativeUnit.DAYS
-                    )
-                }.",
-                Color.Red
-            )
-        }
-    }
-
-    val (status, statusColour) = createStatus()
+    val (status, statusColour) = createStatus(item)
 
     val showDeleteAlert = remember { mutableStateOf(false) }
     val isResetting = remember { mutableStateOf(false) }
@@ -221,49 +221,94 @@ fun PantryItemCard(
     }
 
     if (showDeleteAlert.value) {
-        BasicAlertDialog(
-            onDismissRequest = {
-                showDeleteAlert.value = false
-            }
-        ) {
-            Surface(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight(),
-                shape = AlertDialogDefaults.shape,
-                tonalElevation = AlertDialogDefaults.TonalElevation,
-                color = AlertDialogDefaults.containerColor
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "This area typically contains the supportive text " + "which presents the details regarding the Dialog's purpose.")
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    TextButton(onClick = {
-                        showDeleteAlert.value = false
-                        onDelete()
-                    }) { Text("Confirm") }
-
-                    TextButton(onClick = {
-                        showDeleteAlert.value = false
-                    }) { Text("Cancel") }
-                }
-            }
-        }
+        DeleteAlertDialog(
+            item = item,
+            showAlert = showDeleteAlert,
+            onDelete = onDelete
+        )
     }
 
-    if (isResetting.value) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect(isResetting.value) {
+        if (isResetting.value) {
+            // Reset is supposed to be called in a LaunchedEffect
             dismissState.reset()
             isResetting.value = false
         }
     }
 
+    // If card is not at the start, but the card is fully in one direction e.g. SwipeToDismissBoxValue.EndToStart
+    // Effectively checks if the card needs to be reset to the center
     if (!isResetting.value && !showDeleteAlert.value && dismissState.currentValue != SwipeToDismissBoxValue.Settled && dismissState.progress == 1.0f) {
         isResetting.value = true
     }
 
+    // If card has been fully slided to the end
     if (!isResetting.value && !showDeleteAlert.value && dismissState.targetValue == SwipeToDismissBoxValue.EndToStart && dismissState.progress == 1.0f) {
         showDeleteAlert.value = true
+    }
+}
+
+@Composable
+internal fun DeleteAlertDialog(
+    item: PantryItem,
+    showAlert: MutableState<Boolean>,
+    onDelete: () -> Unit
+) {
+    BasicAlertDialog(
+        onDismissRequest = {
+            showAlert.value = false
+        }
+    ) {
+        Surface(
+            modifier = Modifier
+                .wrapContentWidth()
+                .wrapContentHeight(),
+            shape = AlertDialogDefaults.shape,
+            tonalElevation = AlertDialogDefaults.TonalElevation,
+            color = AlertDialogDefaults.containerColor
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement
+                    .spacedBy(
+                        space = 16.dp,
+                        alignment = Alignment.CenterVertically
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "",
+                    tint = AlertDialogDefaults.iconContentColor
+                )
+
+                Text(
+                    text = "Delete '${item.name}'?",
+                    color = AlertDialogDefaults.titleContentColor,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    text = "This item cannot be restored. Are you sure you want to delete it?",
+                    color = AlertDialogDefaults.textContentColor,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = {
+                        showAlert.value = false
+                    }) { Text("Cancel") }
+
+                    TextButton(onClick = {
+                        showAlert.value = false
+                        onDelete()
+                    }) { Text("Delete") }
+                }
+            }
+        }
     }
 }
 
