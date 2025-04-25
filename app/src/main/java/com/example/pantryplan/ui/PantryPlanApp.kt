@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -58,7 +59,20 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
             topBar = {
                 val destination = appState.currentTopLevelDestination
                 if (destination != null) {
+                    val shouldShowSearchButton = destination != TopLevelDestination.MEAL_PLANNER
+
                     CenterAlignedTopAppBar(
+                        navigationIcon = {
+                            if (shouldShowSearchButton) {
+                                IconButton(onClick = { /* TODO: Navigate to search. */ }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Search,
+                                        // TODO: Replace with a string resource from settings feature.
+                                        contentDescription = "Search"
+                                    )
+                                }
+                            }
+                        },
                         title = { Text(stringResource(destination.titleTextId)) },
                         actions = {
                             IconButton(onClick = { /* TODO: Navigate to settings. */ }) {
