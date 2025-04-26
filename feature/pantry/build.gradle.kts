@@ -37,7 +37,7 @@ android {
 
 dependencies {
     implementation(project(":core:models"))
-    implementation(project(":core:designsystem"))
+    implementation(project(":core:design-system"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
