@@ -18,7 +18,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ContentUnavailable(icon: ImageVector, title: String, description: String) {
+fun ContentUnavailable(
+    modifier: Modifier = Modifier,
+    icon: ImageVector = Icons.Default.Search,
+    title: String = "Content Unavailable",
+    description: String = "No content was available for your search."
+) {
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -48,9 +53,5 @@ fun ContentUnavailable(icon: ImageVector, title: String, description: String) {
 @Preview(widthDp = 196)
 @Composable
 fun ContentUnavailablePreview() {
-    ContentUnavailable(
-        Icons.Default.Search,
-        "Content Unavailable",
-        "No content was available for your search."
-    )
+    ContentUnavailable()
 }
