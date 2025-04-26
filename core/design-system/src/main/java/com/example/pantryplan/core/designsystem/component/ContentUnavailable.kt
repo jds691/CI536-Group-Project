@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
+@Preview(widthDp = 196, showBackground = true)
 @Composable
 fun ContentUnavailable(
     modifier: Modifier = Modifier,
@@ -48,10 +49,4 @@ fun ContentUnavailable(
             color = MaterialTheme.colorScheme.onSurface,
         )
     }
-}
-
-@Preview(widthDp = 196)
-@Composable
-fun ContentUnavailablePreview() {
-    ContentUnavailable()
 }
