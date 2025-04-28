@@ -100,6 +100,8 @@ internal fun TodaysMeals(modifier: Modifier = Modifier) {
 
     // TODO: Create this list from the recommender system
     val meals = listOf(
+        meal,
+        meal,
         meal
     )
 
@@ -117,7 +119,6 @@ internal fun TodaysMeals(modifier: Modifier = Modifier) {
         HorizontalUncontainedCarousel(
             state = carouselState,
             modifier = Modifier
-                .width(412.dp)
                 .height(221.dp),
             itemWidth = 316.dp,
             itemSpacing = 8.dp,
