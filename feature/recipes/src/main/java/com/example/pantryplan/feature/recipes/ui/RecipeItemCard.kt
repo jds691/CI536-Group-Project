@@ -47,8 +47,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.capitalize
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -60,6 +58,15 @@ import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.R
 import java.util.EnumSet
 
+fun cleanUpAllergenText(allergenName : String) : String
+{
+    var newAllergenName = allergenName.replace("_", " ")
+    newAllergenName = newAllergenName.lowercase()
+    newAllergenName = newAllergenName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+    return newAllergenName
+}
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecipeItemCard(
     item: Recipe,
@@ -70,17 +77,31 @@ fun RecipeItemCard(
     onDelete: () -> Unit = {},
 ) {
     val allergenText = buildAnnotatedString {
+        var allergenLimitCounter = 0
+        var allergenOverflowCounter = 0
+
         for (allergen in item.allergens) {
-            if (allergen.toString() == "MILK") {
-                pushStyle(SpanStyle(color = Color.Red))
-                append(allergen.toString())
-                pop()
-            } else {
-                append(allergen.toString())
+            if (allergenLimitCounter >= 4) { allergenOverflowCounter++ }
+            else {
+                var curAllergen = allergen.toString()
+                //TODO Will have users allergies checked against
+                if (curAllergen == "GLUTEN") {
+                    pushStyle(SpanStyle(color = Color.Red))
+                    curAllergen = cleanUpAllergenText(curAllergen)
+                    if (allergen == item.allergens.last()) { append(curAllergen) }
+                    else { append("$curAllergen, ") }
+                    pop()
+                } else {
+                    curAllergen = cleanUpAllergenText(curAllergen)
+                    if (allergen == item.allergens.last()) { append(curAllergen) }
+                    else { append("$curAllergen, ") }
+                }
+                allergenLimitCounter++
             }
+
         }
+        if (allergenOverflowCounter > 0) { append(" + $allergenOverflowCounter")}
     }
-    allergenText.capitalize()
 
     var refreshToggle by remember { mutableStateOf(false) }
 
@@ -302,15 +323,17 @@ class SampleRecipeItemProvider : PreviewParameterProvider<Recipe>{
             prepTime = 10f,
             cookTime = 15f,
             nutrition = NutritionInfo(
-                calories = TODO(),
-                fats = TODO(),
-                saturatedFats = TODO(),
-                carbohydrates = TODO(),
-                sugar = TODO(),
-                fiber = TODO(),
-                protein = TODO(),
-                sodium = TODO()
-            ),
+                calories = 100,
+                fats = 100f,
+                saturatedFats = 100f,
+                carbohydrates = 100f,
+                sugar = 100f,
+                fiber = 100f,
+                protein = 100f,
+                sodium = 100f
+            )
         )
+
     )
+
 }
