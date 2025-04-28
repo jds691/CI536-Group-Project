@@ -50,15 +50,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import com.example.pantryplan.core.models.Allergen
 import kotlinx.coroutines.delay
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.R
 import java.util.Date
+import java.util.EnumSet
 import java.util.UUID
 import kotlin.math.abs
 
 @Composable
 fun RecipeItemCard(
+    recipe: RecipeItem,
     modifier: Modifier = Modifier,
 
     onClick: () -> Unit = {},
@@ -267,7 +270,23 @@ internal fun DeleteAlertDialog(
 
 @Preview
 @Composable
-fun RecipeItemCardPreview() {
+fun RecipeItemCardPreview(@PreviewParameter) {
     RecipeItemCard()
 }
 
+class SampleRecipeItemProvider : PreviewParameterProvider<Recipe>{
+    override val values: Sequence<Recipe> = sequenceOf(
+        Recipe(
+            title = "Cheeseburger",
+            description = "Burger packed with juicy beef, melted cheese and extra vegetables to add that final flavour.",
+            tags = listOf("Dinner", "High Protein"),
+            allergens = EnumSet.of(Allergen.MILK, Allergen.GLUTEN, Allergen.SESAME),
+            imageUrl = TODO(),
+            instructions = TODO(),
+            ingredients = TODO(),
+            prepTime = TODO(),
+            cookTime = TODO(),
+            nutrition = TODO(),
+        )
+    )
+}
