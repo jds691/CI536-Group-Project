@@ -2,6 +2,11 @@
 
 package com.example.pantryplan.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -14,48 +19,74 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
-import com.example.pantryplan.feature.pantry.navigation.PantryRoute
-import com.example.pantryplan.feature.pantry.navigation.pantryScreen
+import com.example.pantryplan.feature.meals.navigation.mealPlannerScreen
+import com.example.pantryplan.feature.pantry.R
+import com.example.pantryplan.feature.pantry.navigation.Pantry
+import com.example.pantryplan.feature.pantry.navigation.navigateToPantryItem
+import com.example.pantryplan.feature.pantry.navigation.pantrySection
 import com.example.pantryplan.feature.recipes.navigation.recipesScreen
 import com.example.pantryplan.navigation.TopLevelDestination
 import com.example.pantryplan.ui.theme.PantryPlanTheme
-import com.example.pantryplan.feature.meals.navigation.mealPlannerScreen
 
 @Composable
 fun PantryPlanApp(appState: PantryPlanAppState) {
     val currentDestination = appState.currentDestination
+    val destination = appState.currentTopLevelDestination
+    val navSuiteScaffoldState = rememberNavigationSuiteScaffoldState()
+    val lastTitleId = remember { mutableIntStateOf(R.string.feature_pantry_title) }
+
+    LaunchedEffect(destination) {
+        if (destination == null) {
+            navSuiteScaffoldState.hide()
+        } else {
+            lastTitleId.intValue = destination.titleTextId
+            navSuiteScaffoldState.show()
+        }
+    }
 
     NavigationSuiteScaffold(
+        state = navSuiteScaffoldState,
         navigationSuiteItems = {
-            TopLevelDestination.entries.forEach { topLevelDestination ->
-                val selected = currentDestination?.hierarchy?.any {
-                    it.hasRoute(topLevelDestination.route)
-                } == true
+            if (destination != null) {
+                TopLevelDestination.entries.forEach { topLevelDestination ->
+                    val selected = currentDestination?.hierarchy?.any {
+                        it.hasRoute(topLevelDestination.route)
+                    } == true
 
-                item(
-                    selected = selected,
-                    onClick = { appState.navigateToTopLevelDestination(topLevelDestination) },
-                    icon = { Icon(
-                        if (selected) topLevelDestination.selectedIcon else topLevelDestination.unselectedIcon,
-                        contentDescription = stringResource(topLevelDestination.iconTextId)
-                    )},
-                    label = { Text(stringResource(topLevelDestination.iconTextId)) },
-                )
+                    item(
+                        selected = selected,
+                        onClick = { appState.navigateToTopLevelDestination(topLevelDestination) },
+                        icon = {
+                            Icon(
+                                if (selected) topLevelDestination.selectedIcon else topLevelDestination.unselectedIcon,
+                                contentDescription = stringResource(topLevelDestination.iconTextId)
+                            )
+                        },
+                        label = { Text(stringResource(topLevelDestination.iconTextId)) },
+                    )
+                }
             }
         }
     ) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
-                val destination = appState.currentTopLevelDestination
-                if (destination != null) {
+                AnimatedVisibility(
+                    visible = destination != null,
+                    enter = fadeIn() + slideInVertically(),
+                    exit = fadeOut() + slideOutVertically()
+                ) {
                     val shouldShowSearchButton = destination != TopLevelDestination.MEAL_PLANNER
 
                     CenterAlignedTopAppBar(
@@ -70,7 +101,7 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
                                 }
                             }
                         },
-                        title = { Text(stringResource(destination.titleTextId)) },
+                        title = { Text(stringResource(lastTitleId.intValue)) },
                         actions = {
                             IconButton(onClick = { /* TODO: Navigate to settings. */ }) {
                                 Icon(
@@ -86,10 +117,13 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
         ) { innerPadding ->
             NavHost(
                 navController = appState.navController,
-                startDestination = PantryRoute,
+                startDestination = Pantry,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                pantryScreen()
+                pantrySection(
+                    onPantryItemClick = appState.navController::navigateToPantryItem,
+                    onBackClick = appState.navController::popBackStack
+                )
                 recipesScreen()
                 mealPlannerScreen()
             }
