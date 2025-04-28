@@ -1,7 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 package com.example.pantryplan.feature.recipes.ui
 
-import android.icu.text.RelativeDateTimeFormatter
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -46,28 +45,42 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.models.Allergen
+import com.example.pantryplan.core.models.NutritionInfo
 import kotlinx.coroutines.delay
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.R
-import java.util.Date
 import java.util.EnumSet
-import java.util.UUID
-import kotlin.math.abs
 
 @Composable
 fun RecipeItemCard(
-    recipe: RecipeItem,
+    item: Recipe,
     modifier: Modifier = Modifier,
 
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     onDelete: () -> Unit = {},
 ) {
+    val allergenText = buildAnnotatedString {
+        for (allergen in item.allergens) {
+            if (allergen.toString() == "MILK") {
+                pushStyle(SpanStyle(color = Color.Red))
+                append(allergen.toString())
+                pop()
+            } else {
+                append(allergen.toString())
+            }
+        }
+    }
+    allergenText.capitalize()
 
     var refreshToggle by remember { mutableStateOf(false) }
 
@@ -134,7 +147,7 @@ fun RecipeItemCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (false) {
+                if (1f == item.prepTime) {
                     //TODO: Place recipe item image in card when there is an active image passed in
                 } else {
                     Image(
@@ -150,12 +163,14 @@ fun RecipeItemCard(
                     verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
                     horizontalAlignment = Alignment.Start,
                 ) {
+
+
                     Text(
-                        text = "Cheeseburger",
+                        text = item.title,
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "Allergens: Burger",
+                        text = allergenText,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -165,7 +180,7 @@ fun RecipeItemCard(
 
     if (showDeleteAlert.value) {
         DeleteAlertDialog(
-            //item = item,
+            item = item,
             showAlert = showDeleteAlert,
             onDelete = onDelete
         )
@@ -205,7 +220,7 @@ fun RecipeItemCard(
 
 @Composable
 internal fun DeleteAlertDialog(
-    //item: PantryItem
+    item: Recipe,
     showAlert: MutableState<Boolean>,
     onDelete: () -> Unit
 ) {
@@ -237,11 +252,11 @@ internal fun DeleteAlertDialog(
                     tint = AlertDialogDefaults.iconContentColor
                 )
 
-                /*Text(
-                    text = "Delete '${item.name}'?",
+                Text(
+                    text = "Delete '${item.title}'?",
                     color = AlertDialogDefaults.titleContentColor,
                     style = MaterialTheme.typography.headlineSmall
-                )*/
+                )
                 Text(
                     text = "This item cannot be restored. Are you sure you want to delete it?",
                     color = AlertDialogDefaults.textContentColor,
@@ -270,8 +285,8 @@ internal fun DeleteAlertDialog(
 
 @Preview
 @Composable
-fun RecipeItemCardPreview(@PreviewParameter) {
-    RecipeItemCard()
+fun RecipeItemCardPreviews(@PreviewParameter(SampleRecipeItemProvider::class) recipeItem: Recipe) {
+    RecipeItemCard(item = recipeItem)
 }
 
 class SampleRecipeItemProvider : PreviewParameterProvider<Recipe>{
@@ -281,12 +296,21 @@ class SampleRecipeItemProvider : PreviewParameterProvider<Recipe>{
             description = "Burger packed with juicy beef, melted cheese and extra vegetables to add that final flavour.",
             tags = listOf("Dinner", "High Protein"),
             allergens = EnumSet.of(Allergen.MILK, Allergen.GLUTEN, Allergen.SESAME),
-            imageUrl = TODO(),
-            instructions = TODO(),
-            ingredients = TODO(),
-            prepTime = TODO(),
-            cookTime = TODO(),
-            nutrition = TODO(),
+            imageUrl = null,
+            instructions = listOf("1. Cook Burger", "2. Eat burger"),
+            ingredients = listOf("Beef Burger", "Burger Buns", "American Cheese", "Lettuce", "Red Onion", "Bacon"),
+            prepTime = 10f,
+            cookTime = 15f,
+            nutrition = NutritionInfo(
+                calories = TODO(),
+                fats = TODO(),
+                saturatedFats = TODO(),
+                carbohydrates = TODO(),
+                sugar = TODO(),
+                fiber = TODO(),
+                protein = TODO(),
+                sodium = TODO()
+            ),
         )
     )
 }
