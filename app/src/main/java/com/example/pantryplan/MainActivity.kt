@@ -7,7 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import com.example.pantryplan.ui.PantryPlanApp
 import com.example.pantryplan.ui.rememberPantryPlanAppState
 import com.example.pantryplan.ui.theme.PantryPlanTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
