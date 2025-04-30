@@ -39,7 +39,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,7 +52,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.NutritionInfo
-import kotlinx.coroutines.delay
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.R
 import java.util.EnumSet
@@ -66,7 +64,6 @@ fun cleanUpAllergenText(allergenName : String) : String
     return newAllergenName
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecipeItemCard(
     item: Recipe,
@@ -80,13 +77,15 @@ fun RecipeItemCard(
         var allergenLimitCounter = 0
         var allergenOverflowCounter = 0
 
+        append("Allergens: ")
+
         for (allergen in item.allergens) {
-            if (allergenLimitCounter >= 4) { allergenOverflowCounter++ }
+            if (allergenLimitCounter >= 3) { allergenOverflowCounter++ }
             else {
                 var curAllergen = allergen.toString()
                 //TODO Will have users allergies checked against
                 if (curAllergen == "GLUTEN") {
-                    pushStyle(SpanStyle(color = Color.Red))
+                    pushStyle(SpanStyle(color = MaterialTheme.colorScheme.error))
                     curAllergen = cleanUpAllergenText(curAllergen)
                     if (allergen == item.allergens.last()) { append(curAllergen) }
                     else { append("$curAllergen, ") }
@@ -102,8 +101,6 @@ fun RecipeItemCard(
         }
         if (allergenOverflowCounter > 0) { append(" + $allergenOverflowCounter")}
     }
-
-    var refreshToggle by remember { mutableStateOf(false) }
 
     val showDeleteAlert = remember { mutableStateOf(false) }
     val isResetting = remember { mutableStateOf(false) }
@@ -205,12 +202,6 @@ fun RecipeItemCard(
             showAlert = showDeleteAlert,
             onDelete = onDelete
         )
-    }
-
-    // Refreshes the UI every minute to have an accurate status number
-    LaunchedEffect(refreshToggle) {
-        delay(1_000 * 60) // 1 Minute
-        refreshToggle = !refreshToggle
     }
 
     LaunchedEffect(isResetting.value) {
