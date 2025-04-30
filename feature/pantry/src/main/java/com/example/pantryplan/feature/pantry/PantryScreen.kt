@@ -9,10 +9,12 @@ import com.example.pantryplan.core.designsystem.component.ContentUnavailable
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Preview(widthDp = 400)
 @Composable
@@ -23,7 +25,9 @@ fun PantryScreen(
 
     if (uiState.value.pantryItems.isEmpty()) {
         Box(
-            modifier = Modifier.fillMaxSize().padding(16.dp, 0.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = dimensionResource(designSystemR.dimen.horizontal_margin)),
             contentAlignment = Alignment.Center
         ) { PantryContentUnavailable() }
     }
@@ -33,8 +37,7 @@ fun PantryScreen(
 internal fun PantryContentUnavailable() {
     ContentUnavailable(
         icon = Icons.AutoMirrored.Filled.List,
-        // TODO: Replace with translation strings.
-        title = "No Items",
-        description = "Your pantry is empty. Add some items to get started."
+        title = stringResource(R.string.feature_pantry_empty_error),
+        description = stringResource(R.string.feature_pantry_empty_description)
     )
 }
