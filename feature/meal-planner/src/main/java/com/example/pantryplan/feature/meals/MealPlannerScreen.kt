@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
+import com.example.pantryplan.feature.meals.ui.MacrosCard
 import java.util.EnumSet
 
 @Composable
@@ -70,7 +71,18 @@ internal fun Macros(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.primary
         )
 
-        // TODO: Add macros card here
+        MacrosCard(
+            item = NutritionInfo(
+                calories = 500,
+                fats = 13.35f,
+                saturatedFats = 22f,
+                carbohydrates = 65f,
+                sugar = 12f,
+                fiber = 34f,
+                protein = 30f,
+                sodium = 12f
+            )
+        )
     }
 }
 
