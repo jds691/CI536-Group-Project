@@ -7,6 +7,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import com.example.pantryplan.core.designsystem.component.ContentUnavailable
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -16,7 +18,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
-@Preview(widthDp = 400)
 @Composable
 fun PantryScreen(
     viewModel: PantryViewModel = hiltViewModel()
@@ -24,20 +25,32 @@ fun PantryScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     if (uiState.value.pantryItems.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = dimensionResource(designSystemR.dimen.horizontal_margin)),
-            contentAlignment = Alignment.Center
-        ) { PantryContentUnavailable() }
+        PantryContentUnavailable()
     }
 }
 
 @Composable
 internal fun PantryContentUnavailable() {
-    ContentUnavailable(
-        icon = Icons.AutoMirrored.Filled.List,
-        title = stringResource(R.string.feature_pantry_empty_error),
-        description = stringResource(R.string.feature_pantry_empty_description)
-    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = dimensionResource(designSystemR.dimen.horizontal_margin)),
+        contentAlignment = Alignment.Center
+    ) {
+        ContentUnavailable(
+            icon = Icons.AutoMirrored.Filled.List,
+            title = stringResource(R.string.feature_pantry_empty_error),
+            description = stringResource(R.string.feature_pantry_empty_description)
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PantryEmptyPreview() {
+    MaterialTheme {
+        Surface {
+            PantryContentUnavailable()
+        }
+    }
 }
