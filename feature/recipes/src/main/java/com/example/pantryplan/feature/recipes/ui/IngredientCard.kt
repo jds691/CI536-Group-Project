@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+
 package com.example.pantryplan.feature.recipes.ui
 
 import androidx.compose.animation.animateColorAsState
@@ -44,63 +45,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import com.example.pantryplan.core.models.Allergen
-import com.example.pantryplan.core.models.NutritionInfo
-import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.R
-import java.util.EnumSet
-
-fun cleanUpAllergenText(allergenName : String) : String
-{
-    var newAllergenName = allergenName.replace("_", " ")
-    newAllergenName = newAllergenName.lowercase()
-    newAllergenName = newAllergenName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-    return newAllergenName
-}
 
 @Composable
-fun RecipeItemCard(
-    item: Recipe,
+fun IngredientCard(
     modifier: Modifier = Modifier,
 
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     onDelete: () -> Unit = {},
 ) {
-    val allergenText = buildAnnotatedString {
-        var allergenLimitCounter = 0
-        var allergenOverflowCounter = 0
-
-        append("Allergens: ")
-
-        for (allergen in item.allergens) {
-            if (allergenLimitCounter >= 3) { allergenOverflowCounter++ }
-            else {
-                var curAllergen = allergen.toString()
-                //TODO Will have users allergies checked against
-                if (curAllergen == "GLUTEN") {
-                    pushStyle(SpanStyle(color = MaterialTheme.colorScheme.error))
-                    curAllergen = cleanUpAllergenText(curAllergen)
-                    if (allergen == item.allergens.last()) { append(curAllergen) }
-                    else { append("$curAllergen, ") }
-                    pop()
-                } else {
-                    curAllergen = cleanUpAllergenText(curAllergen)
-                    if (allergen == item.allergens.last()) { append(curAllergen) }
-                    else { append("$curAllergen, ") }
-                }
-                allergenLimitCounter++
-            }
-
-        }
-        if (allergenOverflowCounter > 0) { append(" + $allergenOverflowCounter")}
-    }
+    //TODO Get name and gram amount specified when created
+    val ingredientName = "American Cheese"
+    val gramAmount = 20
 
     val showDeleteAlert = remember { mutableStateOf(false) }
     val isResetting = remember { mutableStateOf(false) }
@@ -151,7 +110,7 @@ fun RecipeItemCard(
         },
         modifier = modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(72.dp)
     ) {
         ElevatedCard(
             modifier = Modifier
@@ -165,18 +124,18 @@ fun RecipeItemCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (item.imageUrl != null) {
-                    //TODO: Place recipe item image in card when there is an active image passed in
-                } else {
-                    Image(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .aspectRatio(1.0f),
-                        painter = painterResource(R.drawable.cheeseburger),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                //if (null == false) {
+                //TODO: Place recipe item image in card when there is an active image passed in
+                //} else {
+                Image(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .aspectRatio(1.0f),
+                    painter = painterResource(R.drawable.americancheese),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+                //}
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
                     horizontalAlignment = Alignment.Start,
@@ -184,11 +143,11 @@ fun RecipeItemCard(
 
 
                     Text(
-                        text = item.title,
+                        text = ingredientName,
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = allergenText,
+                        text = "Uses: " + gramAmount + "g",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -198,7 +157,7 @@ fun RecipeItemCard(
 
     if (showDeleteAlert.value) {
         DeleteAlertDialog(
-            item = item,
+            itemName = ingredientName,
             showAlert = showDeleteAlert,
             onDelete = onDelete
         )
@@ -232,7 +191,7 @@ fun RecipeItemCard(
 
 @Composable
 internal fun DeleteAlertDialog(
-    item: Recipe,
+    itemName: String,
     showAlert: MutableState<Boolean>,
     onDelete: () -> Unit
 ) {
@@ -265,7 +224,7 @@ internal fun DeleteAlertDialog(
                 )
 
                 Text(
-                    text = "Delete '${item.title}'?",
+                    text = "Delete '${itemName}'?",
                     color = AlertDialogDefaults.titleContentColor,
                     style = MaterialTheme.typography.headlineSmall
                 )
@@ -297,34 +256,6 @@ internal fun DeleteAlertDialog(
 
 @Preview
 @Composable
-fun RecipeItemCardPreviews(@PreviewParameter(SampleRecipeItemProvider::class) recipeItem: Recipe) {
-    RecipeItemCard(item = recipeItem)
-}
-
-class SampleRecipeItemProvider : PreviewParameterProvider<Recipe>{
-    override val values: Sequence<Recipe> = sequenceOf(
-        Recipe(
-            title = "Cheeseburger",
-            description = "Burger packed with juicy beef, melted cheese and extra vegetables to add that final flavour.",
-            tags = listOf("Dinner", "High Protein"),
-            allergens = EnumSet.of(Allergen.MILK, Allergen.GLUTEN, Allergen.SESAME),
-            imageUrl = null,
-            instructions = listOf("1. Cook Burger", "2. Eat burger"),
-            ingredients = listOf("Beef Burger", "Burger Buns", "American Cheese", "Lettuce", "Red Onion", "Bacon"),
-            prepTime = 10f,
-            cookTime = 15f,
-            nutrition = NutritionInfo(
-                calories = 100,
-                fats = 100f,
-                saturatedFats = 100f,
-                carbohydrates = 100f,
-                sugar = 100f,
-                fiber = 100f,
-                protein = 100f,
-                sodium = 100f
-            )
-        )
-
-    )
-
+fun IngredientCardPreview() {
+    IngredientCard()
 }
