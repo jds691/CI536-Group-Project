@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import com.example.pantryplan.core.designsystem.component.ContentUnavailable
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,7 +50,7 @@ internal fun PantryFABs() {
             onClick = { /* TODO: Navigate to barcode scanning. */ }
         ) {
             Icon(
-                imageVector = Icons.Outlined.Videocam,
+                painter = painterResource(R.drawable.ic_barcode_scanner),
                 contentDescription = stringResource(R.string.feature_pantry_scan_barcode)
             )
         }
