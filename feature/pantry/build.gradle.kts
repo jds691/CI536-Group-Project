@@ -43,6 +43,8 @@ dependencies {
     implementation(project(":core:models"))
     implementation(project(":core:design-system"))
 
+    api(libs.androidx.compose.material.iconsExtended)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
