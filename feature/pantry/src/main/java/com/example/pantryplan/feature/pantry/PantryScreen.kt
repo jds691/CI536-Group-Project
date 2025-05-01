@@ -9,7 +9,8 @@ import java.util.UUID
 
 @Composable
 fun PantryScreen(
-    onClickPantryItem: (UUID) -> Unit
+    onClickPantryItem: (UUID) -> Unit,
+    onCreatePantryItem: () -> Unit
 ) {
     val pantryItem = PantryItem(
         id = UUID.randomUUID(),

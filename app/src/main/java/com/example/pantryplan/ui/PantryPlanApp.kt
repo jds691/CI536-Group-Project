@@ -2,11 +2,8 @@
 
 package com.example.pantryplan.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,12 +15,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,9 +28,9 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import com.example.pantryplan.feature.meals.navigation.mealPlannerScreen
-import com.example.pantryplan.feature.pantry.R
 import com.example.pantryplan.feature.pantry.navigation.Pantry
 import com.example.pantryplan.feature.pantry.navigation.navigateToPantryItem
+import com.example.pantryplan.feature.pantry.navigation.navigateToPantryItemEdit
 import com.example.pantryplan.feature.pantry.navigation.pantrySection
 import com.example.pantryplan.feature.recipes.navigation.recipesScreen
 import com.example.pantryplan.navigation.TopLevelDestination
@@ -44,19 +41,19 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
     val currentDestination = appState.currentDestination
     val destination = appState.currentTopLevelDestination
     val navSuiteScaffoldState = rememberNavigationSuiteScaffoldState()
-    val lastTitleId = remember { mutableIntStateOf(R.string.feature_pantry_title) }
 
-    LaunchedEffect(destination) {
+    val adaptiveInfo = currentWindowAdaptiveInfo()
+    val customNavSuiteType = with(adaptiveInfo) {
         if (destination == null) {
-            navSuiteScaffoldState.hide()
+            NavigationSuiteType.None
         } else {
-            lastTitleId.intValue = destination.titleTextId
-            navSuiteScaffoldState.show()
+            NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
         }
     }
 
     NavigationSuiteScaffold(
         state = navSuiteScaffoldState,
+        layoutType = customNavSuiteType,
         navigationSuiteItems = {
             if (destination != null) {
                 TopLevelDestination.entries.forEach { topLevelDestination ->
@@ -80,13 +77,10 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
         }
     ) {
         Scaffold(
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             modifier = Modifier.fillMaxSize(),
             topBar = {
-                AnimatedVisibility(
-                    visible = destination != null,
-                    enter = fadeIn() + slideInVertically(),
-                    exit = fadeOut() + slideOutVertically()
-                ) {
+                if (destination != null) {
                     val shouldShowSearchButton = destination != TopLevelDestination.MEAL_PLANNER
 
                     CenterAlignedTopAppBar(
@@ -101,7 +95,7 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
                                 }
                             }
                         },
-                        title = { Text(stringResource(lastTitleId.intValue)) },
+                        title = { Text(stringResource(destination.titleTextId)) },
                         actions = {
                             IconButton(onClick = { /* TODO: Navigate to settings. */ }) {
                                 Icon(
@@ -118,11 +112,14 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
             NavHost(
                 navController = appState.navController,
                 startDestination = Pantry,
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier
+                    .consumeWindowInsets(innerPadding)
+                    .padding(innerPadding)
             ) {
                 pantrySection(
                     onPantryItemClick = appState.navController::navigateToPantryItem,
-                    onBackClick = appState.navController::popBackStack
+                    onBackClick = appState.navController::popBackStack,
+                    onPantryItemEdit = appState.navController::navigateToPantryItemEdit
                 )
                 recipesScreen()
                 mealPlannerScreen()
