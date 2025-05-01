@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -12,36 +13,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.component.ContentUnavailable
-import com.example.pantryplan.core.models.PantryItem
-import com.example.pantryplan.core.models.PantryItemState
-import com.example.pantryplan.feature.pantry.ui.PantryItemCard
-import java.util.Date
 import java.util.UUID
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
 fun PantryScreen(
+    viewModel: PantryViewModel = hiltViewModel(),
+
     onClickPantryItem: (UUID) -> Unit,
     onCreatePantryItem: () -> Unit
 ) {
-    val pantryItem = PantryItem(
-        id = UUID.randomUUID(),
-        name = "Cheese With Hat",
-        quantity = 1000,
-        expiryDate = Date(),
-        expiresAfter = 86400 * 1000,
-        inStateSince = Date(),
-        state = PantryItemState.SEALED,
-        imageUrl = null
-    )
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
-    PantryItemCard(
-        item = pantryItem,
-        onClick = {
-            onClickPantryItem(pantryItem.id)
-        }
-    )
+    if (uiState.value.pantryItems.isEmpty()) {
+        PantryContentUnavailable()
+    } else {
+        // TODO: Show a list of all cards
+        /*
+        PantryItemCard(
+            item = pantryItem,
+            onClick = {
+                onClickPantryItem(pantryItem.id)
+            }
+        )*/
+    }
 }
 
 @Composable
