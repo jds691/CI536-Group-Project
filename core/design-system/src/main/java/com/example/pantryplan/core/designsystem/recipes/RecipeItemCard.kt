@@ -64,7 +64,7 @@ fun RecipeItemCard(
 
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
-    onDelete: () -> Unit = {},
+    onDelete: (() -> Unit)? = null,
 ) {
     val allergenText = buildAnnotatedString {
         var allergenLimitCounter = 0
@@ -102,6 +102,7 @@ fun RecipeItemCard(
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = onDelete != null,
         backgroundContent = {
             val backgroundColour by animateColorAsState(
                 when (dismissState.targetValue) {
@@ -189,7 +190,7 @@ fun RecipeItemCard(
         }
     }
 
-    if (showDeleteAlert.value) {
+    if (onDelete != null && showDeleteAlert.value) {
         DeleteAlertDialog(
             itemName = item.title,
             showAlert = showDeleteAlert,
