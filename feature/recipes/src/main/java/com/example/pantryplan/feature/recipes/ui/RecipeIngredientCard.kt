@@ -99,7 +99,8 @@ fun RecipeIngredientCard(
                     modifier = Modifier
                         .fillMaxWidth(),
                     progress = { progressAmount },
-                    color = progressColor
+                    color = progressColor,
+                    trackColor = progressColor.copy(0.2f)
                 )
             }
         }
