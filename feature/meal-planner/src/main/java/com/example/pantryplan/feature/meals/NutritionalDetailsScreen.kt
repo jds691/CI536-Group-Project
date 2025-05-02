@@ -37,11 +37,9 @@ fun NutritionalDetailsScreen(
                 .consumeWindowInsets(innerPadding)
                 .padding(innerPadding)
         ) {
-            Column {
-                Text(
-                    text = "Hello Nutritional Details!"
-                )
-            }
+            Text(
+                text = "Hello Nutritional Details!"
+            )
         }
     }
 }
