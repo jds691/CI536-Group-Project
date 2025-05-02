@@ -165,7 +165,7 @@ fun RecipeItemCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (1f == item.prepTime) {
+                if (item.imageUrl != null) {
                     //TODO: Place recipe item image in card when there is an active image passed in
                 } else {
                     Image(
