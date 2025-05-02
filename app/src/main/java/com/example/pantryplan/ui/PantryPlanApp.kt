@@ -2,10 +2,13 @@
 
 package com.example.pantryplan.ui
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
@@ -13,13 +16,10 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
-import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -36,94 +36,84 @@ import com.example.pantryplan.feature.recipes.navigation.recipesScreen
 import com.example.pantryplan.navigation.TopLevelDestination
 import com.example.pantryplan.ui.theme.PantryPlanTheme
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun PantryPlanApp(appState: PantryPlanAppState) {
     val currentDestination = appState.currentDestination
     val destination = appState.currentTopLevelDestination
-    val navSuiteScaffoldState = rememberNavigationSuiteScaffoldState()
 
-    val adaptiveInfo = currentWindowAdaptiveInfo()
-    val customNavSuiteType = with(adaptiveInfo) {
-        if (destination == null) {
-            NavigationSuiteType.None
-        } else {
-            NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
-        }
-    }
-
-    NavigationSuiteScaffold(
-        state = navSuiteScaffoldState,
-        layoutType = customNavSuiteType,
-        navigationSuiteItems = {
+    Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
             if (destination != null) {
-                TopLevelDestination.entries.forEach { topLevelDestination ->
-                    val selected = currentDestination?.hierarchy?.any {
-                        it.hasRoute(topLevelDestination.route)
-                    } == true
+                val shouldShowSearchButton = destination != TopLevelDestination.MEAL_PLANNER
 
-                    item(
-                        selected = selected,
-                        onClick = { appState.navigateToTopLevelDestination(topLevelDestination) },
-                        icon = {
-                            Icon(
-                                if (selected) topLevelDestination.selectedIcon else topLevelDestination.unselectedIcon,
-                                contentDescription = stringResource(topLevelDestination.iconTextId)
-                            )
-                        },
-                        label = { Text(stringResource(topLevelDestination.iconTextId)) },
-                    )
-                }
-            }
-        }
-    ) {
-        Scaffold(
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
-                if (destination != null) {
-                    val shouldShowSearchButton = destination != TopLevelDestination.MEAL_PLANNER
-
-                    CenterAlignedTopAppBar(
-                        navigationIcon = {
-                            if (shouldShowSearchButton) {
-                                IconButton(onClick = { /* TODO: Navigate to search. */ }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Search,
-                                        // TODO: Replace with a string resource from settings feature.
-                                        contentDescription = "Search"
-                                    )
-                                }
-                            }
-                        },
-                        title = { Text(stringResource(destination.titleTextId)) },
-                        actions = {
-                            IconButton(onClick = { /* TODO: Navigate to settings. */ }) {
+                CenterAlignedTopAppBar(
+                    navigationIcon = {
+                        if (shouldShowSearchButton) {
+                            IconButton(onClick = { /* TODO: Navigate to search. */ }) {
                                 Icon(
-                                    imageVector = Icons.Default.AccountCircle,
+                                    imageVector = Icons.Default.Search,
                                     // TODO: Replace with a string resource from settings feature.
-                                    contentDescription = "Settings"
+                                    contentDescription = "Search"
                                 )
                             }
                         }
-                    )
-                }
-            },
-        ) { innerPadding ->
-            NavHost(
-                navController = appState.navController,
-                startDestination = Pantry,
-                modifier = Modifier
-                    .consumeWindowInsets(innerPadding)
-                    .padding(innerPadding)
-            ) {
-                pantrySection(
-                    onPantryItemClick = appState.navController::navigateToPantryItem,
-                    onBackClick = appState.navController::popBackStack,
-                    onPantryItemEdit = appState.navController::navigateToPantryItemEdit
+                    },
+                    title = { Text(stringResource(destination.titleTextId)) },
+                    actions = {
+                        IconButton(onClick = { /* TODO: Navigate to settings. */ }) {
+                            Icon(
+                                imageVector = Icons.Default.AccountCircle,
+                                // TODO: Replace with a string resource from settings feature.
+                                contentDescription = "Settings"
+                            )
+                        }
+                    }
                 )
-                recipesScreen()
-                mealPlannerScreen()
             }
+        },
+        bottomBar = {
+            AnimatedVisibility(
+                visible = destination != null,
+                enter = EnterTransition.None,
+                // Same as the default animation spec used by the NavHost.
+                exit = fadeOut(tween(700))
+            ) {
+                NavigationBar {
+                    TopLevelDestination.entries.forEach { topLevelDestination ->
+                        val selected = currentDestination?.hierarchy?.any {
+                            it.hasRoute(topLevelDestination.route)
+                        } == true
+
+                        NavigationBarItem(
+                            selected = selected,
+                            onClick = { appState.navigateToTopLevelDestination(topLevelDestination) },
+                            icon = {
+                                Icon(
+                                    if (selected) topLevelDestination.selectedIcon else topLevelDestination.unselectedIcon,
+                                    contentDescription = stringResource(topLevelDestination.iconTextId)
+                                )
+                            },
+                            label = { Text(stringResource(topLevelDestination.iconTextId)) },
+                        )
+                    }
+                }
+            }
+        }
+    ) { _ ->
+        NavHost(
+            navController = appState.navController,
+            startDestination = Pantry,
+        ) {
+            pantrySection(
+                onPantryItemClick = appState.navController::navigateToPantryItem,
+                onBackClick = appState.navController::popBackStack,
+                onPantryItemEdit = appState.navController::navigateToPantryItemEdit
+            )
+            recipesScreen()
+            mealPlannerScreen()
         }
     }
 }

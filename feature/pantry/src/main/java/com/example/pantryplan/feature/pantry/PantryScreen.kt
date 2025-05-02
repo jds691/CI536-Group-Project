@@ -2,7 +2,9 @@ package com.example.pantryplan.feature.pantry
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.MaterialTheme
@@ -27,18 +29,26 @@ fun PantryScreen(
     onCreatePantryItem: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-
-    if (uiState.value.pantryItems.isEmpty()) {
-        PantryContentUnavailable()
-    } else {
-        // TODO: Show a list of all cards
-        /*
-        PantryItemCard(
-            item = pantryItem,
-            onClick = {
-                onClickPantryItem(pantryItem.id)
-            }
-        )*/
+    Box(modifier = Modifier
+        .navigationBarsPadding()
+        .systemBarsPadding()
+        .padding(
+            top = dimensionResource(designSystemR.dimen.top_app_bar_height),
+            bottom = dimensionResource(designSystemR.dimen.bottom_app_bar_height)
+        )
+    ) {
+        if (uiState.value.pantryItems.isEmpty()) {
+            PantryContentUnavailable()
+        } else {
+            // TODO: Show a list of all cards
+            /*
+            PantryItemCard(
+                item = pantryItem,
+                onClick = {
+                    onClickPantryItem(pantryItem.id)
+                }
+            )*/
+        }
     }
 }
 
