@@ -1,5 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
-package com.example.pantryplan.feature.recipes.ui
+
+package com.example.pantryplan.core.designsystem.recipes
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
@@ -40,15 +41,16 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.pantryplan.core.designsystem.R
 import com.example.pantryplan.core.designsystem.component.DeleteAlertDialog
+import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
-import com.example.pantryplan.feature.recipes.R
 import java.util.EnumSet
+import java.util.UUID
 
-fun cleanUpAllergenText(allergenName : String) : String
-{
+internal fun cleanUpAllergenText(allergenName: String): String {
     var newAllergenName = allergenName.replace("_", " ")
     newAllergenName = newAllergenName.lowercase()
     newAllergenName = newAllergenName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
@@ -223,8 +225,9 @@ fun RecipeItemCard(
 
 @Preview
 @Composable
-fun RecipeItemCardPreviews() {
+internal fun RecipeItemCardPreviews() {
     val recipe = Recipe(
+        id = UUID.randomUUID(),
         title = "Cheeseburger",
         description = "Burger packed with juicy beef, melted cheese and extra vegetables to add that final flavour.",
         tags = listOf("Dinner", "High Protein"),
@@ -253,5 +256,7 @@ fun RecipeItemCardPreviews() {
         )
     )
 
-    RecipeItemCard(item = recipe)
+    PantryPlanTheme {
+        RecipeItemCard(item = recipe)
+    }
 }
