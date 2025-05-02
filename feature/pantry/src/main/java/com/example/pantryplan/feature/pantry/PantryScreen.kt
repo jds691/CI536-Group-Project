@@ -2,9 +2,7 @@ package com.example.pantryplan.feature.pantry
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import com.example.pantryplan.core.designsystem.component.ContentUnavailable
@@ -12,7 +10,6 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
@@ -25,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.pantryplan.core.designsystem.component.ContentUnavailable
+import com.example.pantryplan.core.designsystem.component.MultiFAB
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import java.util.UUID
 import com.example.pantryplan.core.designsystem.R as designSystemR
@@ -42,7 +39,7 @@ fun PantryScreen(
             top = dimensionResource(designSystemR.dimen.top_app_bar_height),
             bottom = dimensionResource(designSystemR.dimen.bottom_app_bar_height)
         ),
-        floatingActionButton = { PantryFABs() }
+        floatingActionButton = { PantryFABs(onCreatePantryItem) }
     ) { contentPadding ->
         val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -62,7 +59,7 @@ fun PantryScreen(
 }
 
 @Composable
-internal fun PantryFABs() {
+internal fun PantryFABs(onCreatePantryItem: () -> Unit) {
     MultiFAB {
         SmallFloatingActionButton(
             onClick = { /* TODO: Navigate to barcode scanning. */ }
@@ -73,7 +70,7 @@ internal fun PantryFABs() {
             )
         }
         ExtendedFloatingActionButton(
-            onClick = { /* TODO: Navigate to pantry item creation. */ },
+            onClick = onCreatePantryItem,
             icon = { Icon(Icons.Default.Add, "") },
             text = { Text("Add") }
         )
