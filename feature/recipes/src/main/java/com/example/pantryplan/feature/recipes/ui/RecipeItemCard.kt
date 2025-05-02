@@ -198,7 +198,7 @@ fun RecipeItemCard(
 
     if (showDeleteAlert.value) {
         DeleteAlertDialog(
-            item = item,
+            itemName = item.title,
             showAlert = showDeleteAlert,
             onDelete = onDelete
         )
@@ -232,7 +232,7 @@ fun RecipeItemCard(
 
 @Composable
 internal fun DeleteAlertDialog(
-    item: Recipe,
+    itemName: String,
     showAlert: MutableState<Boolean>,
     onDelete: () -> Unit
 ) {
@@ -265,7 +265,7 @@ internal fun DeleteAlertDialog(
                 )
 
                 Text(
-                    text = "Delete '${item.title}'?",
+                    text = "Delete '${itemName}'?",
                     color = AlertDialogDefaults.titleContentColor,
                     style = MaterialTheme.typography.headlineSmall
                 )
