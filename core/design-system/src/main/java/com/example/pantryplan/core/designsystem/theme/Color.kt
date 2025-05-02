@@ -1,4 +1,4 @@
-package com.example.pantryplan.ui.theme
+package com.example.pantryplan.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 

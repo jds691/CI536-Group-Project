@@ -34,7 +34,6 @@ import com.example.pantryplan.feature.pantry.navigation.navigateToPantryItemEdit
 import com.example.pantryplan.feature.pantry.navigation.pantrySection
 import com.example.pantryplan.feature.recipes.navigation.recipesScreen
 import com.example.pantryplan.navigation.TopLevelDestination
-import com.example.pantryplan.ui.theme.PantryPlanTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -129,7 +128,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    PantryPlanTheme {
+    com.example.pantryplan.core.designsystem.theme.PantryPlanTheme {
         Greeting("Android")
     }
 }

@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.pantryplan.ui.PantryPlanApp
 import com.example.pantryplan.ui.rememberPantryPlanAppState
-import com.example.pantryplan.ui.theme.PantryPlanTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -17,7 +16,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val appState = rememberPantryPlanAppState()
 
-            PantryPlanTheme {
+            com.example.pantryplan.core.designsystem.theme.PantryPlanTheme {
                 PantryPlanApp(appState)
             }
         }
