@@ -39,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.designsystem.recipes.RecipeItemCard
+import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
@@ -345,7 +346,9 @@ internal fun Tips(modifier: Modifier = Modifier) {
 )
 @Composable
 fun TodaysMealsPreview() {
-    TodaysMeals(onRecipeClick = {})
+    PantryPlanTheme {
+        TodaysMeals(onRecipeClick = {})
+    }
 }
 
 @Preview(
@@ -354,7 +357,9 @@ fun TodaysMealsPreview() {
 )
 @Composable
 fun MacrosPreview() {
-    Macros(onMacroCardClick = {})
+    PantryPlanTheme {
+        Macros(onMacroCardClick = {})
+    }
 }
 
 @Preview(
@@ -363,7 +368,9 @@ fun MacrosPreview() {
 )
 @Composable
 fun NextThreeDaysPreview() {
-    NextThreeDays(onRecipeClick = {})
+    PantryPlanTheme {
+        NextThreeDays(onRecipeClick = {})
+    }
 }
 
 @Preview(
@@ -372,5 +379,7 @@ fun NextThreeDaysPreview() {
 )
 @Composable
 fun TipsPreview() {
-    Tips()
+    PantryPlanTheme {
+        Tips()
+    }
 }
