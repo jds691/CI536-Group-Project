@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.CarouselDefaults
 import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
@@ -40,23 +41,40 @@ import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.meals.ui.MacrosCard
 import java.util.EnumSet
+import java.util.UUID
+import androidx.compose.ui.res.dimensionResource
+import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
-fun MealPlannerScreen(modifier: Modifier = Modifier) {
-    Column(
-        verticalArrangement = Arrangement
-            .spacedBy(4.dp),
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        TodaysMeals()
+fun MealPlannerScreen(
+    onRecipeClick: (UUID) -> Unit,
+    onMacroCardClick: () -> Unit,
 
-        Macros()
+    modifier: Modifier = Modifier
+) {
+    Scaffold(
+        modifier = Modifier
+            .padding(
+                top = dimensionResource(designSystemR.dimen.top_app_bar_height),
+                bottom = dimensionResource(designSystemR.dimen.bottom_app_bar_height)
+            )
+    ) { contentPadding ->
+        Column(
+            verticalArrangement = Arrangement
+                .spacedBy(4.dp),
+            modifier = modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+                .padding(horizontal = dimensionResource(designSystemR.dimen.horizontal_margin))
+        ) {
+            TodaysMeals()
 
-        NextThreeDays()
+            Macros()
 
-        Tips()
+            NextThreeDays()
+
+            Tips()
+        }
     }
 }
 

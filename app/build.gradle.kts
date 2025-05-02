@@ -32,11 +32,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -44,12 +44,13 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:design-system"))
+
     implementation(project(":feature:pantry"))
     implementation(project(":feature:recipes"))
     implementation(project(":feature:meal-planner"))
 
     api(libs.androidx.compose.material.iconsExtended)
-    api(libs.androidx.compose.material3.navigationSuite)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -7,32 +7,80 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import com.example.pantryplan.core.designsystem.component.ContentUnavailable
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pantryplan.core.designsystem.component.MultiFAB
+import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import java.util.UUID
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
 fun PantryScreen(
-    viewModel: PantryViewModel = hiltViewModel()
-) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    viewModel: PantryViewModel = hiltViewModel(),
 
-    if (uiState.value.pantryItems.isEmpty()) {
-        PantryContentUnavailable()
+    onClickPantryItem: (UUID) -> Unit,
+    onCreatePantryItem: () -> Unit
+) {
+    Scaffold(modifier = Modifier
+        .padding(
+            top = dimensionResource(designSystemR.dimen.top_app_bar_height),
+            bottom = dimensionResource(designSystemR.dimen.bottom_app_bar_height)
+        ),
+        floatingActionButton = { PantryFABs(onCreatePantryItem) }
+    ) { contentPadding ->
+        val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
+        if (uiState.value.pantryItems.isEmpty()) {
+            PantryContentUnavailable(modifier = Modifier.padding(contentPadding))
+        } else {
+            // TODO: Show a list of all cards
+            /*
+            PantryItemCard(
+                item = pantryItem,
+                onClick = {
+                    onClickPantryItem(pantryItem.id)
+                }
+            )*/
+        }
     }
 }
 
 @Composable
-internal fun PantryContentUnavailable() {
+internal fun PantryFABs(onCreatePantryItem: () -> Unit) {
+    MultiFAB {
+        SmallFloatingActionButton(
+            onClick = { /* TODO: Navigate to barcode scanning. */ }
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_barcode_scanner),
+                contentDescription = stringResource(R.string.feature_pantry_scan_barcode)
+            )
+        }
+        ExtendedFloatingActionButton(
+            onClick = onCreatePantryItem,
+            icon = { Icon(Icons.Default.Add, "") },
+            text = { Text("Add") }
+        )
+    }
+}
+
+@Composable
+internal fun PantryContentUnavailable(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = dimensionResource(designSystemR.dimen.horizontal_margin)),
         contentAlignment = Alignment.Center
@@ -48,7 +96,7 @@ internal fun PantryContentUnavailable() {
 @Preview
 @Composable
 fun PantryEmptyPreview() {
-    MaterialTheme {
+    PantryPlanTheme {
         Surface {
             PantryContentUnavailable()
         }
