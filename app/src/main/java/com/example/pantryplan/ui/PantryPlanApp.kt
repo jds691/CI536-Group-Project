@@ -78,6 +78,7 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
             AnimatedVisibility(
                 visible = destination != null,
                 enter = EnterTransition.None,
+                // Same as the default animation spec used by the NavHost.
                 exit = fadeOut(tween(700))
             ) {
                 NavigationBar {

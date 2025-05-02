@@ -1,7 +1,6 @@
 package com.example.pantryplan.feature.pantry
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.component.ContentUnavailable
@@ -31,11 +29,13 @@ fun PantryScreen(
     onCreatePantryItem: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    Box(
-        modifier = Modifier
-            .navigationBarsPadding()
-            .systemBarsPadding()
-            .padding(paddingValues = PaddingValues(top = 64.dp, bottom = 80.dp))
+    Box(modifier = Modifier
+        .navigationBarsPadding()
+        .systemBarsPadding()
+        .padding(
+            top = dimensionResource(designSystemR.dimen.top_app_bar_height),
+            bottom = dimensionResource(designSystemR.dimen.bottom_app_bar_height)
+        )
     ) {
         if (uiState.value.pantryItems.isEmpty()) {
             PantryContentUnavailable()
