@@ -7,16 +7,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.CarouselDefaults
 import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
@@ -33,16 +34,17 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.pantryplan.core.designsystem.recipes.RecipeItemCard
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.meals.ui.MacrosCard
 import java.util.EnumSet
 import java.util.UUID
-import androidx.compose.ui.res.dimensionResource
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
@@ -63,15 +65,21 @@ fun MealPlannerScreen(
             verticalArrangement = Arrangement
                 .spacedBy(4.dp),
             modifier = modifier
-                .fillMaxSize()
                 .padding(contentPadding)
                 .padding(horizontal = dimensionResource(designSystemR.dimen.horizontal_margin))
+                .verticalScroll(rememberScrollState())
         ) {
-            TodaysMeals()
+            TodaysMeals(
+                onRecipeClick = onRecipeClick
+            )
 
-            Macros()
+            Macros(
+                onMacroCardClick = onMacroCardClick
+            )
 
-            NextThreeDays()
+            NextThreeDays(
+                onRecipeClick = onRecipeClick
+            )
 
             Tips()
         }
@@ -79,7 +87,10 @@ fun MealPlannerScreen(
 }
 
 @Composable
-internal fun Macros(modifier: Modifier = Modifier) {
+internal fun Macros(
+    onMacroCardClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
     ) {
@@ -99,14 +110,19 @@ internal fun Macros(modifier: Modifier = Modifier) {
                 fiber = 34f,
                 protein = 30f,
                 sodium = 12f
-            )
+            ),
+            onClick = onMacroCardClick
         )
     }
 }
 
 @Composable
-internal fun TodaysMeals(modifier: Modifier = Modifier) {
-    val meal = Recipe(
+internal fun TodaysMeals(
+    onRecipeClick: (UUID) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val previewMeal = Recipe(
+        id = UUID.randomUUID(),
         title = "Egg wif Hat",
         description = "The immortal one.",
         tags = listOf(),
@@ -130,9 +146,9 @@ internal fun TodaysMeals(modifier: Modifier = Modifier) {
 
     // TODO: Create this list from the recommender system
     val meals = listOf(
-        meal,
-        meal,
-        meal
+        previewMeal,
+        previewMeal,
+        previewMeal
     )
 
     val carouselState = rememberCarouselState { meals.size }
@@ -154,10 +170,15 @@ internal fun TodaysMeals(modifier: Modifier = Modifier) {
             itemSpacing = 8.dp,
             flingBehavior = CarouselDefaults.singleAdvanceFlingBehavior(carouselState)
         ) { mealIndex ->
+            val meal = meals[mealIndex]
+
             CarouselMealCard(
-                meal = meals[mealIndex],
+                meal = meal,
                 modifier = Modifier
-                    .maskClip(MaterialTheme.shapes.extraLarge)
+                    .maskClip(MaterialTheme.shapes.extraLarge),
+                onClick = {
+                    onRecipeClick(meal.id)
+                }
             )
         }
     }
@@ -222,12 +243,46 @@ internal fun CarouselMealCard(
 }
 
 @Composable
-internal fun NextThreeDays(modifier: Modifier = Modifier) {
+internal fun NextThreeDays(
+    onRecipeClick: (UUID) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val previewMeal = Recipe(
+        id = UUID.randomUUID(),
+        title = "Egg wif Hat",
+        description = "The immortal one.",
+        tags = listOf(),
+        allergens = EnumSet.of(Allergen.EGGS),
+        imageUrl = null,
+        instructions = listOf(),
+        ingredients = listOf(),
+        prepTime = 0.0f,
+        cookTime = 0.0f,
+        nutrition = NutritionInfo(
+            calories = 1_000_000,
+            fats = 0.0f,
+            saturatedFats = 0.0f,
+            carbohydrates = 0.0f,
+            sugar = 0.0f,
+            fiber = 0.0f,
+            protein = 0.0f,
+            sodium = 0.0f
+        )
+    )
+
+    // TODO: Create this list from the recommender system
+    val meals = listOf(
+        previewMeal,
+        previewMeal,
+        previewMeal
+    )
+
     var selectedIndex by remember { mutableIntStateOf(0) }
     val options = listOf("Today", "Tomorrow", "Wednesday")
 
     Column(
-        modifier = modifier
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
             text = "Next Three Days",
@@ -249,14 +304,20 @@ internal fun NextThreeDays(modifier: Modifier = Modifier) {
             }
         }
 
-        // TODO: Show a list of cards that navigate to a specific meal then clicked
-
-        when(selectedIndex) {
+        /*when(selectedIndex) {
             0 -> Text("Unable to retrieve upcoming meals for today.")
             1 -> Text("Unable to retrieve upcoming meals for tomorrow.")
             2 -> Text("Unable to retrieve upcoming meals for Wednesday.")
 
             else -> Text("Unable to retrieve upcoming meals.")
+        }*/
+        for (meal: Recipe in meals) {
+            RecipeItemCard(
+                item = meal,
+                onClick = {
+                    onRecipeClick(meal.id)
+                }
+            )
         }
     }
 }
@@ -284,7 +345,7 @@ internal fun Tips(modifier: Modifier = Modifier) {
 )
 @Composable
 fun TodaysMealsPreview() {
-    TodaysMeals()
+    TodaysMeals(onRecipeClick = {})
 }
 
 @Preview(
@@ -293,7 +354,7 @@ fun TodaysMealsPreview() {
 )
 @Composable
 fun MacrosPreview() {
-    Macros()
+    Macros(onMacroCardClick = {})
 }
 
 @Preview(
@@ -302,7 +363,7 @@ fun MacrosPreview() {
 )
 @Composable
 fun NextThreeDaysPreview() {
-    NextThreeDays()
+    NextThreeDays(onRecipeClick = {})
 }
 
 @Preview(
