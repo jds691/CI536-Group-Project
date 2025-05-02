@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.designsystem.component.DeleteAlertDialog
+import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.feature.recipes.R
 
 @Composable
@@ -186,5 +187,7 @@ fun IngredientCard(
 @Preview
 @Composable
 fun IngredientCardPreview() {
-    IngredientCard()
+    PantryPlanTheme {
+        IngredientCard()
+    }
 }

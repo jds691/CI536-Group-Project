@@ -19,7 +19,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.NutritionInfo
 import kotlin.math.roundToInt
 
@@ -156,9 +159,15 @@ fun MacrosCard(
 
 @Preview
 @Composable
-fun MacrosCardPreview() {
-    MacrosCard(
-        item = NutritionInfo(
+fun MacrosCardPreviews(@PreviewParameter(SampleNutritionInfoProvider::class) nutritionInfo: NutritionInfo) {
+    PantryPlanTheme {
+        MacrosCard(item = nutritionInfo)
+    }
+}
+
+private class SampleNutritionInfoProvider : PreviewParameterProvider<NutritionInfo> {
+    override val values: Sequence<NutritionInfo> = sequenceOf(
+        NutritionInfo(
             calories = 500,
             fats = 13.35f,
             saturatedFats = 22f,
@@ -167,15 +176,8 @@ fun MacrosCardPreview() {
             fiber = 34f,
             protein = 30f,
             sodium = 12f
-        )
-    )
-}
-
-@Preview
-@Composable
-fun MacrosCardPreview2() {
-    MacrosCard(
-        item = NutritionInfo(
+        ),
+        NutritionInfo(
             calories = 600,
             fats = 20f,
             saturatedFats = 10f,
@@ -184,15 +186,8 @@ fun MacrosCardPreview2() {
             fiber = 20f,
             protein = 50f,
             sodium = 15f
-        )
-    )
-}
-
-@Preview
-@Composable // very low amounts of a single macro
-fun MacrosCardPreview3() {
-    MacrosCard(
-        item = NutritionInfo(
+        ),
+        NutritionInfo( // very low amounts of a single macro
             calories = 600,
             fats = 28f,
             saturatedFats = 10f,

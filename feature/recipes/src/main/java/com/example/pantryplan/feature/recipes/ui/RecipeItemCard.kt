@@ -39,8 +39,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.designsystem.component.DeleteAlertDialog
 import com.example.pantryplan.core.models.Allergen
@@ -225,34 +223,35 @@ fun RecipeItemCard(
 
 @Preview
 @Composable
-fun RecipeItemCardPreviews(@PreviewParameter(SampleRecipeItemProvider::class) recipeItem: Recipe) {
-    RecipeItemCard(item = recipeItem)
-}
-
-class SampleRecipeItemProvider : PreviewParameterProvider<Recipe>{
-    override val values: Sequence<Recipe> = sequenceOf(
-        Recipe(
-            title = "Cheeseburger",
-            description = "Burger packed with juicy beef, melted cheese and extra vegetables to add that final flavour.",
-            tags = listOf("Dinner", "High Protein"),
-            allergens = EnumSet.of(Allergen.MILK, Allergen.GLUTEN, Allergen.SESAME),
-            imageUrl = null,
-            instructions = listOf("1. Cook Burger", "2. Eat burger"),
-            ingredients = listOf("Beef Burger", "Burger Buns", "American Cheese", "Lettuce", "Red Onion", "Bacon"),
-            prepTime = 10f,
-            cookTime = 15f,
-            nutrition = NutritionInfo(
-                calories = 100,
-                fats = 100f,
-                saturatedFats = 100f,
-                carbohydrates = 100f,
-                sugar = 100f,
-                fiber = 100f,
-                protein = 100f,
-                sodium = 100f
-            )
+fun RecipeItemCardPreviews() {
+    val recipe = Recipe(
+        title = "Cheeseburger",
+        description = "Burger packed with juicy beef, melted cheese and extra vegetables to add that final flavour.",
+        tags = listOf("Dinner", "High Protein"),
+        allergens = EnumSet.of(Allergen.MILK, Allergen.GLUTEN, Allergen.SESAME),
+        imageUrl = null,
+        instructions = listOf("1. Cook Burger", "2. Eat burger"),
+        ingredients = listOf(
+            "Beef Burger",
+            "Burger Buns",
+            "American Cheese",
+            "Lettuce",
+            "Red Onion",
+            "Bacon"
+        ),
+        prepTime = 10f,
+        cookTime = 15f,
+        nutrition = NutritionInfo(
+            calories = 100,
+            fats = 100f,
+            saturatedFats = 100f,
+            carbohydrates = 100f,
+            sugar = 100f,
+            fiber = 100f,
+            protein = 100f,
+            sodium = 100f
         )
-
     )
 
+    RecipeItemCard(item = recipe)
 }
