@@ -44,6 +44,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:design-system"))
+
     implementation(project(":feature:pantry"))
     implementation(project(":feature:recipes"))
     implementation(project(":feature:meal-planner"))

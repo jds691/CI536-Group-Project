@@ -1,8 +1,7 @@
-@file:OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 package com.example.pantryplan.feature.recipes.ui
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -16,26 +15,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,9 +39,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import com.example.pantryplan.core.designsystem.component.DeleteAlertDialog
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
@@ -230,101 +221,37 @@ fun RecipeItemCard(
     }
 }
 
-@Composable
-internal fun DeleteAlertDialog(
-    itemName: String,
-    showAlert: MutableState<Boolean>,
-    onDelete: () -> Unit
-) {
-    BasicAlertDialog(
-        onDismissRequest = {
-            showAlert.value = false
-        }
-    ) {
-        Surface(
-            modifier = Modifier
-                .wrapContentWidth()
-                .wrapContentHeight(),
-            shape = AlertDialogDefaults.shape,
-            tonalElevation = AlertDialogDefaults.TonalElevation,
-            color = AlertDialogDefaults.containerColor
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement
-                    .spacedBy(
-                        space = 16.dp,
-                        alignment = Alignment.CenterVertically
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "",
-                    tint = AlertDialogDefaults.iconContentColor
-                )
-
-                Text(
-                    text = "Delete '${itemName}'?",
-                    color = AlertDialogDefaults.titleContentColor,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Text(
-                    text = "This item cannot be restored. Are you sure you want to delete it?",
-                    color = AlertDialogDefaults.textContentColor,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = {
-                        showAlert.value = false
-                    }) { Text("Cancel") }
-
-                    TextButton(onClick = {
-                        showAlert.value = false
-                        onDelete()
-                    }) { Text("Delete") }
-                }
-            }
-        }
-    }
-}
-
-
 @Preview
 @Composable
-fun RecipeItemCardPreviews(@PreviewParameter(SampleRecipeItemProvider::class) recipeItem: Recipe) {
-    RecipeItemCard(item = recipeItem)
-}
-
-class SampleRecipeItemProvider : PreviewParameterProvider<Recipe>{
-    override val values: Sequence<Recipe> = sequenceOf(
-        Recipe(
-            title = "Cheeseburger",
-            description = "Burger packed with juicy beef, melted cheese and extra vegetables to add that final flavour.",
-            tags = listOf("Dinner", "High Protein"),
-            allergens = EnumSet.of(Allergen.MILK, Allergen.GLUTEN, Allergen.SESAME),
-            imageUrl = null,
-            instructions = listOf("1. Cook Burger", "2. Eat burger"),
-            ingredients = listOf("Beef Burger", "Burger Buns", "American Cheese", "Lettuce", "Red Onion", "Bacon"),
-            prepTime = 10f,
-            cookTime = 15f,
-            nutrition = NutritionInfo(
-                calories = 100,
-                fats = 100f,
-                saturatedFats = 100f,
-                carbohydrates = 100f,
-                sugar = 100f,
-                fiber = 100f,
-                protein = 100f,
-                sodium = 100f
-            )
+fun RecipeItemCardPreviews() {
+    val recipe = Recipe(
+        title = "Cheeseburger",
+        description = "Burger packed with juicy beef, melted cheese and extra vegetables to add that final flavour.",
+        tags = listOf("Dinner", "High Protein"),
+        allergens = EnumSet.of(Allergen.MILK, Allergen.GLUTEN, Allergen.SESAME),
+        imageUrl = null,
+        instructions = listOf("1. Cook Burger", "2. Eat burger"),
+        ingredients = listOf(
+            "Beef Burger",
+            "Burger Buns",
+            "American Cheese",
+            "Lettuce",
+            "Red Onion",
+            "Bacon"
+        ),
+        prepTime = 10f,
+        cookTime = 15f,
+        nutrition = NutritionInfo(
+            calories = 100,
+            fats = 100f,
+            saturatedFats = 100f,
+            carbohydrates = 100f,
+            sugar = 100f,
+            fiber = 100f,
+            protein = 100f,
+            sodium = 100f
         )
-
     )
 
+    RecipeItemCard(item = recipe)
 }

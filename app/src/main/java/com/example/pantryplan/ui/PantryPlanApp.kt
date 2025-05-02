@@ -23,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -34,7 +33,6 @@ import com.example.pantryplan.feature.pantry.navigation.navigateToPantryItemEdit
 import com.example.pantryplan.feature.pantry.navigation.pantrySection
 import com.example.pantryplan.feature.recipes.navigation.recipesScreen
 import com.example.pantryplan.navigation.TopLevelDestination
-import com.example.pantryplan.ui.theme.PantryPlanTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -115,21 +113,5 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
             recipesScreen()
             mealPlannerScreen()
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PantryPlanTheme {
-        Greeting("Android")
     }
 }

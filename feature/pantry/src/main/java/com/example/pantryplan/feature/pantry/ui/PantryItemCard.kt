@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.R
@@ -329,7 +330,9 @@ internal fun DeleteAlertDialog(
 @Preview
 @Composable
 fun PantryItemCardPreviews(@PreviewParameter(SamplePantryItemProvider::class) pantryItem: PantryItem) {
-    PantryItemCard(item = pantryItem)
+    PantryPlanTheme {
+        PantryItemCard(item = pantryItem)
+    }
 }
 
 class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
