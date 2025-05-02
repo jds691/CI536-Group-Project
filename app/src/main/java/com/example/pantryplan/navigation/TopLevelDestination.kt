@@ -9,7 +9,7 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.pantryplan.feature.meals.navigation.MealPlannerRoute
+import com.example.pantryplan.feature.meals.navigation.MealPlanner
 import com.example.pantryplan.feature.pantry.navigation.PantryList
 import com.example.pantryplan.feature.recipes.navigation.RecipesRoute
 import kotlin.reflect.KClass
@@ -43,6 +43,6 @@ enum class TopLevelDestination (
         mealsR.string.feature_meals_title,
         Icons.Filled.Notifications,
         Icons.Outlined.Notifications,
-        MealPlannerRoute::class
+        MealPlanner::class
     ),
 }

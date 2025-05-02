@@ -27,6 +27,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import com.example.pantryplan.feature.meals.navigation.mealPlannerScreen
+import com.example.pantryplan.feature.meals.navigation.navigateToNutritionalDetails
 import com.example.pantryplan.feature.pantry.navigation.Pantry
 import com.example.pantryplan.feature.pantry.navigation.navigateToPantryItem
 import com.example.pantryplan.feature.pantry.navigation.navigateToPantryItemEdit
@@ -111,7 +112,11 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
                 onPantryItemEdit = appState.navController::navigateToPantryItemEdit
             )
             recipesScreen()
-            mealPlannerScreen()
+            mealPlannerScreen(
+                onBackClick = appState.navController::popBackStack,
+                onRecipeClick = {}, // TODO: Implement when we have recipe sub-navigation done
+                onMacroCardClick = appState.navController::navigateToNutritionalDetails
+            )
         }
     }
 }
