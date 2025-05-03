@@ -2,6 +2,7 @@ package com.example.pantryplan.feature.meals
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,10 +19,11 @@ fun MealPlannerScreen(
 ) {
     Scaffold(
         modifier = Modifier
-        .padding(
-            top = dimensionResource(designSystemR.dimen.top_app_bar_height),
-            bottom = dimensionResource(designSystemR.dimen.bottom_app_bar_height)
-        )
+            .systemBarsPadding()
+            .padding(
+                top = dimensionResource(designSystemR.dimen.top_app_bar_height),
+                bottom = dimensionResource(designSystemR.dimen.bottom_app_bar_height)
+            )
     ) { contentPadding ->
         Column(
             modifier = Modifier
