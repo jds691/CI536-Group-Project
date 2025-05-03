@@ -30,7 +30,7 @@ import kotlin.math.roundToInt
 fun MacrosCard(
     item: NutritionInfo,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: (() -> Unit)? = null
 ) {
     //4 calories per gram of protein
     val proteinPercentage = (item.protein * 4 / item.calories * 1000).roundToInt() / 10f
@@ -40,7 +40,11 @@ fun MacrosCard(
     val fatPercentage = (item.fats * 9 / item.calories * 1000).roundToInt() / 10f
 
     ElevatedCard(
-        onClick = onClick,
+        enabled = onClick != null,
+        onClick = {
+            if (onClick != null)
+                onClick()
+        },
         modifier = modifier
             .fillMaxWidth()
     ) {
@@ -80,6 +84,7 @@ fun MacrosCard(
                     softWrap = false
                 )
             }
+            // TODO: Fix bar text colours if onClick = null
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
