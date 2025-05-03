@@ -1,8 +1,13 @@
 package com.example.pantryplan.feature.pantry
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import com.example.pantryplan.core.designsystem.component.ContentUnavailable
@@ -20,10 +25,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.component.MultiFAB
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import com.example.pantryplan.feature.pantry.ui.PantryItemCard
 import java.util.UUID
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
@@ -35,6 +42,7 @@ fun PantryScreen(
     onCreatePantryItem: () -> Unit
 ) {
     Scaffold(modifier = Modifier
+        .systemBarsPadding()
         .padding(
             top = dimensionResource(designSystemR.dimen.top_app_bar_height),
             bottom = dimensionResource(designSystemR.dimen.bottom_app_bar_height)
@@ -46,14 +54,11 @@ fun PantryScreen(
         if (uiState.value.pantryItems.isEmpty()) {
             PantryContentUnavailable(modifier = Modifier.padding(contentPadding))
         } else {
-            // TODO: Show a list of all cards
-            /*
-            PantryItemCard(
-                item = pantryItem,
-                onClick = {
-                    onClickPantryItem(pantryItem.id)
-                }
-            )*/
+            PantryContentList(
+                pantryState = uiState.value,
+                onClickPantryItem = onClickPantryItem,
+                modifier = Modifier.padding(contentPadding)
+            )
         }
     }
 }
@@ -90,6 +95,29 @@ internal fun PantryContentUnavailable(modifier: Modifier = Modifier) {
             title = stringResource(R.string.feature_pantry_empty_error),
             description = stringResource(R.string.feature_pantry_empty_description)
         )
+    }
+}
+
+@Composable
+internal fun PantryContentList(
+    pantryState: PantryUiState,
+    onClickPantryItem: (UUID) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn (
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(
+            vertical = 8.dp,
+            horizontal = dimensionResource(designSystemR.dimen.horizontal_margin)
+        )
+    ) {
+        items(pantryState.pantryItems) { item ->
+            PantryItemCard(
+                item = item,
+                onClick = { onClickPantryItem(item.id) }
+            )
+        }
     }
 }
 
