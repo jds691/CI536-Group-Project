@@ -1,7 +1,6 @@
 package com.example.pantryplan.feature.recipes
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Text
@@ -13,7 +12,6 @@ import com.example.pantryplan.core.designsystem.R as designSystemR
 @Composable
 fun RecipesScreen() {
     Box(modifier = Modifier
-        .navigationBarsPadding()
         .systemBarsPadding()
         .padding(
             top = dimensionResource(designSystemR.dimen.top_app_bar_height),
