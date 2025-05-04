@@ -101,6 +101,7 @@ fun MacrosCard(
                 ) {
                     Text(
                         style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         text = "${proteinPercentage}%"
                     )
                 }
@@ -113,6 +114,7 @@ fun MacrosCard(
                 ) {
                     Text(
                         style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         text = "${carbohydratePercentage}%"
                     )
                 }
@@ -125,6 +127,7 @@ fun MacrosCard(
                 ) {
                     Text(
                         style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         text = "${fatPercentage}%"
                     )
                 }
