@@ -24,6 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.designsystem.R
@@ -94,6 +98,49 @@ private fun Macros(
                 protein = 30f,
                 sodium = 12f
             )
+        )
+
+        Text(
+            // TODO: Replace styled bold text with correct values
+            buildAnnotatedString {
+                append("Your goal is to ")
+
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("gain muscle")
+                }
+
+                append(". This means:\n")
+
+                append("\u2022")
+                append("\t\t")
+                append("Your protein should be between ")
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("25-30%")
+                }
+                append("\n")
+
+                append("\u2022")
+                append("\t\t")
+                append("Your carbs should be between ")
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("55-60%")
+                }
+                append("\n")
+
+                append("\u2022")
+                append("\t\t")
+                append("Your fats should be between ")
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("15-20%")
+                }
+                append("\n\n")
+
+                append("You are currently ")
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("out of range")
+                }
+                append(".")
+            }
         )
     }
 }
