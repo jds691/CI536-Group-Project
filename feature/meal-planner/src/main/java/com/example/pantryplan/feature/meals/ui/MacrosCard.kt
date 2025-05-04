@@ -1,5 +1,6 @@
 package com.example.pantryplan.feature.meals.ui
 
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +39,9 @@ fun MacrosCard(
     val carbohydratePercentage = (item.carbohydrates * 4 / item.calories * 1000).roundToInt() / 10f
     //9 calories per gram of fat
     val fatPercentage = (item.fats * 9 / item.calories * 1000).roundToInt() / 10f
+
+    // One non-zero trailing decimal point
+    val formatter = DecimalFormat("0.#")
 
     ElevatedCard(
         enabled = onClick != null,
@@ -102,7 +106,7 @@ fun MacrosCard(
                     Text(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        text = "${proteinPercentage}%"
+                        text = "${formatter.format(proteinPercentage)}%"
                     )
                 }
                 Box(
@@ -115,7 +119,7 @@ fun MacrosCard(
                     Text(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        text = "${carbohydratePercentage}%"
+                        text = "${formatter.format(carbohydratePercentage)}%"
                     )
                 }
                 Box(
@@ -128,13 +132,13 @@ fun MacrosCard(
                     Text(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        text = "${fatPercentage}%"
+                        text = "${formatter.format(fatPercentage)}%"
                     )
                 }
             }
             Row{
                 Text(
-                    text = "${item.protein}g",
+                    text = "${formatter.format(item.protein)}g",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.weight(proteinPercentage),
@@ -143,7 +147,7 @@ fun MacrosCard(
                     softWrap = false
                 )
                 Text(
-                    text = "${item.carbohydrates}g",
+                    text = "${formatter.format(item.carbohydrates)}g",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.weight(carbohydratePercentage),
@@ -152,7 +156,7 @@ fun MacrosCard(
                     softWrap = false
                 )
                 Text(
-                    text = "${item.fats}g",
+                    text = "${formatter.format(item.fats)}g",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.weight(fatPercentage),
