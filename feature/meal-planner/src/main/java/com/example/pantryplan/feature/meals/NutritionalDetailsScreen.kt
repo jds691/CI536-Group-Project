@@ -2,6 +2,7 @@
 
 package com.example.pantryplan.feature.meals
 
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,7 +35,6 @@ import com.example.pantryplan.core.designsystem.R
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.feature.meals.ui.MacrosCard
-import java.text.DecimalFormat
 
 @Composable
 fun NutritionalDetailsScreen(
