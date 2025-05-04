@@ -30,6 +30,7 @@ import com.example.pantryplan.core.designsystem.R
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.feature.meals.ui.MacrosCard
+import java.text.DecimalFormat
 
 @Composable
 fun NutritionalDetailsScreen(
@@ -106,6 +107,9 @@ private fun NutrientRow(
     modifier: Modifier = Modifier,
     unit: String = "g"
 ) {
+    // One non-zero trailing decimal point
+    val formatter = DecimalFormat("0.#")
+
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -119,7 +123,7 @@ private fun NutrientRow(
         )
 
         Text(
-            text = "${amount}/${target}${unit}",
+            text = "${formatter.format(amount)}/${formatter.format(target)}${unit}",
             style = MaterialTheme.typography.bodyMedium
         )
     }
