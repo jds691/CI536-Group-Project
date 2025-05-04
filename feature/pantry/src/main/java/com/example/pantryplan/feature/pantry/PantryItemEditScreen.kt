@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,30 +24,40 @@ fun PantryItemEditScreen(
 ) {
     Scaffold (
         topBar = {
-            TopAppBar(
-                title = { Text("Add Item") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.Clear, "")
-                    }
-                },
-                actions = {
-                    TextButton(
-                        onClick = { /* TODO: Actually save */ }
-                    ) {
-                        Text("Save")
-                    }
-                }
+            PantryItemEditTopBar(
+                /* TODO: Pull pantry item name from the data layer. */
+                itemName = existingId?.toString(),
+                onBackClick = onBackClick
             )
-        }) { contentPadding ->
+        }
+    ) { contentPadding ->
         Column (modifier = Modifier.padding(contentPadding)) {
-            Text(
-                text = "Hello Pantry item edit!"
-            )
-
-            Button(onClick = onBackClick) {
-                Text("Back")
-            }
+            Text("Hello Pantry item edit!")
         }
     }
+}
+
+@Composable
+fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Unit) {
+    TopAppBar(
+        title = {
+            if (itemName == null) {
+                Text("Add Item")
+            } else {
+                Text("Update ‘${itemName}’")
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(Icons.Default.Clear, "")
+            }
+        },
+        actions = {
+            TextButton(
+                onClick = { /* TODO: Actually save */ }
+            ) {
+                Text("Save")
+            }
+        }
+    )
 }
