@@ -3,6 +3,7 @@
 package com.example.pantryplan.feature.pantry
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -15,6 +16,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.pantryplan.core.designsystem.component.ImageSelect
 import java.util.UUID
 
 @Composable
@@ -33,6 +35,10 @@ fun PantryItemEditScreen(
     ) { contentPadding ->
         Column (modifier = Modifier.padding(contentPadding)) {
             Text("Hello Pantry item edit!")
+            ImageSelect(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { /* TODO: Actually add an image. */ },
+            )
         }
     }
 }
