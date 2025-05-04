@@ -2,22 +2,45 @@
 
 package com.example.pantryplan.feature.pantry
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.designsystem.component.ImageSelect
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.UUID
+import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
 fun PantryItemEditScreen(
@@ -34,11 +57,19 @@ fun PantryItemEditScreen(
         }
     ) { contentPadding ->
         Column (modifier = Modifier.padding(contentPadding)) {
-            Text("Hello Pantry item edit!")
+            Text(
+                text = "Image",
+                modifier = Modifier.padding(
+                    horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)
+                ),
+                color = MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.bodySmall,
+            )
             ImageSelect(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
                 onClick = { /* TODO: Actually add an image. */ },
             )
+            PantryItemEditForm()
         }
     }
 }
@@ -66,4 +97,85 @@ fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Unit) {
             }
         }
     )
+}
+
+@Composable
+fun PantryItemEditForm() {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        var name by remember { mutableStateOf("") }
+        var selectedDate by remember { mutableStateOf<Long?>(null) }
+        var showModal by remember { mutableStateOf(false) }
+
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Name") },
+            singleLine = true,
+        )
+
+        /* TODO: Remove this function, do actual date formatting with kotlin library. */
+        fun convertMillisToDate(millis: Long): String {
+            val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+            return formatter.format(Date(millis))
+        }
+
+        OutlinedTextField(
+            value = selectedDate?.let { convertMillisToDate(it) } ?: "",
+            onValueChange = { name = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .pointerInput(selectedDate) {
+                    awaitEachGesture {
+                        awaitFirstDown(pass = PointerEventPass.Initial)
+                        val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                        if (upEvent != null) {
+                            showModal = true
+                        }
+                    }
+                }
+                .clickable(onClick = { showModal = true }),
+            readOnly = true,
+            label = { Text("Expires") },
+            trailingIcon = {
+                Icon(Icons.Default.DateRange, contentDescription = "Select date")
+            },
+        )
+        if (showModal) {
+            DatePickerModal(
+                onDateSelected = { selectedDate = it },
+                onDismiss = { showModal = false }
+            )
+        }
+    }
+}
+
+@Composable
+fun DatePickerModal(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                onDateSelected(datePickerState.selectedDateMillis)
+                onDismiss()
+            }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+    ) {
+        DatePicker(datePickerState)
+    }
 }

@@ -3,4 +3,5 @@
     <dimen name="horizontal_margin">16dp</dimen>
     <dimen name="top_app_bar_height">64dp</dimen>
     <dimen name="bottom_app_bar_height">80dp</dimen>
+    <dimen name="form_horizontal_margin">24dp</dimen>
 </resources>
