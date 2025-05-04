@@ -10,12 +10,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -107,8 +113,6 @@ fun PantryItemEditForm() {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         var name by remember { mutableStateOf("") }
-        var selectedDate by remember { mutableStateOf<Long?>(null) }
-        var showModal by remember { mutableStateOf(false) }
 
         OutlinedTextField(
             value = name,
@@ -118,39 +122,78 @@ fun PantryItemEditForm() {
             singleLine = true,
         )
 
-        /* TODO: Remove this function, do actual date formatting with kotlin library. */
-        fun convertMillisToDate(millis: Long): String {
-            val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
-            return formatter.format(Date(millis))
-        }
+        DatePickerTextField()
 
-        OutlinedTextField(
-            value = selectedDate?.let { convertMillisToDate(it) } ?: "",
-            onValueChange = { name = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .pointerInput(selectedDate) {
-                    awaitEachGesture {
-                        awaitFirstDown(pass = PointerEventPass.Initial)
-                        val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                        if (upEvent != null) {
-                            showModal = true
+        // TODO: Generate this from enum variants.
+        val options = listOf("Sealed", "Opened", "Frozen", "Expired")
+        var expanded by remember { mutableStateOf(false) }
+        val textFieldState = rememberTextFieldState(options[0])
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+        ) {
+            OutlinedTextField(
+                readOnly = true,
+                state = textFieldState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                label = { Text("State") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+            )
+            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                options.forEach { selectionOption ->
+                    DropdownMenuItem(
+                        text = {Text(text = selectionOption)},
+                        onClick = {
+                            textFieldState.setTextAndPlaceCursorAtEnd(selectionOption)
+                            expanded = false
                         }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DatePickerTextField() {
+    var selectedDate by remember { mutableStateOf<Long?>(null) }
+    var showModal by remember { mutableStateOf(false) }
+
+    /* TODO: Remove this function, do actual date formatting with kotlin library. */
+    fun convertMillisToDate(millis: Long): String {
+        val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+        return formatter.format(Date(millis))
+    }
+
+    OutlinedTextField(
+        value = selectedDate?.let { convertMillisToDate(it) } ?: "",
+        onValueChange = { },
+        modifier = Modifier
+            .fillMaxWidth()
+            .pointerInput(selectedDate) {
+                awaitEachGesture {
+                    awaitFirstDown(pass = PointerEventPass.Initial)
+                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                    if (upEvent != null) {
+                        showModal = true
                     }
                 }
-                .clickable(onClick = { showModal = true }),
-            readOnly = true,
-            label = { Text("Expires") },
-            trailingIcon = {
-                Icon(Icons.Default.DateRange, contentDescription = "Select date")
-            },
+            }
+            .clickable(onClick = { showModal = true }),
+        readOnly = true,
+        label = { Text("Expires") },
+        trailingIcon = {
+            Icon(Icons.Default.DateRange, contentDescription = "Select date")
+        },
+    )
+    if (showModal) {
+        DatePickerModal(
+            onDateSelected = { selectedDate = it },
+            onDismiss = { showModal = false }
         )
-        if (showModal) {
-            DatePickerModal(
-                onDateSelected = { selectedDate = it },
-                onDismiss = { showModal = false }
-            )
-        }
     }
 }
 
