@@ -35,6 +35,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldLabelScope
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -137,7 +138,7 @@ fun PantryItemEditForm() {
         )
 
         OutlinedDatePickerField(
-            label = "Expires",
+            label = { Text("Expires") },
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -145,7 +146,7 @@ fun PantryItemEditForm() {
         val stateOptions = listOf("Sealed", "Opened", "Frozen", "Expired")
         OutlinedSelectField(
             modifier = Modifier.fillMaxWidth(),
-            label = "State",
+            label = { Text("State") },
             options = stateOptions,
         )
 
@@ -191,8 +192,8 @@ fun PantryItemEditForm() {
 
 @Composable
 fun OutlinedDatePickerField(
-    label: String,
     modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
 ) {
     var selectedDate by remember { mutableStateOf<Long?>(null) }
     var showModal by remember { mutableStateOf(false) }
@@ -218,7 +219,7 @@ fun OutlinedDatePickerField(
             }
             .clickable(onClick = { showModal = true }),
         readOnly = true,
-        label = { Text(label) },
+        label = label,
         trailingIcon = {
             Icon(Icons.Default.DateRange, contentDescription = "Select date")
         },
@@ -260,7 +261,7 @@ fun DatePickerModal(
 @Composable
 fun OutlinedSelectField(
     modifier: Modifier = Modifier,
-    label: String? = null,
+    label: @Composable (TextFieldLabelScope.() -> Unit)? = null,
     options: List<String>,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -276,7 +277,7 @@ fun OutlinedSelectField(
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-            label = label?.let { { Text(it) } },
+            label = label,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
         )
@@ -298,7 +299,7 @@ fun OutlinedSelectField(
 @Composable
 fun OutlinedNumberField(
     modifier: Modifier = Modifier,
-    label: String? = null,
+    label: @Composable (() -> Unit)? = null,
 ) {
     var quantity by remember { mutableStateOf("") }
 
@@ -306,7 +307,7 @@ fun OutlinedNumberField(
         value = quantity,
         onValueChange = { quantity = it },
         modifier = modifier,
-        label = label?.let { { Text(it) } },
+        label = label,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         singleLine = true,
     )
