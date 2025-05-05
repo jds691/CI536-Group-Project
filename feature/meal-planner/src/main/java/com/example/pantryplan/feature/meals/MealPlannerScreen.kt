@@ -90,7 +90,7 @@ fun MealPlannerScreen(
 }
 
 @Composable
-internal fun Macros(
+private fun Macros(
     onMacroCardClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -120,7 +120,7 @@ internal fun Macros(
 }
 
 @Composable
-internal fun TodaysMeals(
+private fun TodaysMeals(
     onRecipeClick: (UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -188,7 +188,7 @@ internal fun TodaysMeals(
 }
 
 @Composable
-internal fun CarouselMealCard(
+private fun CarouselMealCard(
     meal: Recipe,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
@@ -246,7 +246,7 @@ internal fun CarouselMealCard(
 }
 
 @Composable
-internal fun NextThreeDays(
+private fun NextThreeDays(
     onRecipeClick: (UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -326,7 +326,7 @@ internal fun NextThreeDays(
 }
 
 @Composable
-internal fun Tips(modifier: Modifier = Modifier) {
+private fun Tips(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
     ) {
@@ -347,7 +347,7 @@ internal fun Tips(modifier: Modifier = Modifier) {
     showBackground = true
 )
 @Composable
-fun TodaysMealsPreview() {
+private fun TodaysMealsPreview() {
     PantryPlanTheme {
         TodaysMeals(onRecipeClick = {})
     }
@@ -358,7 +358,7 @@ fun TodaysMealsPreview() {
     showBackground = true
 )
 @Composable
-fun MacrosPreview() {
+private fun MacrosPreview() {
     PantryPlanTheme {
         Macros(onMacroCardClick = {})
     }
@@ -369,7 +369,7 @@ fun MacrosPreview() {
     showBackground = true
 )
 @Composable
-fun NextThreeDaysPreview() {
+private fun NextThreeDaysPreview() {
     PantryPlanTheme {
         NextThreeDays(onRecipeClick = {})
     }
@@ -380,7 +380,7 @@ fun NextThreeDaysPreview() {
     showBackground = true
 )
 @Composable
-fun TipsPreview() {
+private fun TipsPreview() {
     PantryPlanTheme {
         Tips()
     }
