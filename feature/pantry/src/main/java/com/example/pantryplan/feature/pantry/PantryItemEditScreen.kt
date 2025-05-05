@@ -7,13 +7,17 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
@@ -63,22 +67,29 @@ fun PantryItemEditScreen(
                 itemName = existingId?.toString(),
                 onBackClick = onBackClick
             )
-        }
+        },
     ) { contentPadding ->
-        Column (modifier = Modifier.padding(contentPadding)) {
-            Text(
-                text = "Image",
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)
-                ),
-                color = MaterialTheme.colorScheme.outline,
-                style = MaterialTheme.typography.bodySmall,
-            )
-            ImageSelect(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-                onClick = { /* TODO: Actually add an image. */ },
-            )
-            PantryItemEditForm()
+        Box (modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .consumeWindowInsets(contentPadding)
+                    .padding(vertical = 8.dp)
+            ) {
+                Text(
+                    text = "Image",
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)
+                    ),
+                    color = MaterialTheme.colorScheme.outline,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                ImageSelect(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                    onClick = { /* TODO: Actually add an image. */ },
+                )
+                PantryItemEditForm()
+            }
         }
     }
 }
@@ -154,6 +165,25 @@ fun PantryItemEditForm() {
             OutlinedSelectField(
                 modifier = Modifier.weight(1f),
                 options = measurementOptions,
+            )
+        }
+
+        Text(
+            text = "When opened, expires in",
+            color = MaterialTheme.colorScheme.outline,
+            style = MaterialTheme.typography.bodySmall,
+        )
+
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            OutlinedNumberField(modifier = Modifier.weight(1f))
+
+            val timeOptions = listOf("Days", "Weeks", "Months")
+            OutlinedSelectField(
+                modifier = Modifier.weight(1f),
+                options = timeOptions,
             )
         }
     }
