@@ -18,6 +18,7 @@ import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -31,6 +32,10 @@ import com.example.pantryplan.core.designsystem.component.ContentUnavailable
 import com.example.pantryplan.core.designsystem.component.MultiFAB
 import com.example.pantryplan.core.designsystem.recipes.RecipeItemCard
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import com.example.pantryplan.core.models.Allergen
+import com.example.pantryplan.core.models.NutritionInfo
+import com.example.pantryplan.core.models.Recipe
+import java.util.EnumSet
 import java.util.UUID
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
@@ -38,6 +43,20 @@ import com.example.pantryplan.core.designsystem.R as designSystemR
 fun RecipesScreen(
     viewModel: RecipesViewModel = hiltViewModel(),
 
+    onClickRecipeItem: (UUID) -> Unit,
+    onCreateRecipeItem: () -> Unit
+) {
+    val recipeUiState: RecipeUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    RecipesScreen(
+        recipeUiState = recipeUiState,
+        onClickRecipeItem = onClickRecipeItem,
+        onCreateRecipeItem = onCreateRecipeItem
+    )
+}
+
+@Composable
+internal fun RecipesScreen(
+    recipeUiState: RecipeUiState,
     onClickRecipeItem: (UUID) -> Unit,
     onCreateRecipeItem: () -> Unit
 ) {
@@ -50,19 +69,19 @@ fun RecipesScreen(
             ),
         floatingActionButton = { RecipesFABs(onCreateRecipeItem) }
     ) { contentPadding ->
-        val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
-        if (uiState.value.recipeItems.isEmpty()) {
+        if (recipeUiState.recipeItems.isEmpty()) {
             RecipesContentUnavailable(modifier = Modifier.padding(contentPadding))
         } else {
             RecipesContentList(
-                recipeState = uiState.value,
+                recipeState = recipeUiState,
                 onClickRecipeItem = onClickRecipeItem,
                 modifier = Modifier.padding(contentPadding)
             )
         }
     }
 }
+
 
 @Composable
 internal fun RecipesFABs(onCreateRecipeItem: () -> Unit) {
@@ -122,12 +141,57 @@ internal fun RecipesContentList(
     }
 }
 
-@Preview
 @Composable
 fun RecipesEmptyPreview() {
     PantryPlanTheme {
         Surface {
             RecipesContentUnavailable()
+        }
+    }
+}
+
+@Preview
+@Composable
+fun RecipesScreenPreview() {
+    PantryPlanTheme {
+        Surface {
+            RecipesScreen(
+                recipeUiState = RecipeUiState(
+                    recipeItems = listOf(
+                        Recipe(
+                            id = UUID.randomUUID(),
+                            title = "Cheeseburger",
+                            description = "Burger packed with juicy beef, melted cheese and extra vegetables to add that final flavour.",
+                            tags = listOf("Dinner", "High Protein"),
+                            allergens = EnumSet.of(Allergen.MILK, Allergen.GLUTEN, Allergen.SESAME),
+                            imageUrl = null,
+                            instructions = listOf("1. Cook Burger", "2. Eat burger"),
+                            ingredients = listOf(
+                                "Beef Burger",
+                                "Burger Buns",
+                                "American Cheese",
+                                "Lettuce",
+                                "Red Onion",
+                                "Bacon"
+                            ),
+                            prepTime = 10f,
+                            cookTime = 15f,
+                            nutrition = NutritionInfo(
+                                calories = 100,
+                                fats = 100f,
+                                saturatedFats = 100f,
+                                carbohydrates = 100f,
+                                sugar = 100f,
+                                fiber = 100f,
+                                protein = 100f,
+                                sodium = 100f
+                            )
+                        )
+                    )
+                ),
+                onClickRecipeItem = {},
+                onCreateRecipeItem = {}
+            )
         }
     }
 }

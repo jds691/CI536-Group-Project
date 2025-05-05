@@ -6,7 +6,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
 import com.example.pantryplan.feature.recipes.RecipeItemAddScreen
-import com.example.pantryplan.feature.recipes.RecipeItemDetailsScreen
 import com.example.pantryplan.feature.recipes.RecipesScreen
 import kotlinx.serialization.Serializable
 import java.util.UUID
@@ -45,7 +44,7 @@ fun NavGraphBuilder.pantrySection(
             )
         }
 
-        composable<RecipeItemDetails> { entry ->
+        /*composable<RecipeItemDetails> { entry ->
             val itemDetails = entry.toRoute<RecipeItemDetails>()
 
             RecipeItemDetailsScreen(
@@ -53,7 +52,7 @@ fun NavGraphBuilder.pantrySection(
                 onBackClick = onBackClick,
                 onEditItem = onRecipeItemAdd
             )
-        }
+        }*/
 
         composable<RecipeItemAdd> { entry ->
             val itemEdit = entry.toRoute<RecipeItemAdd>()
