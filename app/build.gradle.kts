@@ -49,6 +49,7 @@ dependencies {
     implementation(project(":feature:pantry"))
     implementation(project(":feature:recipes"))
     implementation(project(":feature:meal-planner"))
+    implementation(project(":feature:settings"))
 
     api(libs.androidx.compose.material.iconsExtended)
 
