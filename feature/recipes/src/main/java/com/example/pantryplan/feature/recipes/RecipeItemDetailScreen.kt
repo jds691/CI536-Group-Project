@@ -215,11 +215,7 @@ fun RecipeItemDetailsScreen(
                             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            /*AssistChip(
-                                onClick = {},
-                                label = { Text("1") },
-                                leadingIcon =
-                            )*/
+
                         }
                     }
 
