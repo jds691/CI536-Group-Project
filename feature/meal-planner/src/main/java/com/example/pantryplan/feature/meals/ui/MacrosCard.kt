@@ -45,10 +45,7 @@ fun MacrosCard(
 
     ElevatedCard(
         enabled = onClick != null,
-        onClick = {
-            if (onClick != null)
-                onClick()
-        },
+        onClick = onClick ?: {},
         modifier = modifier
             .fillMaxWidth()
     ) {

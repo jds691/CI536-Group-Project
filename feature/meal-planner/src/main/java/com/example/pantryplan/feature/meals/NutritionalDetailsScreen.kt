@@ -39,7 +39,6 @@ import com.example.pantryplan.feature.meals.ui.MacrosCard
 @Composable
 fun NutritionalDetailsScreen(
     onBackClick: () -> Unit,
-
     modifier: Modifier = Modifier
 ) {
     Scaffold(
