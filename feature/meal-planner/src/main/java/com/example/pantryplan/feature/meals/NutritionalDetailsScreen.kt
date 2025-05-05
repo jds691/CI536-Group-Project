@@ -108,32 +108,28 @@ private fun Macros(
                     append("gain muscle")
                 }
 
-                append(". This means:\n")
+                append(". This means:")
+            }
+        )
 
-                append("\u2022")
-                append("\t\t")
-                append("Your protein should be between ")
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("25-30%")
-                }
+        BulletedNutrientGoal(
+            nutrient = "protein",
+            range = "25-30%"
+        )
+
+        BulletedNutrientGoal(
+            nutrient = "carbs",
+            range = "55-60%"
+        )
+
+        BulletedNutrientGoal(
+            nutrient = "fats",
+            range = "15-20%"
+        )
+
+        Text(
+            buildAnnotatedString {
                 append("\n")
-
-                append("\u2022")
-                append("\t\t")
-                append("Your carbs should be between ")
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("55-60%")
-                }
-                append("\n")
-
-                append("\u2022")
-                append("\t\t")
-                append("Your fats should be between ")
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("15-20%")
-                }
-                append("\n\n")
-
                 append("You are currently ")
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                     append("out of range")
@@ -142,6 +138,23 @@ private fun Macros(
             }
         )
     }
+}
+
+@Composable
+private fun BulletedNutrientGoal(
+    nutrient: String,
+    range: String
+) {
+    Text(
+        buildAnnotatedString {
+            append("\u2022")
+            append("\t\t")
+            append("Your $nutrient should be between ")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(range)
+            }
+        }
+    )
 }
 
 @Composable
