@@ -8,8 +8,10 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
@@ -40,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.designsystem.component.ImageSelect
 import java.text.SimpleDateFormat
@@ -128,12 +131,31 @@ fun PantryItemEditForm() {
         )
 
         // TODO: Generate this from enum variants.
-        val options = listOf("Sealed", "Opened", "Frozen", "Expired")
+        val stateOptions = listOf("Sealed", "Opened", "Frozen", "Expired")
         OutlinedSelectField(
-            label = "State",
-            options = options,
             modifier = Modifier.fillMaxWidth(),
+            label = "State",
+            options = stateOptions,
         )
+
+        Text(
+            text = "Quantity",
+            color = MaterialTheme.colorScheme.outline,
+            style = MaterialTheme.typography.bodySmall,
+        )
+
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            OutlinedNumberField(modifier = Modifier.weight(1f))
+
+            val measurementOptions = listOf("Grams", "Kilograms")
+            OutlinedSelectField(
+                modifier = Modifier.weight(1f),
+                options = measurementOptions,
+            )
+        }
     }
 }
 
@@ -207,21 +229,24 @@ fun DatePickerModal(
 
 @Composable
 fun OutlinedSelectField(
-    label: String,
-    options: List<String>,
     modifier: Modifier = Modifier,
+    label: String? = null,
+    options: List<String>,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val textFieldState = rememberTextFieldState(options[0])
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it },
+        modifier = modifier,
     ) {
         OutlinedTextField(
             readOnly = true,
             state = textFieldState,
-            modifier = modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-            label = { Text(label) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            label = label?.let { { Text(it) } },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
         )
@@ -237,4 +262,22 @@ fun OutlinedSelectField(
             }
         }
     }
+}
+
+// TODO: Input validation, ensure value is actually a number.
+@Composable
+fun OutlinedNumberField(
+    modifier: Modifier = Modifier,
+    label: String? = null,
+) {
+    var quantity by remember { mutableStateOf("") }
+
+    OutlinedTextField(
+        value = quantity,
+        onValueChange = { quantity = it },
+        modifier = modifier,
+        label = label?.let { { Text(it) } },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        singleLine = true,
+    )
 }
