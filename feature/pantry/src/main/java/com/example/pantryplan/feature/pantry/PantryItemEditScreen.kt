@@ -122,43 +122,14 @@ fun PantryItemEditForm() {
             singleLine = true,
         )
 
-        DatePickerTextField()
+        OutlinedDatePickerField()
 
-        // TODO: Generate this from enum variants.
-        val options = listOf("Sealed", "Opened", "Frozen", "Expired")
-        var expanded by remember { mutableStateOf(false) }
-        val textFieldState = rememberTextFieldState(options[0])
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
-        ) {
-            OutlinedTextField(
-                readOnly = true,
-                state = textFieldState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-                label = { Text("State") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-            )
-            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                options.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        text = {Text(text = selectionOption)},
-                        onClick = {
-                            textFieldState.setTextAndPlaceCursorAtEnd(selectionOption)
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
+        OutlinedSelectField()
     }
 }
 
 @Composable
-fun DatePickerTextField() {
+fun OutlinedDatePickerField() {
     var selectedDate by remember { mutableStateOf<Long?>(null) }
     var showModal by remember { mutableStateOf(false) }
 
@@ -220,5 +191,39 @@ fun DatePickerModal(
         },
     ) {
         DatePicker(datePickerState)
+    }
+}
+
+@Composable
+fun OutlinedSelectField() {
+    // TODO: Generate this from enum variants.
+    val options = listOf("Sealed", "Opened", "Frozen", "Expired")
+    var expanded by remember { mutableStateOf(false) }
+    val textFieldState = rememberTextFieldState(options[0])
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+    ) {
+        OutlinedTextField(
+            readOnly = true,
+            state = textFieldState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            label = { Text("State") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = {Text(text = selectionOption)},
+                    onClick = {
+                        textFieldState.setTextAndPlaceCursorAtEnd(selectionOption)
+                        expanded = false
+                    }
+                )
+            }
+        }
     }
 }
