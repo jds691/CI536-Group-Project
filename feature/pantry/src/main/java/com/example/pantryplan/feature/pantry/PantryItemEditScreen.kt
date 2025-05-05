@@ -54,6 +54,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
@@ -140,6 +141,8 @@ fun PantryItemEditForm() {
         OutlinedDatePickerField(
             label = { Text("Expires") },
             modifier = Modifier.fillMaxWidth(),
+            initialSelectedDateMillis = Date().time
+                    + TimeUnit.MILLISECONDS.convert(7, TimeUnit.DAYS),
         )
 
         // TODO: Generate this from enum variants.
@@ -194,13 +197,14 @@ fun PantryItemEditForm() {
 fun OutlinedDatePickerField(
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
+    initialSelectedDateMillis: Long? = null,
 ) {
-    var selectedDate by remember { mutableStateOf<Long?>(null) }
+    var selectedDate by remember { mutableStateOf<Long?>(initialSelectedDateMillis) }
     var showModal by remember { mutableStateOf(false) }
 
     /* TODO: Remove this function, do actual date formatting with kotlin library. */
     fun convertMillisToDate(millis: Long): String {
-        val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+        val formatter = SimpleDateFormat("EEE, dd MMM", Locale.getDefault())
         return formatter.format(Date(millis))
     }
 
@@ -227,7 +231,8 @@ fun OutlinedDatePickerField(
     if (showModal) {
         DatePickerModal(
             onDateSelected = { selectedDate = it },
-            onDismiss = { showModal = false }
+            onDismiss = { showModal = false },
+            initialSelectedDateMillis = initialSelectedDateMillis,
         )
     }
 }
@@ -235,9 +240,12 @@ fun OutlinedDatePickerField(
 @Composable
 fun DatePickerModal(
     onDateSelected: (Long?) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    initialSelectedDateMillis: Long? = null,
 ) {
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialSelectedDateMillis
+    )
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
