@@ -122,14 +122,26 @@ fun PantryItemEditForm() {
             singleLine = true,
         )
 
-        OutlinedDatePickerField()
+        OutlinedDatePickerField(
+            label = "Expires",
+            modifier = Modifier.fillMaxWidth(),
+        )
 
-        OutlinedSelectField()
+        // TODO: Generate this from enum variants.
+        val options = listOf("Sealed", "Opened", "Frozen", "Expired")
+        OutlinedSelectField(
+            label = "State",
+            options = options,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
 @Composable
-fun OutlinedDatePickerField() {
+fun OutlinedDatePickerField(
+    label: String,
+    modifier: Modifier = Modifier,
+) {
     var selectedDate by remember { mutableStateOf<Long?>(null) }
     var showModal by remember { mutableStateOf(false) }
 
@@ -142,8 +154,7 @@ fun OutlinedDatePickerField() {
     OutlinedTextField(
         value = selectedDate?.let { convertMillisToDate(it) } ?: "",
         onValueChange = { },
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .pointerInput(selectedDate) {
                 awaitEachGesture {
                     awaitFirstDown(pass = PointerEventPass.Initial)
@@ -155,7 +166,7 @@ fun OutlinedDatePickerField() {
             }
             .clickable(onClick = { showModal = true }),
         readOnly = true,
-        label = { Text("Expires") },
+        label = { Text(label) },
         trailingIcon = {
             Icon(Icons.Default.DateRange, contentDescription = "Select date")
         },
@@ -195,9 +206,11 @@ fun DatePickerModal(
 }
 
 @Composable
-fun OutlinedSelectField() {
-    // TODO: Generate this from enum variants.
-    val options = listOf("Sealed", "Opened", "Frozen", "Expired")
+fun OutlinedSelectField(
+    label: String,
+    options: List<String>,
+    modifier: Modifier = Modifier,
+) {
     var expanded by remember { mutableStateOf(false) }
     val textFieldState = rememberTextFieldState(options[0])
     ExposedDropdownMenuBox(
@@ -207,17 +220,15 @@ fun OutlinedSelectField() {
         OutlinedTextField(
             readOnly = true,
             state = textFieldState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-            label = { Text("State") },
+            modifier = modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             options.forEach { selectionOption ->
                 DropdownMenuItem(
-                    text = {Text(text = selectionOption)},
+                    text = { Text(text = selectionOption) },
                     onClick = {
                         textFieldState.setTextAndPlaceCursorAtEnd(selectionOption)
                         expanded = false
