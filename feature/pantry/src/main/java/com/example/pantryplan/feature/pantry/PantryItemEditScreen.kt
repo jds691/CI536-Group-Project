@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -63,6 +64,7 @@ fun PantryItemEditScreen(
     onBackClick: () -> Unit
 ) {
     Scaffold (
+        modifier = Modifier.imePadding(),
         topBar = {
             PantryItemEditTopBar(
                 /* TODO: Pull pantry item name from the data layer. */
@@ -97,7 +99,7 @@ fun PantryItemEditScreen(
 }
 
 @Composable
-fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Unit) {
+private fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Unit) {
     TopAppBar(
         title = {
             if (itemName == null) {
@@ -122,7 +124,7 @@ fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Unit) {
 }
 
 @Composable
-fun PantryItemEditForm() {
+private fun PantryItemEditForm() {
     Column(
         modifier = Modifier
             .padding(horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)),
@@ -194,7 +196,7 @@ fun PantryItemEditForm() {
 }
 
 @Composable
-fun OutlinedDatePickerField(
+private fun OutlinedDatePickerField(
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
     initialSelectedDateMillis: Long? = null,
@@ -238,7 +240,7 @@ fun OutlinedDatePickerField(
 }
 
 @Composable
-fun DatePickerModal(
+private fun DatePickerModal(
     onDateSelected: (Long?) -> Unit,
     onDismiss: () -> Unit,
     initialSelectedDateMillis: Long? = null,
@@ -267,7 +269,7 @@ fun DatePickerModal(
 }
 
 @Composable
-fun OutlinedSelectField(
+private fun OutlinedSelectField(
     modifier: Modifier = Modifier,
     label: @Composable (TextFieldLabelScope.() -> Unit)? = null,
     options: List<String>,
@@ -305,7 +307,7 @@ fun OutlinedSelectField(
 
 // TODO: Input validation, ensure value is actually a number.
 @Composable
-fun OutlinedNumberField(
+private fun OutlinedNumberField(
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
 ) {
