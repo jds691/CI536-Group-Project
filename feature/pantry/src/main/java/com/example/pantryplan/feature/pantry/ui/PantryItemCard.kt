@@ -57,17 +57,17 @@ import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.R
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
 import java.util.UUID
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.days
 
 fun createStatus(item: PantryItem): Pair<String, Color> {
     val formatter = RelativeDateTimeFormatter.getInstance()
 
     val days: Long = if (item.expiresAfter != null)
-        (DateTimeUnit.MILLISECOND * item.expiresAfter!!).duration.inWholeDays
+        item.expiresAfter!!.inWholeDays
     else
     // Days since the expiry has passed
         item.expiryDate.daysUntil(Clock.System.now(), TimeZone.UTC).toLong()
@@ -335,7 +335,7 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             name = "Cheese With Hat",
             quantity = 1000,
             expiryDate = Clock.System.now(),
-            expiresAfter = 86400 * 1000,
+            expiresAfter = 1.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
             imageUrl = null
@@ -345,7 +345,7 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             name = "Cheese With Hat",
             quantity = 1000,
             expiryDate = Clock.System.now(),
-            expiresAfter = 86400 * 1000 * 3,
+            expiresAfter = 3.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.OPENED,
             imageUrl = null
