@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
 
+    id("kotlinx-serialization")
+
     // Hilt plugins.
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -35,6 +37,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:models"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -43,7 +46,13 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation(libs.kotlinx.serialization.json)
+
     // Hilt dependencies.
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    api("androidx.datastore:datastore-core:1.1.0")
+    api("androidx.datastore:datastore-preferences-core:1.1.0")
+    api("androidx.datastore:datastore-preferences:1.1.0")
 }
