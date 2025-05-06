@@ -2,6 +2,7 @@
 
 package com.example.pantryplan.feature.pantry
 
+import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -50,11 +52,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.designsystem.component.ImageSelect
-import java.text.SimpleDateFormat
+import kotlinx.datetime.Clock
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
@@ -63,6 +65,7 @@ fun PantryItemEditScreen(
     onBackClick: () -> Unit
 ) {
     Scaffold (
+        modifier = Modifier.imePadding(),
         topBar = {
             PantryItemEditTopBar(
                 /* TODO: Pull pantry item name from the data layer. */
@@ -97,7 +100,7 @@ fun PantryItemEditScreen(
 }
 
 @Composable
-fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Unit) {
+private fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Unit) {
     TopAppBar(
         title = {
             if (itemName == null) {
@@ -122,7 +125,7 @@ fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Unit) {
 }
 
 @Composable
-fun PantryItemEditForm() {
+private fun PantryItemEditForm() {
     Column(
         modifier = Modifier
             .padding(horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)),
@@ -141,8 +144,7 @@ fun PantryItemEditForm() {
         OutlinedDatePickerField(
             label = { Text("Expires") },
             modifier = Modifier.fillMaxWidth(),
-            initialSelectedDateMillis = Date().time
-                    + TimeUnit.MILLISECONDS.convert(7, TimeUnit.DAYS),
+            initialSelectedDateMillis = (Clock.System.now() + 7.days).toEpochMilliseconds(),
         )
 
         // TODO: Generate this from enum variants.
@@ -194,7 +196,7 @@ fun PantryItemEditForm() {
 }
 
 @Composable
-fun OutlinedDatePickerField(
+private fun OutlinedDatePickerField(
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
     initialSelectedDateMillis: Long? = null,
@@ -238,7 +240,7 @@ fun OutlinedDatePickerField(
 }
 
 @Composable
-fun DatePickerModal(
+private fun DatePickerModal(
     onDateSelected: (Long?) -> Unit,
     onDismiss: () -> Unit,
     initialSelectedDateMillis: Long? = null,
@@ -267,7 +269,7 @@ fun DatePickerModal(
 }
 
 @Composable
-fun OutlinedSelectField(
+private fun OutlinedSelectField(
     modifier: Modifier = Modifier,
     label: @Composable (TextFieldLabelScope.() -> Unit)? = null,
     options: List<String>,
@@ -305,7 +307,7 @@ fun OutlinedSelectField(
 
 // TODO: Input validation, ensure value is actually a number.
 @Composable
-fun OutlinedNumberField(
+private fun OutlinedNumberField(
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
 ) {
