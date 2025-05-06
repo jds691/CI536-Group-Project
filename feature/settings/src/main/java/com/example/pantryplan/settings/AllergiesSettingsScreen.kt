@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -55,7 +56,7 @@ internal fun AllergiesSettingsScreen(
         }
     ) { innerPadding ->
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .consumeWindowInsets(innerPadding)
                 .padding(innerPadding)
@@ -64,6 +65,8 @@ internal fun AllergiesSettingsScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             YourAllergies()
+
+            HorizontalDivider()
 
             YourIntolerances()
         }
