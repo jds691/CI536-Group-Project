@@ -43,7 +43,7 @@ fun NavGraphBuilder.pantrySection(
             )
         }
 
-        composable<PantryItemDetails> { entry ->
+        /*composable<PantryItemDetails> { entry ->
             val itemDetails = entry.toRoute<PantryItemDetails>()
 
             PantryItemDetailsScreen(
@@ -51,7 +51,7 @@ fun NavGraphBuilder.pantrySection(
                 onBackClick = onBackClick,
                 onEditItem = onPantryItemEdit
             )
-        }
+        }*/
 
         composable<PantryItemEdit> { entry ->
             val itemEdit = entry.toRoute<PantryItemEdit>()
