@@ -36,7 +36,8 @@ android {
 
 dependencies {
     implementation(project(":core:models"))
-    implementation(project(":core:datastore"))
+    // Automatically exposes required models from datastore
+    api(project(":core:datastore"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

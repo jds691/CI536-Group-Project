@@ -24,22 +24,41 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.text.getDisplayNameId
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
-import com.example.pantryplan.core.models.Allergen.MILK
+import java.util.EnumSet
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
 internal fun AllergiesSettingsScreen(
+    viewModel: SettingsViewModel = hiltViewModel(),
     onBackClick: () -> Unit
+) {
+    val settingsUiState: SettingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    AllergiesSettingsScreen(
+        uiState = settingsUiState,
+        onBackClick = onBackClick,
+        onUpdateAllergies = viewModel::updateAllergies,
+        onUpdateIntolerances = viewModel::updateIntolerances
+    )
+}
+
+@Composable
+internal fun AllergiesSettingsScreen(
+    uiState: SettingsUiState,
+    onBackClick: () -> Unit,
+    onUpdateAllergies: (EnumSet<Allergen>) -> Unit,
+    onUpdateIntolerances: (EnumSet<Allergen>) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -64,17 +83,26 @@ internal fun AllergiesSettingsScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            YourAllergies()
+            YourAllergies(
+                uiState = uiState,
+                onUpdateAllergies = onUpdateAllergies
+            )
 
             HorizontalDivider()
 
-            YourIntolerances()
+            YourIntolerances(
+                uiState = uiState,
+                onUpdateIntolerances = onUpdateIntolerances
+            )
         }
     }
 }
 
 @Composable
-private fun YourAllergies() {
+private fun YourAllergies(
+    uiState: SettingsUiState,
+    onUpdateAllergies: (EnumSet<Allergen>) -> Unit
+) {
     Column {
         Text(
             text = "Your Allergies",
@@ -82,7 +110,7 @@ private fun YourAllergies() {
             color = MaterialTheme.colorScheme.primary
         )
 
-        val set = remember { mutableStateSetOf(MILK) }
+        val set = uiState.settings.allergies
 
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -96,6 +124,13 @@ private fun YourAllergies() {
                             set.remove(allergy)
                         else
                             set.add(allergy)
+
+                        try {
+                            onUpdateAllergies(EnumSet.copyOf(set))
+                        } catch (e: IllegalArgumentException) {
+                            // Thrown if set is empty when calling copyOf
+                            onUpdateAllergies(EnumSet.noneOf(Allergen::class.java))
+                        }
                     },
                     label = { Text(stringResource(allergy.getDisplayNameId())) },
                     leadingIcon = {
@@ -114,7 +149,10 @@ private fun YourAllergies() {
 }
 
 @Composable
-private fun YourIntolerances() {
+private fun YourIntolerances(
+    uiState: SettingsUiState,
+    onUpdateIntolerances: (EnumSet<Allergen>) -> Unit
+) {
     Column {
         Text(
             text = "Your Intolerances",
@@ -122,7 +160,7 @@ private fun YourIntolerances() {
             color = MaterialTheme.colorScheme.primary
         )
 
-        val set = remember { mutableStateSetOf(MILK) }
+        val set = uiState.settings.intolerances
 
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -136,6 +174,12 @@ private fun YourIntolerances() {
                             set.remove(allergy)
                         else
                             set.add(allergy)
+
+                        try {
+                            onUpdateIntolerances(EnumSet.copyOf(set))
+                        } catch (e: IllegalArgumentException) {
+                            onUpdateIntolerances(EnumSet.noneOf(Allergen::class.java))
+                        }
                     },
                     label = { Text(stringResource(allergy.getDisplayNameId())) },
                     leadingIcon = {
@@ -158,7 +202,10 @@ private fun YourIntolerances() {
 private fun AllergiesSettingsScreenPreview() {
     PantryPlanTheme {
         AllergiesSettingsScreen(
-            onBackClick = {}
+            uiState = SettingsUiState(),
+            onBackClick = {},
+            onUpdateAllergies = {},
+            onUpdateIntolerances = {}
         )
     }
 }

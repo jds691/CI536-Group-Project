@@ -122,6 +122,9 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
             )
 
             settingsSection(
+                // Required to be able to share 1 common view model between all settings screens
+                navController = appState.navController,
+
                 onBackClick = appState.navController::popBackStack,
                 onAllergySettingsClick = appState.navController::navigateToAllergySettings
             )

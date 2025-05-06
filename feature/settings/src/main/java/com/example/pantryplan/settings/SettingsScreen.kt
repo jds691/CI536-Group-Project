@@ -17,14 +17,33 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.settings.ui.SettingsRow
+
+@Composable
+internal fun SettingsScreen(
+    viewModel: SettingsViewModel = hiltViewModel(),
+    onBackClick: () -> Unit,
+    onAllergySettingsClick: () -> Unit
+) {
+    val settingsUiState: SettingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    SettingsScreen(
+        uiState = settingsUiState,
+        onBackClick = onBackClick,
+        onAllergySettingsClick = onAllergySettingsClick
+    )
+}
 
 
 @Composable
 internal fun SettingsScreen(
+    uiState: SettingsUiState,
     onBackClick: () -> Unit,
     onAllergySettingsClick: () -> Unit
 ) {
@@ -51,7 +70,7 @@ internal fun SettingsScreen(
         ) {
             SettingsRow(
                 title = "Allergies & Intolerances",
-                description = "X Allergies, X Intolerances",
+                description = "${uiState.settings.allergies.count()} Allergies, ${uiState.settings.intolerances.count()} Intolerances",
                 onClick = onAllergySettingsClick
             )
         }
@@ -63,6 +82,7 @@ internal fun SettingsScreen(
 private fun SettingsScreenPreview() {
     PantryPlanTheme {
         SettingsScreen(
+            uiState = SettingsUiState(),
             onBackClick = {},
             onAllergySettingsClick = {}
         )
