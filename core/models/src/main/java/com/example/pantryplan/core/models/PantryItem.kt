@@ -1,6 +1,6 @@
 package com.example.pantryplan.core.models
 
-import java.util.Date
+import kotlinx.datetime.Instant
 import java.util.UUID
 
 enum class PantryItemState {
@@ -11,11 +11,11 @@ data class PantryItem(
     val id: UUID,
     val name: String,
     val quantity: Int,
-    val expiryDate: Date,
+    val expiryDate: Instant,
     // How long until an item will expire
     val expiresAfter: Int?,
     // How long the item has been in its current state
-    val inStateSince: Date,
+    val inStateSince: Instant,
     val state: PantryItemState,
     val imageUrl: String?
 )
