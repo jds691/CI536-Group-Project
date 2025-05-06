@@ -2,7 +2,7 @@
 
 package com.example.pantryplan.feature.pantry.ui
 
-import android.icu.text.RelativeDateTimeFormatter
+import android.text.format.DateUtils
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -57,56 +57,54 @@ import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.R
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.daysUntil
+import kotlinx.datetime.Instant
 import java.util.UUID
-import kotlin.math.abs
+import kotlin.math.absoluteValue
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
+private fun humanReadableTimestamp(time: Instant, now: Instant): String {
+    val minResolution = if ((time - now).inWholeDays.absoluteValue < 7) {
+        DateUtils.DAY_IN_MILLIS
+    } else {
+        DateUtils.WEEK_IN_MILLIS
+
+    }
+    return DateUtils.getRelativeTimeSpanString(
+        time.toEpochMilliseconds(),
+        now.toEpochMilliseconds(),
+        minResolution,
+    ).toString().lowercase()
+}
+
 fun createStatus(item: PantryItem): Pair<String, Color> {
-    val formatter = RelativeDateTimeFormatter.getInstance()
-
-    val days: Long = if (item.expiresAfter != null)
-        item.expiresAfter!!.inWholeDays
-    else
-    // Days since the expiry has passed
-        item.expiryDate.daysUntil(Clock.System.now(), TimeZone.UTC).toLong()
-
     // TODO: When Theme.kt is updated to support the extended colours, replace the status colour
 
+    val now = Clock.System.now()
     return when (item.state) {
-        PantryItemState.SEALED, PantryItemState.OPENED -> Pair(
-            "Expires ${
-                formatter.format(
-                    days.toDouble(),
-                    RelativeDateTimeFormatter.Direction.NEXT,
-                    RelativeDateTimeFormatter.RelativeUnit.DAYS
-                )
-            }.",
-            if (days <= 2) Color(255, 102, 0) else Color.Green
-        )
+        PantryItemState.SEALED, PantryItemState.OPENED -> {
+            val expiry = item.expiryDate + item.expiresAfter!!
+            val timestamp = humanReadableTimestamp(expiry, now)
 
-        PantryItemState.FROZEN -> Pair(
-            if (days == 0L) "Frozen today." else "Frozen ${
-                formatter.format(
-                    abs(days.toDouble()),
-                    RelativeDateTimeFormatter.Direction.LAST,
-                    RelativeDateTimeFormatter.RelativeUnit.DAYS
-                )
-            }.",
-            Color.Cyan
-        )
+            val expiringSoon = item.expiresAfter!!.inWholeDays <= 2
+            val color = if (expiringSoon) Color(255, 102, 0) else Color.Green
 
-        PantryItemState.EXPIRED -> Pair(
-            if (days == 0L) "Expired today." else "Expired ${
-                formatter.format(
-                    abs(days.toDouble()),
-                    RelativeDateTimeFormatter.Direction.LAST,
-                    RelativeDateTimeFormatter.RelativeUnit.DAYS
-                )
-            }.",
-            Color.Red
-        )
+            Pair("Expires ${timestamp}.", color)
+        }
+
+        PantryItemState.FROZEN -> {
+            val frozen = item.expiryDate - (item.expiresAfter ?: Duration.ZERO)
+            val timestamp = humanReadableTimestamp(frozen, now)
+
+            Pair("Frozen ${timestamp}.", Color.Cyan)
+        }
+
+        PantryItemState.EXPIRED -> {
+            val expiry = item.expiryDate
+            val timestamp = humanReadableTimestamp(expiry, now)
+            
+            Pair("Expired ${timestamp}.", Color.Red)
+        }
     }
 }
 
