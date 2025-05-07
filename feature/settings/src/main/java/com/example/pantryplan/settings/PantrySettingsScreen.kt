@@ -38,15 +38,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.R
+import com.example.pantryplan.core.designsystem.text.pantryPlanExactFormat
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.settings.ui.SettingsValueRow
 import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.format.MonthNames
-import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -103,20 +100,12 @@ internal fun PantrySettingsScreen(
                     if (uiState.settings.showRelativeDates.value) {
                         "Will show dates as 'Expires Tomorrow'."
                     } else {
-                        val currentMoment = Clock.System.now()
+                        val moment = Clock.System.now().plus(1.days)
                         val datetimeInSystemZone: LocalDateTime =
-                            currentMoment.toLocalDateTime(TimeZone.currentSystemDefault())
-
-                        val exactDateFormat = LocalDate.Format {
-                            monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); dayOfMonth(); chars(
-                            ", "
-                        ); year()
-                        }
+                            moment.toLocalDateTime(TimeZone.currentSystemDefault())
 
                         "Will show dates as 'Expires ${
-                            datetimeInSystemZone.date.format(
-                                exactDateFormat
-                            )
+                            datetimeInSystemZone.date.pantryPlanExactFormat()
                         }'."
                     }
             ) {

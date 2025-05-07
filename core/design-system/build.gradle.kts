@@ -37,6 +37,8 @@ android {
 dependencies {
     implementation(project(":core:models"))
 
+    implementation(libs.kotlinx.datetime)
+
     api(libs.androidx.compose.material.iconsExtended)
 
     implementation(libs.androidx.core.ktx)
