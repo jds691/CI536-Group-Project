@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,6 +40,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.R
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.settings.ui.SettingsValueRow
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.DurationUnit
@@ -54,6 +63,7 @@ internal fun PantrySettingsScreen(
         uiState = settingsUiState,
         onBackClick = onBackClick,
         onUpdateExpiringSoon = viewModel::updateExpiringSoonAmount,
+        onChangeShowRelativeDates = viewModel::updateUseRelativeDates
     )
 }
 
@@ -61,7 +71,8 @@ internal fun PantrySettingsScreen(
 internal fun PantrySettingsScreen(
     uiState: SettingsUiState,
     onBackClick: () -> Unit,
-    onUpdateExpiringSoon: (Duration) -> Unit
+    onUpdateExpiringSoon: (Duration) -> Unit,
+    onChangeShowRelativeDates: (Boolean) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -86,6 +97,35 @@ internal fun PantrySettingsScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
+            SettingsValueRow(
+                title = "Show Relative Dates",
+                description =
+                    if (uiState.settings.showRelativeDates.value) {
+                        "Will show dates as 'Expires Tomorrow'."
+                    } else {
+                        val currentMoment = Clock.System.now()
+                        val datetimeInSystemZone: LocalDateTime =
+                            currentMoment.toLocalDateTime(TimeZone.currentSystemDefault())
+
+                        val exactDateFormat = LocalDate.Format {
+                            monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); dayOfMonth(); chars(
+                            ", "
+                        ); year()
+                        }
+
+                        "Will show dates as 'Expires ${
+                            datetimeInSystemZone.date.format(
+                                exactDateFormat
+                            )
+                        }'."
+                    }
+            ) {
+                Switch(
+                    checked = uiState.settings.showRelativeDates.value,
+                    onCheckedChange = onChangeShowRelativeDates
+                )
+            }
+
             SettingsValueRow(
                 "Expiring Soon Amount"
             ) {
@@ -162,7 +202,8 @@ private fun PantrySettingsScreenPreview() {
         PantrySettingsScreen(
             uiState = SettingsUiState(),
             onBackClick = {},
-            onUpdateExpiringSoon = {}
+            onUpdateExpiringSoon = {},
+            onChangeShowRelativeDates = {}
         )
     }
 }
