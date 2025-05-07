@@ -2,6 +2,7 @@
 
 package com.example.pantryplan.settings
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,8 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,45 +20,37 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
-import com.example.pantryplan.settings.ui.SettingsRow
+import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
-internal fun SettingsScreen(
+internal fun MealPlannerSettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
-    onBackClick: () -> Unit,
-    onAllergySettingsClick: () -> Unit,
-    onPantrySettingsClick: () -> Unit,
-    onMealPlannerSettingsClick: () -> Unit
+    onBackClick: () -> Unit
 ) {
     val settingsUiState: SettingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    SettingsScreen(
+    MealPlannerSettingsScreen(
         uiState = settingsUiState,
-        onBackClick = onBackClick,
-        onAllergySettingsClick = onAllergySettingsClick,
-        onPantrySettingsClick = onPantrySettingsClick,
-        onMealPlannerSettingsClick = onMealPlannerSettingsClick
+        onBackClick = onBackClick
     )
 }
 
-
 @Composable
-internal fun SettingsScreen(
+internal fun MealPlannerSettingsScreen(
     uiState: SettingsUiState,
-    onBackClick: () -> Unit,
-    onAllergySettingsClick: () -> Unit,
-    onPantrySettingsClick: () -> Unit,
-    onMealPlannerSettingsClick: () -> Unit
+    onBackClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
             MediumTopAppBar(
                 title = {
-                    Text("Settings")
+                    Text("Meal Planner")
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
@@ -70,45 +61,25 @@ internal fun SettingsScreen(
         }
     ) { innerPadding ->
         Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .consumeWindowInsets(innerPadding)
                 .padding(innerPadding)
+                .padding(horizontal = dimensionResource(designSystemR.dimen.horizontal_margin))
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            SettingsRow(
-                title = "Allergies & Intolerances",
-                description = "${uiState.settings.allergies.count()} Allergies, ${uiState.settings.intolerances.count()} Intolerances",
-                onClick = onAllergySettingsClick
-            )
-
-            SettingsRow(
-                title = "Pantry",
-                description = "Pantry Settings",
-                icon = Icons.Outlined.Place,
-                onClick = onPantrySettingsClick
-            )
-
-            SettingsRow(
-                title = "Meal Planner",
-                description = "Meal Planner Settings",
-                icon = Icons.Outlined.Notifications,
-                onClick = onMealPlannerSettingsClick
-            )
         }
     }
 }
 
 @Preview
 @Composable
-private fun SettingsScreenPreview() {
+private fun MealPlannerSettingsScreenPreview() {
     PantryPlanTheme {
-        SettingsScreen(
+        MealPlannerSettingsScreen(
             uiState = SettingsUiState(),
-            onBackClick = {},
-            onAllergySettingsClick = {},
-            onPantrySettingsClick = {},
-            onMealPlannerSettingsClick = {}
+            onBackClick = {}
         )
     }
 }
