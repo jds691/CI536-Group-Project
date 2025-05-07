@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import com.example.pantryplan.core.models.Allergen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,12 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.util.EnumSet
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
+
+private val expiringSoonAmountPreferencesKey = longPreferencesKey("expiring_soon_amount")
 
 private val allergiesPreferencesKey = byteArrayPreferencesKey("allergies")
 private val intolerancesPreferencesKey = byteArrayPreferencesKey("intolerances")
@@ -37,10 +44,21 @@ class UserPreferencesDataSource @Inject constructor(
         if (intolerances == null)
             intolerances = EnumSet.noneOf(Allergen::class.java)
 
+        val expiringSoon =
+            preferences[expiringSoonAmountPreferencesKey]?.toDuration(DurationUnit.DAYS) ?: 2.days
+
         UserPreferences(
+            expiringSoonAmount = expiringSoon,
+
             allergies = allergies!!,
             intolerances = intolerances!!
         )
+    }
+
+    suspend fun setExpiringSoonAmount(expiringSoon: Duration) {
+        userPreferences.edit { preferences ->
+            preferences[expiringSoonAmountPreferencesKey] = expiringSoon.toLong(DurationUnit.DAYS)
+        }
     }
 
     suspend fun setAllergies(allergies: EnumSet<Allergen>) {
