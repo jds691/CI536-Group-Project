@@ -29,14 +29,16 @@ import com.example.pantryplan.settings.ui.SettingsRow
 internal fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
-    onAllergySettingsClick: () -> Unit
+    onAllergySettingsClick: () -> Unit,
+    onPantrySettingsClick: () -> Unit
 ) {
     val settingsUiState: SettingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SettingsScreen(
         uiState = settingsUiState,
         onBackClick = onBackClick,
-        onAllergySettingsClick = onAllergySettingsClick
+        onAllergySettingsClick = onAllergySettingsClick,
+        onPantrySettingsClick = onPantrySettingsClick
     )
 }
 
@@ -45,7 +47,8 @@ internal fun SettingsScreen(
 internal fun SettingsScreen(
     uiState: SettingsUiState,
     onBackClick: () -> Unit,
-    onAllergySettingsClick: () -> Unit
+    onAllergySettingsClick: () -> Unit,
+    onPantrySettingsClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -73,6 +76,12 @@ internal fun SettingsScreen(
                 description = "${uiState.settings.allergies.count()} Allergies, ${uiState.settings.intolerances.count()} Intolerances",
                 onClick = onAllergySettingsClick
             )
+
+            SettingsRow(
+                title = "Pantry",
+                description = "Pantry Settings",
+                onClick = onPantrySettingsClick
+            )
         }
     }
 }
@@ -84,7 +93,8 @@ private fun SettingsScreenPreview() {
         SettingsScreen(
             uiState = SettingsUiState(),
             onBackClick = {},
-            onAllergySettingsClick = {}
+            onAllergySettingsClick = {},
+            onPantrySettingsClick = {}
         )
     }
 }
