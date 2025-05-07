@@ -25,13 +25,19 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.component.MultiFAB
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import com.example.pantryplan.core.models.PantryItem
+import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.ui.PantryItemCard
+import kotlinx.datetime.Clock
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
@@ -64,7 +70,7 @@ fun PantryScreen(
 }
 
 @Composable
-internal fun PantryFABs(onCreatePantryItem: () -> Unit) {
+private fun PantryFABs(onCreatePantryItem: () -> Unit) {
     MultiFAB {
         SmallFloatingActionButton(
             onClick = { /* TODO: Navigate to barcode scanning. */ }
@@ -83,7 +89,7 @@ internal fun PantryFABs(onCreatePantryItem: () -> Unit) {
 }
 
 @Composable
-internal fun PantryContentUnavailable(modifier: Modifier = Modifier) {
+private fun PantryContentUnavailable(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -99,7 +105,7 @@ internal fun PantryContentUnavailable(modifier: Modifier = Modifier) {
 }
 
 @Composable
-internal fun PantryContentList(
+private fun PantryContentList(
     pantryState: PantryUiState,
     onClickPantryItem: (UUID) -> Unit,
     modifier: Modifier = Modifier,
@@ -123,10 +129,80 @@ internal fun PantryContentList(
 
 @Preview
 @Composable
-fun PantryEmptyPreview() {
+private fun PantryPopulatedPreview(
+    @PreviewParameter(SamplePantryItemProvider::class) pantryItems: List<PantryItem>
+) {
+    PantryPlanTheme {
+        Surface {
+            PantryContentList(
+                pantryState = PantryUiState(pantryItems),
+                onClickPantryItem = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PantryEmptyPreview() {
     PantryPlanTheme {
         Surface {
             PantryContentUnavailable()
         }
     }
+}
+
+private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryItem>> {
+    override val values: Sequence<List<PantryItem>> = sequenceOf(listOf(
+        PantryItem(
+            id = UUID.randomUUID(),
+            name = "Bacon",
+            quantity = 1000,
+            expiryDate = Clock.System.now(),
+            expiresAfter = 7.5.days,
+            inStateSince = Clock.System.now(),
+            state = PantryItemState.SEALED,
+            imageUrl = null
+        ),
+        PantryItem(
+            id = UUID.randomUUID(),
+            name = "Cheese",
+            quantity = 1000,
+            expiryDate = Clock.System.now(),
+            expiresAfter = 1.days,
+            inStateSince = Clock.System.now(),
+            state = PantryItemState.OPENED,
+            imageUrl = null
+        ),
+        PantryItem(
+            id = UUID.randomUUID(),
+            name = "Milk",
+            quantity = 1000,
+            expiryDate = Clock.System.now(),
+            expiresAfter = 1.days,
+            inStateSince = Clock.System.now(),
+            state = PantryItemState.EXPIRED,
+            imageUrl = null
+        ),
+        PantryItem(
+            id = UUID.randomUUID(),
+            name = "Pasta Bake",
+            quantity = 1000,
+            expiryDate = Clock.System.now(),
+            expiresAfter = 7.days,
+            inStateSince = Clock.System.now(),
+            state = PantryItemState.FROZEN,
+            imageUrl = null
+        ),
+        PantryItem(
+            id = UUID.randomUUID(),
+            name = "Egg",
+            quantity = 1000,
+            expiryDate = Clock.System.now(),
+            expiresAfter = Int.MAX_VALUE.days,
+            inStateSince = Clock.System.now(),
+            state = PantryItemState.SEALED,
+            imageUrl = null
+        ),
+    ))
 }
