@@ -5,6 +5,7 @@ import java.util.EnumSet
 import kotlin.time.Duration
 
 data class UserPreferences(
+    val useRelativeDates: Boolean,
     val expiringSoonAmount: Duration,
 
     val allergies: EnumSet<Allergen>,

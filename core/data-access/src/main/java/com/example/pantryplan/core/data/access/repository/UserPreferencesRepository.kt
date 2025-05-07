@@ -9,6 +9,7 @@ import kotlin.time.Duration
 interface UserPreferencesRepository {
     val preferences: Flow<UserPreferences>
 
+    suspend fun setUseRelativeDates(use: Boolean)
     suspend fun setExpiringSoonAmount(amount: Duration)
 
     suspend fun setAllergies(allergies: EnumSet<Allergen>)

@@ -2,6 +2,7 @@ package com.example.pantryplan.core.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -21,6 +22,7 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+private val useRelativeDatesPreferencesKey = booleanPreferencesKey("use_relative_dates")
 private val expiringSoonAmountPreferencesKey = longPreferencesKey("expiring_soon_amount")
 
 private val allergiesPreferencesKey = byteArrayPreferencesKey("allergies")
@@ -47,12 +49,22 @@ class UserPreferencesDataSource @Inject constructor(
         val expiringSoon =
             preferences[expiringSoonAmountPreferencesKey]?.toDuration(DurationUnit.DAYS) ?: 2.days
 
+        val useRelativeDates =
+            preferences[useRelativeDatesPreferencesKey] ?: true
+
         UserPreferences(
+            useRelativeDates = useRelativeDates,
             expiringSoonAmount = expiringSoon,
 
             allergies = allergies!!,
             intolerances = intolerances!!
         )
+    }
+
+    suspend fun setUseRelativeDates(use: Boolean) {
+        userPreferences.edit { preferences ->
+            preferences[useRelativeDatesPreferencesKey] = use
+        }
     }
 
     suspend fun setExpiringSoonAmount(expiringSoon: Duration) {

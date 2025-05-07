@@ -13,6 +13,10 @@ class UserPreferencesRepositoryImpl @Inject constructor(
 ) : UserPreferencesRepository {
     override val preferences: Flow<UserPreferences> = dataSource.preferences
 
+    override suspend fun setUseRelativeDates(use: Boolean) {
+        dataSource.setUseRelativeDates(use)
+    }
+
     override suspend fun setExpiringSoonAmount(amount: Duration) {
         dataSource.setExpiringSoonAmount(amount)
     }

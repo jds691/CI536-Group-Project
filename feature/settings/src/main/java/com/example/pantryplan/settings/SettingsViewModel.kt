@@ -27,6 +27,7 @@ class SettingsViewModel @Inject constructor(
     val uiState: StateFlow<SettingsUiState> = userPreferencesRepository.preferences
         .map { preferences ->
             val settings = UserSettings(
+                showRelativeDates = mutableStateOf(preferences.useRelativeDates),
                 expiringSoonAmount = mutableStateOf(preferences.expiringSoonAmount)
             )
             settings.allergies.addAll(preferences.allergies)
@@ -41,6 +42,12 @@ class SettingsViewModel @Inject constructor(
             started = WhileSubscribed(5.seconds.inWholeMilliseconds),
             initialValue = SettingsUiState(),
         )
+
+    fun updateUseRelativeDates(use: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.setUseRelativeDates(use)
+        }
+    }
 
     fun updateExpiringSoonAmount(amount: Duration) {
         viewModelScope.launch {
@@ -62,6 +69,7 @@ class SettingsViewModel @Inject constructor(
 }
 
 data class UserSettings(
+    val showRelativeDates: MutableState<Boolean> = mutableStateOf(true),
     val expiringSoonAmount: MutableState<Duration> = mutableStateOf(2.days),
 
     val allergies: SnapshotStateSet<Allergen> = mutableStateSetOf(),
