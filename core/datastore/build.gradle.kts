@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+
     id("kotlinx-serialization")
 
     // Hilt plugins.
@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pantryplan.feature.pantry"
+    namespace = "com.example.pantryplan.core.datastore"
     compileSdk = 35
 
     defaultConfig {
@@ -34,14 +34,12 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
     implementation(project(":core:models"))
-    implementation(project(":core:design-system"))
+
+    api(libs.kotlinx.datetime)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -50,21 +48,13 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
 
     // Hilt dependencies.
     implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
 
-    debugImplementation(libs.androidx.ui.tooling)
-    implementation(libs.androidx.ui.tooling.preview)
+    api("androidx.datastore:datastore-core:1.1.0")
+    api("androidx.datastore:datastore-preferences-core:1.1.0")
+    api("androidx.datastore:datastore-preferences:1.1.0")
 }

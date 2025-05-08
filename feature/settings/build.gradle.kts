@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pantryplan.feature.pantry"
+    namespace = "com.example.pantryplan.feature.settings"
     compileSdk = 35
 
     defaultConfig {
@@ -40,8 +40,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:models"))
     implementation(project(":core:design-system"))
+    implementation(project(":core:models"))
+    implementation(project(":core:data-access"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -57,14 +58,13 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
+
+    debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.ui.tooling.preview)
 
     // Hilt dependencies.
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
-
-    debugImplementation(libs.androidx.ui.tooling)
-    implementation(libs.androidx.ui.tooling.preview)
 }
