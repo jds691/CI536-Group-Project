@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.ChipColors
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -44,10 +45,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.NutritionInfo
@@ -67,6 +71,29 @@ internal fun cleanUpAllergenText(allergenName: String): String {
 
 @Composable
 fun RecipeItemDetailsScreen(
+    viewModel: RecipeDetailViewModel = hiltViewModel(),
+    item: Recipe,
+    id: UUID,
+
+    onBackClick: () -> Unit,
+    onEditItem: (UUID) -> Unit
+
+) {
+    val recipeDetailUiState: RecipePreferencesUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    RecipeItemDetailsScreen(
+        recipeDetailUiState = recipeDetailUiState,
+        item = item,
+        id = id,
+
+        onBackClick = onBackClick,
+        onEditItem = onEditItem
+    )
+
+}
+
+@Composable
+internal fun RecipeItemDetailsScreen(
+    recipeDetailUiState: RecipePreferencesUiState,
     item: Recipe,
     id: UUID,
 
@@ -142,12 +169,32 @@ fun RecipeItemDetailsScreen(
                         text = "Allergens:",
                         style = MaterialTheme.typography.labelLarge
                     )
+                    val allergenSet = recipeDetailUiState.allergies
+                    var chipEnabled = true
                     item.allergens.forEach { allergen ->
+
+                        if (allergenSet.contains(allergen)) {
+                            chipEnabled = false
+                        } else {
+                            chipEnabled = true
+                        }
+
                         var curAllergen = allergen.toString()
                         curAllergen = cleanUpAllergenText(curAllergen)
-                        AssistChip(
+                        var allergenChip = AssistChip(
                             onClick = {},
-                            label = { Text(curAllergen) }
+                            label = { Text(curAllergen) },
+                            enabled = chipEnabled,
+                            colors = ChipColors(
+                                containerColor = Color.Unspecified,
+                                labelColor = Color.Unspecified,
+                                leadingIconContentColor = Color.Unspecified,
+                                trailingIconContentColor = Color.Unspecified,
+                                disabledContainerColor = MaterialTheme.colorScheme.errorContainer,
+                                disabledLabelColor = MaterialTheme.colorScheme.error,
+                                disabledLeadingIconContentColor = Color.Unspecified,
+                                disabledTrailingIconContentColor = Color.Unspecified
+                            )
                         )
                     }
                 }
@@ -377,6 +424,7 @@ fun RecipesDetailPreview() {
     PantryPlanTheme {
         Surface {
             RecipeItemDetailsScreen(
+                recipeDetailUiState = RecipePreferencesUiState(),
                 item = recipe,
                 id = UUID.randomUUID(),
                 onBackClick = {},
