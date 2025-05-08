@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
@@ -18,18 +20,27 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldLabelScope
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -43,6 +54,7 @@ import com.example.pantryplan.core.models.Recipe
 import java.util.EnumSet
 import java.util.UUID
 
+
 internal fun cleanUpAllergenText(allergenName: String): String {
     var newAllergenName = allergenName.replace("_", " ")
     newAllergenName = newAllergenName.lowercase()
@@ -50,6 +62,7 @@ internal fun cleanUpAllergenText(allergenName: String): String {
         newAllergenName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
     return newAllergenName
 }
+
 
 @Composable
 fun RecipeItemDetailsScreen(
@@ -201,12 +214,12 @@ fun RecipeItemDetailsScreen(
                     }
                     HorizontalDivider()
                     Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            modifier = Modifier
-                                .fillMaxWidth(),
                             text = "Ingredients",
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary
@@ -215,7 +228,10 @@ fun RecipeItemDetailsScreen(
                             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-
+                            val servingAmountList = List(10) { "${it + 1}" }
+                            OutlinedSelectField(
+                                options = servingAmountList,
+                            )
                         }
                     }
 
@@ -226,6 +242,42 @@ fun RecipeItemDetailsScreen(
         }
     }
 }
+
+@Composable
+private fun OutlinedSelectField(
+    modifier: Modifier = Modifier,
+    label: @Composable (TextFieldLabelScope.() -> Unit)? = null,
+    options: List<String>,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val textFieldState = rememberTextFieldState(options[0])
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = modifier,
+    ) {
+        OutlinedTextField(
+            readOnly = true,
+            state = textFieldState,
+            modifier = Modifier,
+            label = label,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(text = selectionOption) },
+                    onClick = {
+                        textFieldState.setTextAndPlaceCursorAtEnd(selectionOption)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
 
 @Preview
 @Composable
