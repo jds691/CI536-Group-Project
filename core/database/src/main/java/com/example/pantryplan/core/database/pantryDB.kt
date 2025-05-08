@@ -1,5 +1,6 @@
 package com.example.pantryplan.core.database
 
+import android.media.Image
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Delete
@@ -63,9 +64,14 @@ abstract class PantryDAO {
             //TODO: Image reference URI
         )
 
-        @Update (entity = PantryStock::class)
+        @Update (entity = PantryDB::class)
         suspend fun updateItemState(itemState: Int)
-        //Come back to this after a nap ^
+
+        @Update (entity = UUID::class)
+        suspend fun updateItem(itemName: String, dateExpiring: Date, dateOpened: Date,
+                               quantity: Int, itemState: Int, imageRefURL: String)
+        //TODO: Come back to update functions after nap
+
 
         @Delete
         suspend fun removeItem(itemID: UUID); //Delete row containing specified item UUID
