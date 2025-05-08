@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
@@ -141,13 +142,12 @@ fun RecipeItemDetailsScreen(
                         text = "Allergens:",
                         style = MaterialTheme.typography.labelLarge
                     )
-                    for (allergen in item.allergens) {
+                    item.allergens.forEach { allergen ->
                         var curAllergen = allergen.toString()
                         curAllergen = cleanUpAllergenText(curAllergen)
                         AssistChip(
                             onClick = {},
-                            label = { Text(curAllergen) },
-                            enabled = true
+                            label = { Text(curAllergen) }
                         )
                     }
                 }
@@ -159,7 +159,12 @@ fun RecipeItemDetailsScreen(
                     verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
                     horizontalAlignment = Alignment.Start,
                 ) {
-                    HorizontalDivider()
+
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .padding(0.dp, 4.dp, 0.dp, 4.dp)
+                    )
+
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -212,7 +217,12 @@ fun RecipeItemDetailsScreen(
                             )
                         }
                     }
-                    HorizontalDivider()
+
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .padding(0.dp, 4.dp, 0.dp, 4.dp)
+                    )
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -230,11 +240,64 @@ fun RecipeItemDetailsScreen(
                         ) {
                             val servingAmountList = List(10) { "${it + 1}" }
                             OutlinedSelectField(
+                                modifier = Modifier
+                                    .width(80.dp),
                                 options = servingAmountList,
+                            )
+                            Text(
+                                text = "Serving(s)",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
 
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .padding(0.dp, 4.dp, 0.dp, 4.dp)
+                    )
+
+                    Text(
+                        text = "Instructions",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        var stepNum = 1
+                        item.instructions.forEach { instruction ->
+                            Text(
+                                text = "Step $stepNum - $instruction",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            stepNum++
+                        }
+                    }
+
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .padding(0.dp, 4.dp, 0.dp, 4.dp)
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Tags:",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        item.tags.forEach { tag ->
+                            AssistChip(
+                                onClick = {},
+                                label = { Text(tag) }
+                            )
+                        }
+                    }
 
                 }
             }
@@ -289,7 +352,7 @@ fun RecipesDetailPreview() {
         tags = listOf("Dinner", "High Protein"),
         allergens = EnumSet.of(Allergen.MILK, Allergen.GLUTEN, Allergen.SESAME),
         imageUrl = null,
-        instructions = listOf("1. Cook Burger", "2. Eat burger"),
+        instructions = listOf("Cook Burger", "Eat burger"),
         ingredients = listOf(
             "Beef Burger",
             "Burger Buns",
