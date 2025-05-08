@@ -46,7 +46,7 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    api("androidx.datastore:datastore-core:1.1.0")
-    api("androidx.datastore:datastore-preferences-core:1.1.0")
-    api("androidx.datastore:datastore-preferences:1.1.0")
+    api(libs.androidx.dataStore)
+    api(libs.androidx.dataStore.core)
+    api(libs.androidx.dataStore.preferences)
 }
