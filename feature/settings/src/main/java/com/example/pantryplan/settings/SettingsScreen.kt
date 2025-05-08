@@ -10,8 +10,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,8 +30,7 @@ internal fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onAllergySettingsClick: () -> Unit,
-    onPantrySettingsClick: () -> Unit,
-    onMealPlannerSettingsClick: () -> Unit
+    onPantrySettingsClick: () -> Unit
 ) {
     val settingsUiState: SettingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -41,8 +38,7 @@ internal fun SettingsScreen(
         uiState = settingsUiState,
         onBackClick = onBackClick,
         onAllergySettingsClick = onAllergySettingsClick,
-        onPantrySettingsClick = onPantrySettingsClick,
-        onMealPlannerSettingsClick = onMealPlannerSettingsClick
+        onPantrySettingsClick = onPantrySettingsClick
     )
 }
 
@@ -52,8 +48,7 @@ internal fun SettingsScreen(
     uiState: SettingsUiState,
     onBackClick: () -> Unit,
     onAllergySettingsClick: () -> Unit,
-    onPantrySettingsClick: () -> Unit,
-    onMealPlannerSettingsClick: () -> Unit
+    onPantrySettingsClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -85,15 +80,7 @@ internal fun SettingsScreen(
             SettingsRow(
                 title = "Pantry",
                 description = "Pantry Settings",
-                icon = Icons.Outlined.Place,
                 onClick = onPantrySettingsClick
-            )
-
-            SettingsRow(
-                title = "Meal Planner",
-                description = "Meal Planner Settings",
-                icon = Icons.Outlined.Notifications,
-                onClick = onMealPlannerSettingsClick
             )
         }
     }
@@ -107,8 +94,7 @@ private fun SettingsScreenPreview() {
             uiState = SettingsUiState(),
             onBackClick = {},
             onAllergySettingsClick = {},
-            onPantrySettingsClick = {},
-            onMealPlannerSettingsClick = {}
+            onPantrySettingsClick = {}
         )
     }
 }
