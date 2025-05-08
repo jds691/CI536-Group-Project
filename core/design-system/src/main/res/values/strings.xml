@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_design_system_allergen_milk">Milk</string>
+    <string name="feature_design_system_allergen_tree_nuts">Tree Nuts</string>
+    <string name="feature_design_system_allergen_gluten">Gluten</string>
+    <string name="feature_design_system_allergen_eggs">Eggs</string>
+    <string name="feature_design_system_allergen_peanuts">Peanuts</string>
+    <string name="feature_design_system_allergen_fish">Fish</string>
+    <string name="feature_design_system_allergen_molluscs">Molluscs</string>
+    <string name="feature_design_system_allergen_lupin">Lupin</string>
+    <string name="feature_design_system_allergen_sesame">Sesame</string>
+    <string name="feature_design_system_allergen_soybeans">Soybeans</string>
+    <string name="feature_design_system_allergen_celery">Celery</string>
+    <string name="feature_design_system_allergen_mustard">Mustard</string>
+    <string name="feature_design_system_allergen_sulphides">Sulphides</string>
+    <string name="feature_design_system_allergen_crustaceans">Crustaceans</string>
+</resources>

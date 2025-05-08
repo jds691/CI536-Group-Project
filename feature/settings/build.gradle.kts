@@ -2,10 +2,15 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlinx-serialization")
+
+    // Hilt plugins.
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
-    namespace = "com.example.pantryplan.core.designsystem"
+    namespace = "com.example.pantryplan.feature.settings"
     compileSdk = 35
 
     defaultConfig {
@@ -18,7 +23,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
+                getDefaultProguardFile("proguard-android-optimize.txt")
             )
         }
     }
@@ -35,11 +40,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:design-system"))
     implementation(project(":core:models"))
-
-    implementation(libs.kotlinx.datetime)
-
-    api(libs.androidx.compose.material.iconsExtended)
+    implementation(project(":core:data-access"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -54,7 +57,14 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.tooling.preview)
+
+    // Hilt dependencies.
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    ksp(libs.hilt.compiler)
 }

@@ -1,11 +1,16 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+
+    id("kotlinx-serialization")
+
+    // Hilt plugins.
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
-    namespace = "com.example.pantryplan.core.designsystem"
+    namespace = "com.example.pantryplan.core.datastore"
     compileSdk = 35
 
     defaultConfig {
@@ -18,7 +23,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
+                getDefaultProguardFile("proguard-android-optimize.txt")
             )
         }
     }
@@ -29,17 +34,12 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
     implementation(project(":core:models"))
 
-    implementation(libs.kotlinx.datetime)
-
-    api(libs.androidx.compose.material.iconsExtended)
+    api(libs.kotlinx.datetime)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -48,13 +48,13 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.kotlinx.serialization.json)
 
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.material3)
+    // Hilt dependencies.
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
-    debugImplementation(libs.androidx.ui.tooling)
-    implementation(libs.androidx.ui.tooling.preview)
+    api("androidx.datastore:datastore-core:1.1.0")
+    api("androidx.datastore:datastore-preferences-core:1.1.0")
+    api("androidx.datastore:datastore-preferences:1.1.0")
 }
