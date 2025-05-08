@@ -181,7 +181,7 @@ internal fun RecipeItemDetailsScreen(
 
                         var curAllergen = allergen.toString()
                         curAllergen = cleanUpAllergenText(curAllergen)
-                        var allergenChip = AssistChip(
+                        AssistChip(
                             onClick = {},
                             label = { Text(curAllergen) },
                             enabled = chipEnabled,
