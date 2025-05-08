@@ -8,6 +8,7 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
+import androidx.room.Update
 import java.sql.Date
 import java.util.UUID
 
@@ -35,24 +36,25 @@ data class PantryStock(
     then return time until expiry
 */
 
-
-//This is where most of the problems will be. I think it works, though.
 @Dao
 abstract class PantryDAO {
     interface PantryDAO {
         @Query("SELECT * FROM PantryStock")
-        fun showAll(): List<String>
+        suspend fun showAll(): List<String>
 
         @Query("SELECT * FROM PantryStock WHERE itemName LIKE :searchQuery")
-        fun searchByName(searchQuery: String): PantryStock
+        suspend fun searchByName(searchQuery: String): PantryStock
 
-        @Query("SELECT * FROM pantrystock")
-        fun calcDaysUntilExpired(): List<String>
+        @Query("Select * FROM PantryStock WHERE itemState LIKE :searchQuery")
+        suspend fun readFromState(searchQuery: String)
+
+        @Query("SELECT itemID, itemName, dateOpened, dateExpiring, itemState FROM pantrystock")
+        suspend fun calcDaysUntilExpired(): List<String>
         //TODO; check date opened and compare to date,
         // expiring then return time until expiry
 
         @Insert
-        fun addItem(
+        suspend fun addItem(
             itemName: String,
             dateExpiring: java.util.Date,
             dateOpened: java.util.Date,
@@ -61,7 +63,11 @@ abstract class PantryDAO {
             //TODO: Image reference URI
         )
 
+        @Update (entity = PantryStock::class)
+        suspend fun updateItemState(itemState: Int)
+        //Come back to this after a nap ^
+
         @Delete
-        fun removeItem(itemID: UUID); //Delete *row* containing specified item UUID
+        suspend fun removeItem(itemID: UUID); //Delete row containing specified item UUID
     }
 }
