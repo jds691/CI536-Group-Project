@@ -1,5 +1,6 @@
 package com.example.pantryplan.core.designsystem.text
 
+import androidx.annotation.StringRes
 import com.example.pantryplan.core.designsystem.R
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.Allergen.CELERY
@@ -17,6 +18,7 @@ import com.example.pantryplan.core.models.Allergen.SOYBEANS
 import com.example.pantryplan.core.models.Allergen.SULPHIDES
 import com.example.pantryplan.core.models.Allergen.TREE_NUTS
 
+@StringRes
 fun Allergen.getDisplayNameId(): Int {
     return when (this) {
         MILK -> R.string.feature_design_system_allergen_milk
