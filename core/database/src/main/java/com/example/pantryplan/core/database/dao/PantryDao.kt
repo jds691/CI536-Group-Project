@@ -1,63 +1,38 @@
-package com.example.pantryplan.core.database
+package com.example.pantryplan.core.database.dao
 
 import androidx.room.Dao
-import androidx.room.Database
 import androidx.room.Delete
-import androidx.room.Entity
 import androidx.room.Insert
-import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.RoomDatabase
 import androidx.room.Update
+import com.example.pantryplan.core.database.PantryPlanDatabase
+import com.example.pantryplan.core.database.model.PantryStock
 import kotlinx.datetime.Instant
 import java.util.UUID
 
-enum class PantryItemStates {
-    FROZEN, UNSEALED, OPENED, EXPIRED
-}
-
-@Entity(tableName = "PantryStock")
-data class PantryStock(
-    @PrimaryKey val itemID: UUID,
-    val itemName: String,
-    val dateExpiring: Instant,
-    val dateOpened: Instant?,
-    val quantity: Int,
-    val inStateSince: Instant, // It just works ¯\_(ツ)_/¯
-    val itemState: PantryItemStates,
-    val imageRefURL: String? // TODO: Path once camera is functional
-)
-
-// Create Database with above class as fields
-@Database(entities = [PantryStock::class], version = 1)
-    abstract class PantryDB : RoomDatabase() { //Database class
-        abstract fun pantryDAO(): PantryDAO.PantryDAO // Hook data entity up to interface
-    }
-
 @Dao
-abstract class PantryDAO {
-    interface PantryDAO {
-        @Query("SELECT * FROM PantryStock")
-        suspend fun showAll(): List<String>
+interface PantryDao {
+    @Query("SELECT * FROM PantryStock")
+    suspend fun showAll(): List<String>
 
-        @Query("SELECT * FROM PantryStock WHERE itemName LIKE :searchQuery")
-        suspend fun searchByUUID(searchQuery: String): PantryStock
+    @Query("SELECT * FROM PantryStock WHERE itemName LIKE :searchQuery")
+    suspend fun searchByUUID(searchQuery: String): PantryStock
 
-        @Query("SELECT * FROM PantryStock WHERE itemName LIKE :searchQuery")
-        suspend fun fuzzySearchByName(searchQuery: String): PantryStock
+    @Query("SELECT * FROM PantryStock WHERE itemName LIKE :searchQuery")
+    suspend fun fuzzySearchByName(searchQuery: String): PantryStock
 
-        @Query("Select * FROM PantryStock WHERE itemState LIKE :searchQuery")
-        suspend fun readFromState(searchQuery: String)
+    @Query("Select * FROM PantryStock WHERE itemState LIKE :searchQuery")
+    suspend fun readFromState(searchQuery: String)
 
-        @Query("SELECT itemID, itemName, dateOpened, dateExpiring, itemState FROM pantrystock")
-        suspend fun calcDaysUntilExpired(){
+    @Query("SELECT itemID, itemName, dateOpened, dateExpiring, itemState FROM pantrystock")
+    suspend fun calcDaysUntilExpired() {
 
-        }
-        // check date opened and compare to date
-        // expiring, then return time until expiry
+    }
+    // check date opened and compare to date
+    // expiring, then return time until expiry
 
-        @Insert
-        suspend fun addItem(/*
+    @Insert
+    suspend fun addItem(/*
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWNNO0kKWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWXOl;,,;;cc,.   .':cl0XWWNWNWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 WWWWWWWWWWWWWWWWWWWWWWWWWNWOcc...                 ..,,'o0XNWWNWWWWWWWWWWWWWWWWWWWWWWW
@@ -102,17 +77,18 @@ WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWX0kOOkkkkkkxddol:;lkKWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWNX0OkkkkkkkkkO0NWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 It just works.*/
-        ): PantryStock
+    ): PantryStock
 
-        @Update (entity = PantryDB::class)
-        suspend fun updateItemState(itemState: Int)
+    @Update(entity = PantryPlanDatabase::class)
+    suspend fun updateItemState(itemState: Int)
 
-        @Update (entity = UUID::class)
-        suspend fun updateItem(itemName: String, dateExpiring: Instant, dateOpened: Instant,
-                               quantity: Int, itemState: Int, imageRefURL: String)
-        //This *probably* works. Target specification is unclear, though
+    @Update(entity = UUID::class)
+    suspend fun updateItem(
+        itemName: String, dateExpiring: Instant, dateOpened: Instant,
+        quantity: Int, itemState: Int, imageRefURL: String
+    )
+    //This *probably* works. Target specification is unclear, though
 
-        @Delete
-        suspend fun removeItem(itemID: UUID); //Delete row containing specified item UUID
-    }
+    @Delete
+    suspend fun removeItem(itemID: UUID) //Delete row containing specified item UUID
 }
