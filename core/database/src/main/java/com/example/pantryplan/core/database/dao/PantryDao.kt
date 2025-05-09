@@ -85,14 +85,9 @@ It just works.*/
     @Delete
     suspend fun removeItem(item: PantryStock)
 
-    @Delete(entity = PantryStock::class)
-    suspend fun removeItemById(id: PantryStockID) //Delete row containing specified item UUID
+    @Query("DELETE FROM PantryStock WHERE itemID = :id")
+    suspend fun removeItemById(id: UUID) //Delete row containing specified item UUID
 }
-
-// Yes really, this has to be in its own wrapper class
-data class PantryStockID(
-    val itemID: UUID
-)
 
 data class PantryStockStateUpdate(
     val itemID: UUID,
