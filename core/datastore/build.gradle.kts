@@ -14,19 +14,11 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt")
-            )
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -54,7 +46,7 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    api("androidx.datastore:datastore-core:1.1.0")
-    api("androidx.datastore:datastore-preferences-core:1.1.0")
-    api("androidx.datastore:datastore-preferences:1.1.0")
+    api(libs.androidx.dataStore)
+    api(libs.androidx.dataStore.core)
+    api(libs.androidx.dataStore.preferences)
 }

@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# TODO: Remove this once we replace the ObjectInputStream slop.
+-keep class com.example.pantryplan.core.** { *; }

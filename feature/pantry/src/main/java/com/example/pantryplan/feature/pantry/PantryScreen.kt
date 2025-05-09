@@ -1,5 +1,6 @@
 package com.example.pantryplan.feature.pantry
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,6 +37,9 @@ import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.ui.PantryItemCard
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import kotlinx.datetime.Clock
 import java.util.UUID
 import kotlin.time.Duration.Companion.days
@@ -45,15 +50,28 @@ fun PantryScreen(
     viewModel: PantryViewModel = hiltViewModel(),
 
     onClickPantryItem: (UUID) -> Unit,
-    onCreatePantryItem: () -> Unit
+    onCreatePantryItem: () -> Unit,
+    onScanBarcode: (String) -> Unit,
 ) {
+    val context = LocalContext.current
+
     Scaffold(modifier = Modifier
         .systemBarsPadding()
         .padding(
             top = dimensionResource(designSystemR.dimen.top_app_bar_height),
             bottom = dimensionResource(designSystemR.dimen.bottom_app_bar_height)
         ),
-        floatingActionButton = { PantryFABs(onCreatePantryItem) }
+        floatingActionButton = {
+            PantryFABs(
+                onScanBarcode = {
+                    scanBarcode(
+                        context = context,
+                        onSuccess = { onScanBarcode(it.rawValue.toString()) }
+                    )
+                },
+                onCreatePantryItem = onCreatePantryItem
+            )
+        }
     ) { contentPadding ->
         val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -69,11 +87,34 @@ fun PantryScreen(
     }
 }
 
+private fun scanBarcode(
+    context: Context,
+    onSuccess: (Barcode) -> Unit = {},
+    onCancelled: () -> Unit = {},
+    onFailure: (Exception) -> Unit = {},
+) {
+    val options = GmsBarcodeScannerOptions
+        .Builder()
+        .setBarcodeFormats(
+            Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E
+        )
+        .build()
+    val scanner = GmsBarcodeScanning.getClient(context, options)
+    scanner
+        .startScan()
+        .addOnSuccessListener(onSuccess)
+        .addOnCanceledListener(onCancelled)
+        .addOnFailureListener(onFailure)
+}
+
 @Composable
-private fun PantryFABs(onCreatePantryItem: () -> Unit) {
+private fun PantryFABs(
+    onScanBarcode: () -> Unit,
+    onCreatePantryItem: () -> Unit
+) {
     MultiFAB {
         SmallFloatingActionButton(
-            onClick = { /* TODO: Navigate to barcode scanning. */ }
+            onClick = onScanBarcode
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_barcode_scanner),
