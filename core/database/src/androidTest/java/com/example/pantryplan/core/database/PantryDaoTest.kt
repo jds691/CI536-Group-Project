@@ -67,7 +67,7 @@ internal class PantryDaoTest : DatabaseTest() {
         pantryDao.addItem(coconutMilk)
         pantryDao.addItem(borger)
 
-        val items = pantryDao.fuzzySearchByName("Milk")
+        val items = pantryDao.fuzzySearchByName("%Milk%")
 
         assertEquals(3, items.size)
         assertFalse(items.contains(borger))
