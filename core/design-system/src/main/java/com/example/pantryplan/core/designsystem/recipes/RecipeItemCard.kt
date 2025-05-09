@@ -78,7 +78,7 @@ fun RecipeItemCard(
             if (allergenLimitCounter >= 3) { allergenOverflowCounter++ }
             else {
                 var curAllergen = allergen.toString()
-                //TODO Will have users allergies checked against
+
                 if (userAllergies.contains(allergen)) {
                     pushStyle(SpanStyle(color = MaterialTheme.colorScheme.error))
                     curAllergen = cleanUpAllergenText(curAllergen)
