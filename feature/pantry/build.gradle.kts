@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(libs.google.code.scanner)
+
     // Hilt dependencies.
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
