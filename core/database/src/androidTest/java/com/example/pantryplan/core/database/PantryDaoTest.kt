@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.days
 
 internal class PantryDaoTest : DatabaseTest() {
     @Test
-    fun getAllItems() = runTest {
+    fun getAllItems_And_addItem() = runTest {
         val firstItem = testPantryStock(
             name = "Test"
         )
@@ -71,6 +71,33 @@ internal class PantryDaoTest : DatabaseTest() {
 
         assertEquals(3, items.size)
         assertFalse(items.contains(borger))
+    }
+
+    @Test
+    fun getItemsByState() = runTest {
+        val frozen = testPantryStock(
+            name = "Frozen",
+            state = PantryItemState.FROZEN
+        )
+
+        val frozen2 = testPantryStock(
+            name = "Frozen 2",
+            state = PantryItemState.FROZEN
+        )
+
+        val expired = testPantryStock(
+            name = "Expired",
+            state = PantryItemState.EXPIRED
+        )
+
+        pantryDao.addItem(frozen)
+        pantryDao.addItem(frozen2)
+        pantryDao.addItem(expired)
+
+        val items = pantryDao.getItemsByState(PantryItemState.FROZEN)
+
+        assertEquals(2, items.size)
+        assertEquals(frozen.itemName, items[0].itemName)
     }
 }
 
