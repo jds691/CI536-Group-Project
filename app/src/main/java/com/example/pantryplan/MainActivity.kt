@@ -4,10 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.ui.PantryPlanApp
 import com.example.pantryplan.ui.rememberPantryPlanAppState
-import com.example.pantryplan.ui.theme.PantryPlanTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
