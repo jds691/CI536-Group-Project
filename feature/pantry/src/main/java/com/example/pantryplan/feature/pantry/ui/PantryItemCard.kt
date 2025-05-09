@@ -2,7 +2,7 @@
 
 package com.example.pantryplan.feature.pantry.ui
 
-import android.icu.text.RelativeDateTimeFormatter
+import android.text.format.DateUtils
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -56,64 +56,55 @@ import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.R
 import kotlinx.coroutines.delay
-import java.util.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import java.util.UUID
-import kotlin.math.abs
+import kotlin.math.absoluteValue
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
-fun dateDiffInDays(date1Millis: Long, date2Millis: Long): Long {
-    val dateDiffMillis = date1Millis - date2Millis
-    val seconds = dateDiffMillis / 1000
-    val minutes = seconds / 60
-    val hours = minutes / 60
+private fun humanReadableTimestamp(time: Instant, now: Instant): String {
+    val minResolution = if ((time - now).inWholeDays.absoluteValue < 7) {
+        DateUtils.DAY_IN_MILLIS
+    } else {
+        DateUtils.WEEK_IN_MILLIS
 
-    // Days
-    return hours / 24
+    }
+    return DateUtils.getRelativeTimeSpanString(
+        time.toEpochMilliseconds(),
+        now.toEpochMilliseconds(),
+        minResolution,
+    ).toString().lowercase()
 }
 
 fun createStatus(item: PantryItem): Pair<String, Color> {
-    val formatter = RelativeDateTimeFormatter.getInstance()
-
-    val days: Long = if (item.expiresAfter != null)
-        dateDiffInDays(item.expiryDate.time + item.expiresAfter!!, item.expiryDate.time)
-    else
-    // Days since the expiry has passed
-        dateDiffInDays(item.expiryDate.time, Date().time)
-
     // TODO: When Theme.kt is updated to support the extended colours, replace the status colour
 
+    val now = Clock.System.now()
     return when (item.state) {
-        PantryItemState.SEALED, PantryItemState.OPENED -> Pair(
-            "Expires ${
-                formatter.format(
-                    days.toDouble(),
-                    RelativeDateTimeFormatter.Direction.NEXT,
-                    RelativeDateTimeFormatter.RelativeUnit.DAYS
-                )
-            }.",
-            if (days <= 2) Color(255, 102, 0) else Color.Green
-        )
+        PantryItemState.SEALED, PantryItemState.OPENED -> {
+            val expiry = item.expiryDate + item.expiresAfter!!
+            val timestamp = humanReadableTimestamp(expiry, now)
 
-        PantryItemState.FROZEN -> Pair(
-            if (days == 0L) "Frozen today." else "Frozen ${
-                formatter.format(
-                    abs(days.toDouble()),
-                    RelativeDateTimeFormatter.Direction.LAST,
-                    RelativeDateTimeFormatter.RelativeUnit.DAYS
-                )
-            }.",
-            Color.Cyan
-        )
+            val expiringSoon = item.expiresAfter!!.inWholeDays <= 2
+            val color = if (expiringSoon) Color(255, 102, 0) else Color.Green
 
-        PantryItemState.EXPIRED -> Pair(
-            if (days == 0L) "Expired today." else "Expired ${
-                formatter.format(
-                    abs(days.toDouble()),
-                    RelativeDateTimeFormatter.Direction.LAST,
-                    RelativeDateTimeFormatter.RelativeUnit.DAYS
-                )
-            }.",
-            Color.Red
-        )
+            Pair("Expires ${timestamp}.", color)
+        }
+
+        PantryItemState.FROZEN -> {
+            val frozen = item.expiryDate - (item.expiresAfter ?: Duration.ZERO)
+            val timestamp = humanReadableTimestamp(frozen, now)
+
+            Pair("Frozen ${timestamp}.", Color.Cyan)
+        }
+
+        PantryItemState.EXPIRED -> {
+            val expiry = item.expiryDate
+            val timestamp = humanReadableTimestamp(expiry, now)
+            
+            Pair("Expired ${timestamp}.", Color.Red)
+        }
     }
 }
 
@@ -341,9 +332,9 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
             quantity = 1000,
-            expiryDate = Date(),
-            expiresAfter = 86400 * 1000,
-            inStateSince = Date(),
+            expiryDate = Clock.System.now(),
+            expiresAfter = 1.days,
+            inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
             imageUrl = null
         ),
@@ -351,9 +342,9 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
             quantity = 1000,
-            expiryDate = Date(),
-            expiresAfter = 86400 * 1000 * 3,
-            inStateSince = Date(),
+            expiryDate = Clock.System.now(),
+            expiresAfter = 3.days,
+            inStateSince = Clock.System.now(),
             state = PantryItemState.OPENED,
             imageUrl = null
         ),
@@ -361,9 +352,9 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
             quantity = 1000,
-            expiryDate = Date(),
+            expiryDate = Clock.System.now(),
             expiresAfter = null,
-            inStateSince = Date(),
+            inStateSince = Clock.System.now(),
             state = PantryItemState.FROZEN,
             imageUrl = null
         ),
@@ -371,9 +362,9 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
             quantity = 1000,
-            expiryDate = Date(),
+            expiryDate = Clock.System.now(),
             expiresAfter = null,
-            inStateSince = Date(),
+            inStateSince = Clock.System.now(),
             state = PantryItemState.EXPIRED,
             imageUrl = null
         )

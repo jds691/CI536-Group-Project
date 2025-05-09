@@ -24,7 +24,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -45,10 +45,12 @@ android {
 
 dependencies {
     implementation(project(":core:design-system"))
+    implementation(project(":core:datastore"))
 
     implementation(project(":feature:pantry"))
     implementation(project(":feature:recipes"))
     implementation(project(":feature:meal-planner"))
+    implementation(project(":feature:settings"))
 
     api(libs.androidx.compose.material.iconsExtended)
 

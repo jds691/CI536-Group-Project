@@ -34,6 +34,10 @@ import com.example.pantryplan.feature.pantry.navigation.navigateToPantryItemEdit
 import com.example.pantryplan.feature.pantry.navigation.pantrySection
 import com.example.pantryplan.feature.recipes.navigation.recipesScreen
 import com.example.pantryplan.navigation.TopLevelDestination
+import com.example.pantryplan.settings.navigation.navigateToAllergySettings
+import com.example.pantryplan.settings.navigation.navigateToPantrySettings
+import com.example.pantryplan.settings.navigation.navigateToSettings
+import com.example.pantryplan.settings.navigation.settingsSection
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -62,7 +66,7 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
                     },
                     title = { Text(stringResource(destination.titleTextId)) },
                     actions = {
-                        IconButton(onClick = { /* TODO: Navigate to settings. */ }) {
+                        IconButton(onClick = appState.navController::navigateToSettings) {
                             Icon(
                                 imageVector = Icons.Default.AccountCircle,
                                 // TODO: Replace with a string resource from settings feature.
@@ -116,6 +120,15 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
                 onBackClick = appState.navController::popBackStack,
                 onRecipeClick = {}, // TODO: Implement when we have recipe sub-navigation done
                 onMacroCardClick = appState.navController::navigateToNutritionalDetails
+            )
+
+            settingsSection(
+                // Required to be able to share 1 common view model between all settings screens
+                navController = appState.navController,
+
+                onBackClick = appState.navController::popBackStack,
+                onAllergySettingsClick = appState.navController::navigateToAllergySettings,
+                onPantrySettingsClick = appState.navController::navigateToPantrySettings
             )
         }
     }
