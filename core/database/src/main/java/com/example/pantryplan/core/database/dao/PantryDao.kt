@@ -5,29 +5,23 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.example.pantryplan.core.database.PantryPlanDatabase
 import com.example.pantryplan.core.database.model.PantryStock
-import kotlinx.datetime.Instant
+import com.example.pantryplan.core.models.PantryItemState
 import java.util.UUID
 
 @Dao
 interface PantryDao {
     @Query("SELECT * FROM PantryStock")
-    suspend fun showAll(): List<String>
+    suspend fun showAll(): List<PantryStock>
 
-    @Query("SELECT * FROM PantryStock WHERE itemName LIKE :searchQuery")
-    suspend fun searchByUUID(searchQuery: String): PantryStock
+    @Query("SELECT * FROM PantryStock WHERE itemID = :id")
+    suspend fun searchById(id: UUID): PantryStock
 
-    @Query("SELECT * FROM PantryStock WHERE itemName LIKE :searchQuery")
-    suspend fun fuzzySearchByName(searchQuery: String): PantryStock
+    @Query("SELECT * FROM PantryStock WHERE itemName LIKE :name")
+    suspend fun fuzzySearchByName(name: String): PantryStock
 
-    @Query("Select * FROM PantryStock WHERE itemState LIKE :searchQuery")
-    suspend fun readFromState(searchQuery: String)
-
-    @Query("SELECT itemID, itemName, dateOpened, dateExpiring, itemState FROM pantrystock")
-    suspend fun calcDaysUntilExpired() {
-
-    }
+    @Query("Select * FROM PantryStock WHERE itemState = :state")
+    suspend fun getItemsByState(state: PantryItemState): List<PantryStock>
     // check date opened and compare to date
     // expiring, then return time until expiry
 
@@ -77,18 +71,15 @@ WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWX0kOOkkkkkkxddol:;lkKWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWNX0OkkkkkkkkkO0NWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 It just works.*/
-    ): PantryStock
-
-    @Update(entity = PantryPlanDatabase::class)
-    suspend fun updateItemState(itemState: Int)
-
-    @Update(entity = UUID::class)
-    suspend fun updateItem(
-        itemName: String, dateExpiring: Instant, dateOpened: Instant,
-        quantity: Int, itemState: Int, imageRefURL: String
+                        item: PantryStock
     )
-    //This *probably* works. Target specification is unclear, though
+
+    @Update
+    suspend fun updateItem(itemState: PantryStock)
 
     @Delete
-    suspend fun removeItem(itemID: UUID) //Delete row containing specified item UUID
+    suspend fun removeItem(item: PantryStock)
+
+    // TODO: Add @Delete method for deleting by primary key
+    //Delete row containing specified item UUID
 }
