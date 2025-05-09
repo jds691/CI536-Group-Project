@@ -22,6 +22,8 @@ interface PantryDao {
 
     @Query("Select * FROM PantryStock WHERE itemState = :state")
     suspend fun getItemsByState(state: PantryItemState): List<PantryStock>
+
+    // Used by a function that wasn't required by the DB
     // check date opened and compare to date
     // expiring, then return time until expiry
 
@@ -75,11 +77,25 @@ It just works.*/
     )
 
     @Update
-    suspend fun updateItem(itemState: PantryStock)
+    suspend fun updateItem(item: PantryStock)
+
+    @Update(entity = PantryStock::class)
+    suspend fun updateItemState(stateUpdate: PantryStockStateUpdate)
 
     @Delete
     suspend fun removeItem(item: PantryStock)
 
-    // TODO: Add @Delete method for deleting by primary key
-    //Delete row containing specified item UUID
+    @Delete(entity = PantryStock::class)
+    suspend fun removeItemById(id: PantryStockID) //Delete row containing specified item UUID
 }
+
+// Yes really, this has to be in its own wrapper class
+data class PantryStockID(
+    val itemID: UUID
+)
+
+data class PantryStockStateUpdate(
+    val itemID: UUID,
+
+    val itemState: PantryItemState,
+)
