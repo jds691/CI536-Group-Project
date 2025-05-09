@@ -3,6 +3,9 @@
 package com.example.pantryplan.feature.pantry
 
 import android.icu.text.SimpleDateFormat
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -49,8 +53,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import coil3.compose.rememberAsyncImagePainter
 import com.example.pantryplan.core.designsystem.component.ImageSelect
 import kotlinx.datetime.Clock
 import java.util.Date
@@ -90,9 +96,27 @@ fun PantryItemEditScreen(
                     color = MaterialTheme.colorScheme.outline,
                     style = MaterialTheme.typography.bodySmall,
                 )
+
+                var uri by remember { mutableStateOf<String?>(null) }
+
+                val painter = rememberAsyncImagePainter(
+                    model = uri,
+                    fallback = painterResource(designSystemR.drawable.bigcheese),
+                )
+
+                //val picture = rememberLauncherForActivityResult(TakePicture()) { a -> }
+                val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) {
+                    uri = it?.toString()
+                }
                 ImageSelect(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-                    onClick = { /* TODO: Actually add an image. */ },
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                        .aspectRatio(1.8f),
+                    onClick = {
+                        //picture.launch(Uri.EMPTY)
+                        pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+                    },
+                    backgroundPainter = painter
                 )
                 PantryItemEditForm()
             }

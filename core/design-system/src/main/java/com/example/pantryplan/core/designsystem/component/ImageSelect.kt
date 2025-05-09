@@ -3,6 +3,7 @@ package com.example.pantryplan.core.designsystem.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
@@ -10,7 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
@@ -28,16 +28,19 @@ fun ImageSelect(
     backgroundPainter: (Painter) = painterResource(R.drawable.bigcheese)
 ) {
     Box(
-        modifier = modifier.paint(
+    modifier.clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
             painter = backgroundPainter,
-            contentScale = ContentScale.FillWidth,
-            colorFilter = ColorFilter.tint(
+            contentDescription = null,
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.Crop,
+            colorFilter =  ColorFilter.tint(
                 MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
                 blendMode = BlendMode.SrcAtop
             )
-        ).clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
+        )
         Image(
             imageVector = Icons.Outlined.CameraAlt,
             contentDescription = "Select image",
@@ -51,6 +54,6 @@ fun ImageSelect(
 @Composable
 fun MacrosCardPreviews() {
     PantryPlanTheme {
-        ImageSelect(onClick = {})
+        ImageSelect(onClick = {}, modifier = Modifier.aspectRatio(1.8f))
     }
 }
