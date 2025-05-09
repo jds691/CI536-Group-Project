@@ -18,7 +18,7 @@ interface PantryDao {
     suspend fun searchById(id: UUID): PantryStock
 
     @Query("SELECT * FROM PantryStock WHERE itemName LIKE :name")
-    suspend fun fuzzySearchByName(name: String): PantryStock
+    suspend fun fuzzySearchByName(name: String): List<PantryStock>
 
     @Query("Select * FROM PantryStock WHERE itemState = :state")
     suspend fun getItemsByState(state: PantryItemState): List<PantryStock>
