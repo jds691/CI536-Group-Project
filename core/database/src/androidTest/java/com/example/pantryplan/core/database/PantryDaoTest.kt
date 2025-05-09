@@ -160,6 +160,22 @@ internal class PantryDaoTest : DatabaseTest() {
         val foundItemAgain = pantryDao.searchById(item.itemID)
         assertTrue(foundItemAgain == null)
     }
+
+    @Test
+    fun removeItemById() = runTest {
+        val item = testPantryStock(
+            name = "Marked for Death"
+        )
+
+        pantryDao.addItem(item)
+
+        val foundItem = pantryDao.searchById(item.itemID)
+        assertTrue(foundItem != null)
+
+        pantryDao.removeItemById(item.itemID)
+        val foundItemAgain = pantryDao.searchById(item.itemID)
+        assertTrue(foundItemAgain == null)
+    }
 }
 
 private fun testPantryStock(
