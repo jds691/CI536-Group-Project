@@ -13,5 +13,5 @@ import com.example.pantryplan.core.database.model.PantryStock
     version = 1
 )
 internal abstract class PantryPlanDatabase : RoomDatabase() { //Database class
-    abstract fun pantryDAO(): PantryDao // Hook data entity up to interface
+    abstract fun pantryDao(): PantryDao // Hook data entity up to interface
 }
