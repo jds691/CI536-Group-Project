@@ -11,34 +11,40 @@ import com.example.pantryplan.feature.pantry.PantryScreen
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
+// Route to Pantry screen
 @Serializable
-data object Pantry // Route to Pantry screen
-@Serializable
-data object PantryList // Route to the root list
-@Serializable
-data class PantryItemDetails(val id: String) // Route to the details screen
+data object Pantry
 
+// Route to the root list
 @Serializable
-data class PantryItemEdit(val id: String?) // Route to edit an existing item or create a new one
+data object PantryList
 
+// Route to the details screen
+@Serializable
+data class PantryItemDetails(val id: String)
+
+// Route to edit an existing item or create a new one
+@Serializable
+data class PantryItemEdit(val id: String?, val barcode: String?)
 
 fun NavController.navigateToPantry() = navigate(route = PantryList)
 fun NavController.navigateToPantryItem(id: UUID) =
     navigate(route = PantryItemDetails(id = id.toString()))
-fun NavController.navigateToPantryItemEdit(id: UUID?) =
-    navigate(route = PantryItemEdit(id = id?.toString()))
+fun NavController.navigateToPantryItemEdit(id: UUID?, barcode: String?) =
+    navigate(route = PantryItemEdit(id = id?.toString(), barcode = barcode))
 
 fun NavGraphBuilder.pantrySection(
     onPantryItemClick: (UUID) -> Unit,
-    onPantryItemEdit: (UUID?) -> Unit,
+    onPantryItemEdit: (UUID?, String?) -> Unit,
     onBackClick: () -> Unit
 ) {
     navigation<Pantry>(startDestination = PantryList) {
         composable<PantryList> {
             PantryScreen(
                 onClickPantryItem = onPantryItemClick,
+                onScanBarcode = { onPantryItemEdit(null, it) },
                 onCreatePantryItem = {
-                    onPantryItemEdit(null)
+                    onPantryItemEdit(null, null)
                 }
             )
         }
@@ -49,7 +55,7 @@ fun NavGraphBuilder.pantrySection(
             PantryItemDetailsScreen(
                 id = UUID.fromString(itemDetails.id),
                 onBackClick = onBackClick,
-                onEditItem = onPantryItemEdit
+                onEditItem = { onPantryItemEdit(it, null) }
             )
         }
 
@@ -58,6 +64,7 @@ fun NavGraphBuilder.pantrySection(
 
             PantryItemEditScreen(
                 existingId = if (itemEdit.id != null) UUID.fromString(itemEdit.id) else null,
+                barcode = itemEdit.barcode,
                 onBackClick = onBackClick
             )
         }
