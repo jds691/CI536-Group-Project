@@ -26,7 +26,6 @@ private val useRelativeDatesPreferencesKey = booleanPreferencesKey("use_relative
 private val expiringSoonAmountPreferencesKey = longPreferencesKey("expiring_soon_amount")
 
 private val allergiesPreferencesKey = byteArrayPreferencesKey("allergies")
-private val intolerancesPreferencesKey = byteArrayPreferencesKey("intolerances")
 
 class UserPreferencesDataSource @Inject constructor(
     private val userPreferences: DataStore<Preferences>,
@@ -38,13 +37,6 @@ class UserPreferencesDataSource @Inject constructor(
         if (allergies == null)
             allergies = EnumSet.noneOf(Allergen::class.java)
 
-        var intolerances = readJavaSerializablePreference<EnumSet<Allergen>>(
-            intolerancesPreferencesKey,
-            preferences
-        )
-
-        if (intolerances == null)
-            intolerances = EnumSet.noneOf(Allergen::class.java)
 
         val expiringSoon =
             preferences[expiringSoonAmountPreferencesKey]?.toDuration(DurationUnit.DAYS) ?: 2.days
@@ -56,8 +48,7 @@ class UserPreferencesDataSource @Inject constructor(
             useRelativeDates = useRelativeDates,
             expiringSoonAmount = expiringSoon,
 
-            allergies = allergies!!,
-            intolerances = intolerances!!
+            allergies = allergies!!
         )
     }
 
@@ -75,10 +66,6 @@ class UserPreferencesDataSource @Inject constructor(
 
     suspend fun setAllergies(allergies: EnumSet<Allergen>) {
         setJavaSerializablePreference(allergiesPreferencesKey, allergies)
-    }
-
-    suspend fun setIntolerances(allergies: EnumSet<Allergen>) {
-        setJavaSerializablePreference(intolerancesPreferencesKey, allergies)
     }
 
     private suspend inline fun <reified T> readJavaSerializablePreference(

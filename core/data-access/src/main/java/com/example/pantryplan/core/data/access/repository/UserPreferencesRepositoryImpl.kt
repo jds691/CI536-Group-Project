@@ -25,7 +25,4 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         dataSource.setAllergies(allergies)
     }
 
-    override suspend fun setIntolerances(intolerances: EnumSet<Allergen>) {
-        dataSource.setIntolerances(intolerances)
-    }
 }

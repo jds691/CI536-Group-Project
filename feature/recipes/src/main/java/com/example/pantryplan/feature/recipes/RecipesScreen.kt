@@ -135,6 +135,7 @@ internal fun RecipesContentList(
         items(recipeState.recipeItems) { item ->
             RecipeItemCard(
                 item = item,
+                userAllergies = recipeState.allergies,
                 onClick = { onClickRecipeItem(item.id) }
             )
         }

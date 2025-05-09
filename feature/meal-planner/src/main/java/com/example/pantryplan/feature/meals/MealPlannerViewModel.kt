@@ -1,4 +1,4 @@
-package com.example.pantryplan.feature.recipes
+package com.example.pantryplan.feature.meals
 
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.snapshots.SnapshotStateSet
@@ -6,37 +6,35 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pantryplan.core.data.access.repository.UserPreferencesRepository
 import com.example.pantryplan.core.models.Allergen
-import com.example.pantryplan.core.models.Recipe
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
-class RecipesViewModel @Inject constructor(
+class MealPlannerViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
-    val uiState: StateFlow<RecipeUiState> = userPreferencesRepository.preferences
+    val uiState: StateFlow<MealPlannerUiState> = userPreferencesRepository.preferences
         .map { preferences ->
             val recipeAllergySet: SnapshotStateSet<Allergen> = mutableStateSetOf()
             recipeAllergySet.addAll(preferences.allergies)
 
-            RecipeUiState(
+            MealPlannerUiState(
                 allergies = recipeAllergySet
             )
         }
         .stateIn(
             scope = viewModelScope,
             started = WhileSubscribed(1.seconds.inWholeMilliseconds),
-            initialValue = RecipeUiState(),
+            initialValue = MealPlannerUiState(),
         )
 
 }
 
-data class RecipeUiState(
-    val allergies: SnapshotStateSet<Allergen> = mutableStateSetOf(),
-    val recipeItems: List<Recipe> = emptyList()
+data class MealPlannerUiState(
+    val allergies: SnapshotStateSet<Allergen> = mutableStateSetOf()
 )

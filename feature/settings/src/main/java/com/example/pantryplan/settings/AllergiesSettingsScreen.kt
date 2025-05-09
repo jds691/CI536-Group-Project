@@ -49,7 +49,6 @@ internal fun AllergiesSettingsScreen(
         uiState = settingsUiState,
         onBackClick = onBackClick,
         onUpdateAllergies = viewModel::updateAllergies,
-        onUpdateIntolerances = viewModel::updateIntolerances
     )
 }
 
@@ -58,7 +57,6 @@ internal fun AllergiesSettingsScreen(
     uiState: SettingsUiState,
     onBackClick: () -> Unit,
     onUpdateAllergies: (EnumSet<Allergen>) -> Unit,
-    onUpdateIntolerances: (EnumSet<Allergen>) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -90,10 +88,6 @@ internal fun AllergiesSettingsScreen(
 
             HorizontalDivider()
 
-            YourIntolerances(
-                uiState = uiState,
-                onUpdateIntolerances = onUpdateIntolerances
-            )
         }
     }
 }
@@ -105,7 +99,7 @@ private fun YourAllergies(
 ) {
     Column {
         Text(
-            text = "Your Allergies",
+            text = "Your Allergies and Intolerances",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary
         )
@@ -148,55 +142,6 @@ private fun YourAllergies(
     }
 }
 
-@Composable
-private fun YourIntolerances(
-    uiState: SettingsUiState,
-    onUpdateIntolerances: (EnumSet<Allergen>) -> Unit
-) {
-    Column {
-        Text(
-            text = "Your Intolerances",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        val set = uiState.settings.intolerances
-
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            for (allergy in Allergen.entries) {
-                val selected = set.contains(allergy)
-                FilterChip(
-                    selected = selected,
-                    onClick = {
-                        if (selected)
-                            set.remove(allergy)
-                        else
-                            set.add(allergy)
-
-                        try {
-                            onUpdateIntolerances(EnumSet.copyOf(set))
-                        } catch (e: IllegalArgumentException) {
-                            onUpdateIntolerances(EnumSet.noneOf(Allergen::class.java))
-                        }
-                    },
-                    label = { Text(stringResource(allergy.getDisplayNameId())) },
-                    leadingIcon = {
-                        if (selected)
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(18.dp)
-                            )
-                    }
-                )
-            }
-        }
-    }
-}
-
 @Preview
 @Composable
 private fun AllergiesSettingsScreenPreview() {
@@ -205,7 +150,6 @@ private fun AllergiesSettingsScreenPreview() {
             uiState = SettingsUiState(),
             onBackClick = {},
             onUpdateAllergies = {},
-            onUpdateIntolerances = {}
         )
     }
 }

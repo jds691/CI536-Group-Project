@@ -39,6 +39,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.recipes.RecipeItemCard
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
@@ -51,6 +53,27 @@ import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
 fun MealPlannerScreen(
+    viewModel: MealPlannerViewModel = hiltViewModel(),
+    onRecipeClick: (UUID) -> Unit,
+    onMacroCardClick: () -> Unit,
+
+    modifier: Modifier = Modifier
+) {
+    val mealPlannerUiState: MealPlannerUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    MealPlannerScreen(
+        mealPlannerUiState = mealPlannerUiState,
+        onRecipeClick = onRecipeClick,
+        onMacroCardClick = onMacroCardClick,
+
+        modifier = modifier
+
+    )
+}
+
+
+@Composable
+fun MealPlannerScreen(
+    mealPlannerUiState: MealPlannerUiState,
     onRecipeClick: (UUID) -> Unit,
     onMacroCardClick: () -> Unit,
 
@@ -81,6 +104,7 @@ fun MealPlannerScreen(
             )
 
             NextThreeDays(
+                mealPlannerUiState = mealPlannerUiState,
                 onRecipeClick = onRecipeClick
             )
 
@@ -247,6 +271,7 @@ private fun CarouselMealCard(
 
 @Composable
 private fun NextThreeDays(
+    mealPlannerUiState: MealPlannerUiState,
     onRecipeClick: (UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -319,7 +344,8 @@ private fun NextThreeDays(
                 item = meal,
                 onClick = {
                     onRecipeClick(meal.id)
-                }
+                },
+                userAllergies = mealPlannerUiState.allergies
             )
         }
     }
@@ -371,7 +397,10 @@ private fun MacrosPreview() {
 @Composable
 private fun NextThreeDaysPreview() {
     PantryPlanTheme {
-        NextThreeDays(onRecipeClick = {})
+        NextThreeDays(
+            onRecipeClick = {},
+            mealPlannerUiState = MealPlannerUiState(),
+        )
     }
 }
 
