@@ -1,5 +1,6 @@
 package com.example.pantryplan.core.database
 
+import com.example.pantryplan.core.database.dao.PantryStockStateUpdate
 import com.example.pantryplan.core.database.model.PantryStock
 import com.example.pantryplan.core.models.PantryItemState
 import kotlinx.coroutines.test.runTest
@@ -118,6 +119,27 @@ internal class PantryDaoTest : DatabaseTest() {
         val updatedItem = pantryDao.searchById(newItem.itemID)
 
         assertEquals(newItem.itemName, updatedItem.itemName)
+    }
+
+    @Test
+    fun updateItemState() = runTest {
+        val item = testPantryStock(
+            name = "Frozen",
+            state = PantryItemState.FROZEN
+        )
+
+        pantryDao.addItem(item)
+
+        pantryDao.updateItemState(
+            PantryStockStateUpdate(
+                itemID = item.itemID,
+                itemState = PantryItemState.OPENED
+            )
+        )
+
+        val newItem = pantryDao.searchById(item.itemID)
+
+        assertEquals(PantryItemState.OPENED, newItem.itemState)
     }
 }
 
