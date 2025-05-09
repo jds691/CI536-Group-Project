@@ -99,6 +99,26 @@ internal class PantryDaoTest : DatabaseTest() {
         assertEquals(2, items.size)
         assertEquals(frozen.itemName, items[0].itemName)
     }
+
+    @Test
+    fun updateItem() = runTest {
+        val item = testPantryStock(
+            name = "OG"
+        )
+
+        pantryDao.addItem(item)
+
+        val newItem = testPantryStock(
+            id = item.itemID,
+            name = "N"
+        )
+
+        pantryDao.updateItem(newItem)
+
+        val updatedItem = pantryDao.searchById(newItem.itemID)
+
+        assertEquals(newItem.itemName, updatedItem.itemName)
+    }
 }
 
 private fun testPantryStock(
