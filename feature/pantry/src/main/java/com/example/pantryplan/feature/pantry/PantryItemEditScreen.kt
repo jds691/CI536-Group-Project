@@ -62,6 +62,7 @@ import com.example.pantryplan.core.designsystem.R as designSystemR
 @Composable
 fun PantryItemEditScreen(
     existingId: UUID? = null,
+    barcode: String? = null,
     onBackClick: () -> Unit
 ) {
     Scaffold (
