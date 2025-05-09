@@ -10,7 +10,6 @@ import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.RecipeItemAddScreen
 import com.example.pantryplan.feature.recipes.RecipeItemDetailsScreen
-import com.example.pantryplan.feature.recipes.RecipePreferencesUiState
 import com.example.pantryplan.feature.recipes.RecipesScreen
 import kotlinx.serialization.Serializable
 import java.util.EnumSet
@@ -82,7 +81,6 @@ fun NavGraphBuilder.recipeSection(
                 )
             )
             RecipeItemDetailsScreen(
-                recipeDetailUiState = RecipePreferencesUiState(),
                 item = recipe,
                 id = UUID.fromString(itemDetails.id),
                 onBackClick = onBackClick,
