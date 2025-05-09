@@ -9,6 +9,7 @@ import org.junit.Test
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.days
 
 internal class PantryDaoTest : DatabaseTest() {
@@ -41,8 +42,10 @@ internal class PantryDaoTest : DatabaseTest() {
         val searchedItem = pantryDao.searchById(item.itemID)
 
         // Checking the entire object fails due to floating point errors on the Instants
-        assertEquals(item.itemName, searchedItem.itemName)
+        assertEquals(item.itemName, searchedItem!!.itemName)
         assertEquals(item.itemState, searchedItem.itemState)
+
+        assertTrue(pantryDao.searchById(UUID.randomUUID()) == null)
     }
 
     @Test
@@ -118,7 +121,7 @@ internal class PantryDaoTest : DatabaseTest() {
 
         val updatedItem = pantryDao.searchById(newItem.itemID)
 
-        assertEquals(newItem.itemName, updatedItem.itemName)
+        assertEquals(newItem.itemName, updatedItem!!.itemName)
     }
 
     @Test
@@ -139,7 +142,23 @@ internal class PantryDaoTest : DatabaseTest() {
 
         val newItem = pantryDao.searchById(item.itemID)
 
-        assertEquals(PantryItemState.OPENED, newItem.itemState)
+        assertEquals(PantryItemState.OPENED, newItem!!.itemState)
+    }
+
+    @Test
+    fun removeItem() = runTest {
+        val item = testPantryStock(
+            name = "Marked for Death"
+        )
+
+        pantryDao.addItem(item)
+
+        val foundItem = pantryDao.searchById(item.itemID)
+        assertTrue(foundItem != null)
+
+        pantryDao.removeItem(item)
+        val foundItemAgain = pantryDao.searchById(item.itemID)
+        assertTrue(foundItemAgain == null)
     }
 }
 
