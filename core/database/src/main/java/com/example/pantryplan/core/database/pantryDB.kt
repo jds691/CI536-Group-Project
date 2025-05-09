@@ -28,7 +28,6 @@ data class PantryStock(
     val imageRefURL: String? // TODO: Path once camera is functional
 )
 
-
 // Create Database with above class as fields
 @Database(entities = [PantryStock::class], version = 1)
     abstract class PantryDB : RoomDatabase() { //Database class
