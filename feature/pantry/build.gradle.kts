@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(libs.coil.kt.compose)
+
     implementation(libs.google.code.scanner)
 
     // Hilt dependencies.
