@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="feature_recipes_title">Recipes</string>
+    <string name="feature_recipes_empty_error">No Recipes</string>
+    <string name="feature_recipes_empty_description">Your Recipe List is empty. Add some recipes to get started.</string>
+    <string name="feature_recipes_download_recipe">Download recipe</string>
 </resources>
