@@ -1,10 +1,9 @@
-@file:OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.example.pantryplan.feature.pantry.ui
 
 import android.text.format.DateUtils
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -336,7 +335,8 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             expiresAfter = 1.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
-            imageUrl = null
+            imageUrl = null,
+            barcode = ""
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -346,7 +346,8 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             expiresAfter = 3.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.OPENED,
-            imageUrl = null
+            imageUrl = null,
+            barcode = ""
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -356,7 +357,8 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             expiresAfter = null,
             inStateSince = Clock.System.now(),
             state = PantryItemState.FROZEN,
-            imageUrl = null
+            imageUrl = null,
+            barcode = ""
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -366,7 +368,8 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             expiresAfter = null,
             inStateSince = Clock.System.now(),
             state = PantryItemState.EXPIRED,
-            imageUrl = null
+            imageUrl = null,
+            barcode = ""
         )
     )
 }

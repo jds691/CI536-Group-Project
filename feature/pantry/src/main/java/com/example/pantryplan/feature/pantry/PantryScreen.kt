@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.runtime.Composable
-import com.example.pantryplan.core.designsystem.component.ContentUnavailable
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -20,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,6 +31,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pantryplan.core.designsystem.component.ContentUnavailable
 import com.example.pantryplan.core.designsystem.component.MultiFAB
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.PantryItem
@@ -203,7 +203,8 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             expiresAfter = 7.5.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
-            imageUrl = null
+            imageUrl = null,
+            barcode = ""
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -213,7 +214,8 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             expiresAfter = 1.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.OPENED,
-            imageUrl = null
+            imageUrl = null,
+            barcode = ""
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -223,7 +225,8 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             expiresAfter = 1.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.EXPIRED,
-            imageUrl = null
+            imageUrl = null,
+            barcode = ""
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -233,7 +236,8 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             expiresAfter = 7.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.FROZEN,
-            imageUrl = null
+            imageUrl = null,
+            barcode = ""
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -243,7 +247,8 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             expiresAfter = Int.MAX_VALUE.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
-            imageUrl = null
+            imageUrl = null,
+            barcode = ""
         ),
     ))
 }
