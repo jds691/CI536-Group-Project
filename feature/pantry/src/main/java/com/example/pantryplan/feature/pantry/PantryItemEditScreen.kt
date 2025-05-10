@@ -146,23 +146,26 @@ private fun PantryItemImageSelect() {
 
     val context = LocalContext.current
 
-    // TODO: Only save to storage on form submit. Right now, this saves every photo taken.
-    // Generate random filename for the photo that the user takes.
+    // TODO: Move temporary file to persistent storage on form submit.
+    // Generate random filename for the photo that the user takes/picks.
     val filename = Uuid.random().toString()
-    val file = File(context.filesDir, filename)
-    val fileUri = FileProvider.getUriForFile(
+    val tempFile = File.createTempFile(filename, null, context.cacheDir)
+    val tempFileUri = FileProvider.getUriForFile(
         context,
         context.packageName + ".provider",
-        file
+        tempFile
     )
     val takePicture = rememberLauncherForActivityResult(TakePicture()) { success ->
         if (success) {
-            uri = fileUri?.toString()
+            uri = tempFileUri?.toString()
         }
     }
 
-    val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) {
-        uri = it?.toString()
+    val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { picked ->
+        picked?.let {
+            context.contentResolver.openInputStream(it)!!.copyTo(tempFile.outputStream())
+            uri = tempFileUri?.toString()
+        }
     }
 
     ImageSelect(
@@ -170,7 +173,7 @@ private fun PantryItemImageSelect() {
             .padding(vertical = 16.dp)
             .aspectRatio(1.8f),
         onTakePhoto = {
-            takePicture.launch(fileUri)
+            takePicture.launch(tempFileUri)
         },
         onPickPhoto = {
             pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
