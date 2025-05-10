@@ -1,5 +1,7 @@
 package com.example.pantryplan.core.data.access.di
 
+import com.example.pantryplan.core.data.access.repository.PantryItemRepository
+import com.example.pantryplan.core.data.access.repository.PantryItemRepositoryImpl
 import com.example.pantryplan.core.data.access.repository.UserPreferencesRepository
 import com.example.pantryplan.core.data.access.repository.UserPreferencesRepositoryImpl
 import dagger.Binds
@@ -10,6 +12,10 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataAccessModule {
+    @Binds
+    internal abstract fun bindPantryItemRepository(
+        pantryItemRepositoryImpl: PantryItemRepositoryImpl
+    ): PantryItemRepository
 
     @Binds
     internal abstract fun bindUserPreferencesRepository(

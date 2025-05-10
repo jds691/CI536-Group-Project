@@ -28,6 +28,7 @@ android {
 
 dependencies {
     implementation(project(":core:models"))
+    implementation(project(":core:database"))
     // Automatically exposes required models from datastore
     api(project(":core:datastore"))
 
