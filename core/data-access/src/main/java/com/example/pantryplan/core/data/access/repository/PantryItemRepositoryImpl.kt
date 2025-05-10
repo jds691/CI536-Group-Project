@@ -38,12 +38,12 @@ class PantryItemRepositoryImpl @Inject constructor(
         return pantryDao.showAll().map { it.map(PantryStock::asExternalModel) }
     }
 
-    override fun getItemById(id: UUID): Flow<PantryItem>? {
-        return pantryDao.searchById(id)?.map { it.asExternalModel() }
+    override fun getItemById(id: UUID): Flow<PantryItem?> {
+        return pantryDao.searchById(id).map { it?.asExternalModel() }
     }
 
-    override fun getItemByBarcode(barcode: String): Flow<PantryItem>? {
-        return pantryDao.getStockByBarcode(barcode)?.map { it.asExternalModel() }
+    override fun getItemByBarcode(barcode: String): Flow<PantryItem?> {
+        return pantryDao.getStockByBarcode(barcode).map { it?.asExternalModel() }
     }
 
     override suspend fun updateItem(item: PantryItem) {

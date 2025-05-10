@@ -10,8 +10,8 @@ interface PantryItemRepository {
     suspend fun removeItemFromRepository(item: PantryItem)
 
     fun getAllItems(): Flow<List<PantryItem>>
-    fun getItemById(id: UUID): Flow<PantryItem>?
-    fun getItemByBarcode(barcode: String): Flow<PantryItem>?
+    fun getItemById(id: UUID): Flow<PantryItem?>
+    fun getItemByBarcode(barcode: String): Flow<PantryItem?>
 
     suspend fun updateItem(item: PantryItem)
     suspend fun updateItemStateById(id: UUID, state: PantryItemState)

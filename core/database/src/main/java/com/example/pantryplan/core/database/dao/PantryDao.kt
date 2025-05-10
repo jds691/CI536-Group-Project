@@ -16,10 +16,10 @@ interface PantryDao {
     fun showAll(): Flow<List<PantryStock>>
 
     @Query("SELECT * FROM PantryStock WHERE itemID = :id")
-    fun searchById(id: UUID): Flow<PantryStock>?
+    fun searchById(id: UUID): Flow<PantryStock?>
 
     @Query("SELECT * FROM PantryStock WHERE barcode = :barcode")
-    fun getStockByBarcode(barcode: String): Flow<PantryStock>?
+    fun getStockByBarcode(barcode: String): Flow<PantryStock?>
 
     @Query("SELECT * FROM PantryStock WHERE itemName LIKE :name")
     fun fuzzySearchByName(name: String): Flow<List<PantryStock>>
