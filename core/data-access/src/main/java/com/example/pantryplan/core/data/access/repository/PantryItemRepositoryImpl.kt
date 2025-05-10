@@ -41,7 +41,7 @@ class PantryItemRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getItemByBarcode(barcode: String): PantryItem? {
-        TODO("Not yet implemented")
+        return pantryDao.getStockByBarcode(barcode)?.asExternalModel()
     }
 
     override suspend fun updateItem(item: PantryItem) {
