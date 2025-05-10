@@ -1,8 +1,8 @@
 package com.example.pantryplan.core.models
 
 import kotlinx.datetime.Instant
-import kotlin.time.Duration
 import java.util.UUID
+import kotlin.time.Duration
 
 enum class PantryItemState {
     SEALED, OPENED, FROZEN, EXPIRED
@@ -18,5 +18,6 @@ data class PantryItem(
     // How long the item has been in its current state
     val inStateSince: Instant,
     val state: PantryItemState,
-    val imageUrl: String?
+    val imageUrl: String?,
+    val barcode: String?
 )

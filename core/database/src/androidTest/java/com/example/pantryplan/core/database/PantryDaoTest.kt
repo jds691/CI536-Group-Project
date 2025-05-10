@@ -3,13 +3,15 @@ package com.example.pantryplan.core.database
 import com.example.pantryplan.core.database.dao.PantryStockStateUpdate
 import com.example.pantryplan.core.database.model.PantryStock
 import com.example.pantryplan.core.models.PantryItemState
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import org.junit.Test
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.days
 
 internal class PantryDaoTest : DatabaseTest() {
@@ -25,7 +27,7 @@ internal class PantryDaoTest : DatabaseTest() {
         pantryDao.addItem(firstItem)
         pantryDao.addItem(secondItem)
 
-        val items = pantryDao.showAll()
+        val items = pantryDao.showAll().first()
 
         assertEquals(items.size, 2)
 
@@ -39,13 +41,28 @@ internal class PantryDaoTest : DatabaseTest() {
         )
 
         pantryDao.addItem(item)
-        val searchedItem = pantryDao.searchById(item.itemID)
+        val searchedItem = pantryDao.searchById(item.itemID).first()
 
         // Checking the entire object fails due to floating point errors on the Instants
         assertEquals(item.itemName, searchedItem!!.itemName)
         assertEquals(item.itemState, searchedItem.itemState)
 
-        assertTrue(pantryDao.searchById(UUID.randomUUID()) == null)
+        assertNull(pantryDao.searchById(UUID.randomUUID()).first())
+    }
+
+    @Test
+    fun getItemByBarcode() = runTest {
+        val barcode = "123456789"
+        val item = testPantryStock(
+            name = "Barcode Item",
+            barcode = barcode
+        )
+
+        pantryDao.addItem(item)
+
+        val barcodeItem = pantryDao.getStockByBarcode(barcode).first()
+        assertNotNull(barcodeItem)
+        assertEquals(barcode, barcodeItem.barcode!!)
     }
 
     @Test
@@ -71,7 +88,7 @@ internal class PantryDaoTest : DatabaseTest() {
         pantryDao.addItem(coconutMilk)
         pantryDao.addItem(borger)
 
-        val items = pantryDao.fuzzySearchByName("%Milk%")
+        val items = pantryDao.fuzzySearchByName("%Milk%").first()
 
         assertEquals(3, items.size)
         assertFalse(items.contains(borger))
@@ -98,7 +115,7 @@ internal class PantryDaoTest : DatabaseTest() {
         pantryDao.addItem(frozen2)
         pantryDao.addItem(expired)
 
-        val items = pantryDao.getItemsByState(PantryItemState.FROZEN)
+        val items = pantryDao.getItemsByState(PantryItemState.FROZEN).first()
 
         assertEquals(2, items.size)
         assertEquals(frozen.itemName, items[0].itemName)
@@ -119,7 +136,7 @@ internal class PantryDaoTest : DatabaseTest() {
 
         pantryDao.updateItem(newItem)
 
-        val updatedItem = pantryDao.searchById(newItem.itemID)
+        val updatedItem = pantryDao.searchById(newItem.itemID).first()
 
         assertEquals(newItem.itemName, updatedItem!!.itemName)
     }
@@ -140,7 +157,7 @@ internal class PantryDaoTest : DatabaseTest() {
             )
         )
 
-        val newItem = pantryDao.searchById(item.itemID)
+        val newItem = pantryDao.searchById(item.itemID).first()
 
         assertEquals(PantryItemState.OPENED, newItem!!.itemState)
     }
@@ -153,12 +170,12 @@ internal class PantryDaoTest : DatabaseTest() {
 
         pantryDao.addItem(item)
 
-        val foundItem = pantryDao.searchById(item.itemID)
-        assertTrue(foundItem != null)
+        val foundItem = pantryDao.searchById(item.itemID).first()
+        assertNotNull(foundItem)
 
         pantryDao.removeItem(item)
-        val foundItemAgain = pantryDao.searchById(item.itemID)
-        assertTrue(foundItemAgain == null)
+        val foundItemAgain = pantryDao.searchById(item.itemID).first()
+        assertNull(foundItemAgain)
     }
 
     @Test
@@ -169,26 +186,28 @@ internal class PantryDaoTest : DatabaseTest() {
 
         pantryDao.addItem(item)
 
-        val foundItem = pantryDao.searchById(item.itemID)
-        assertTrue(foundItem != null)
+        val foundItem = pantryDao.searchById(item.itemID).first()
+        assertNotNull(foundItem)
 
         pantryDao.removeItemById(item.itemID)
-        val foundItemAgain = pantryDao.searchById(item.itemID)
-        assertTrue(foundItemAgain == null)
+        val foundItemAgain = pantryDao.searchById(item.itemID).first()
+        assertNull(foundItemAgain)
     }
 }
 
 private fun testPantryStock(
     id: UUID = UUID.randomUUID(),
     name: String,
-    state: PantryItemState = PantryItemState.OPENED
+    state: PantryItemState = PantryItemState.OPENED,
+    barcode: String? = null
 ) = PantryStock(
     itemID = id,
     itemName = name,
     dateExpiring = Clock.System.now().plus(7.days),
-    dateOpened = Clock.System.now(),
+    expiresAfter = 2.days,
     quantity = 0,
     inStateSince = Clock.System.now(),
     itemState = state,
-    imageRefURL = null
+    imageRefURL = null,
+    barcode = barcode
 )
