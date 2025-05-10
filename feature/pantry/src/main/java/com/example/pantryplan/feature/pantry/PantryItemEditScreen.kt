@@ -12,7 +12,6 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -87,25 +86,24 @@ fun PantryItemEditScreen(
             )
         },
     ) { contentPadding ->
-        Box (modifier = Modifier.verticalScroll(rememberScrollState())) {
-            Column(
-                modifier = Modifier
-                    .padding(contentPadding)
-                    .consumeWindowInsets(contentPadding)
-                    .padding(vertical = 8.dp)
-            ) {
-                Text(
-                    text = "Image",
-                    modifier = Modifier.padding(
-                        horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)
-                    ),
-                    color = MaterialTheme.colorScheme.outline,
-                    style = MaterialTheme.typography.bodySmall,
-                )
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(contentPadding)
+                .consumeWindowInsets(contentPadding)
+                .padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = "Image",
+                modifier = Modifier.padding(
+                    horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)
+                ),
+                color = MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.bodySmall,
+            )
 
-                PantryItemImageSelect()
-                PantryItemEditForm()
-            }
+            PantryItemImageSelect()
+            PantryItemEditForm()
         }
     }
 }
