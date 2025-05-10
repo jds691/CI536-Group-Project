@@ -34,7 +34,8 @@ import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 @Composable
 fun ImageSelect(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+    onTakePhoto: () -> Unit,
+    onPickPhoto: () -> Unit,
     backgroundPainter: (Painter) = painterResource(R.drawable.bigcheese)
 ) {
     Box(
@@ -54,13 +55,13 @@ fun ImageSelect(
         Row (horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             // TODO: Replace with translation strings.
             ImageSelectButton(
-                onClick = onClick,
+                onClick = onTakePhoto,
                 // TODO: Replace this fuck-ass icon.
                 icon = Icons.Outlined.AddAPhoto,
                 label = "Take Photo",
             )
             ImageSelectButton(
-                onClick = onClick,
+                onClick = onPickPhoto,
                 icon = Icons.Outlined.AddPhotoAlternate,
                 label = "Pick Photo",
             )
@@ -83,7 +84,7 @@ fun ImageSelectButton(
             )
             .border(
                 width = 1.5.dp,
-                color = MaterialTheme.colorScheme.outlineVariant,
+                color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(8.dp),
@@ -117,6 +118,10 @@ fun ImageSelectButtonPreview() {
 @Composable
 fun MacrosCardPreviews() {
     PantryPlanTheme {
-        ImageSelect(onClick = {}, modifier = Modifier.aspectRatio(1.8f))
+        ImageSelect(
+            onTakePhoto = {},
+            onPickPhoto = {},
+            modifier = Modifier.aspectRatio(1.8f)
+        )
     }
 }

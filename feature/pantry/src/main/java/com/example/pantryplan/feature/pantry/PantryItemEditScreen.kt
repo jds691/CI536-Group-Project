@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalUuidApi::class)
 
 package com.example.pantryplan.feature.pantry
 
@@ -6,6 +6,7 @@ import android.icu.text.SimpleDateFormat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -52,10 +53,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import coil3.compose.rememberAsyncImagePainter
 import com.example.pantryplan.core.designsystem.component.ImageSelect
 import kotlinx.datetime.Clock
@@ -63,7 +66,10 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import kotlin.time.Duration.Companion.days
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 import com.example.pantryplan.core.designsystem.R as designSystemR
+import java.io.File
 
 @Composable
 fun PantryItemEditScreen(
@@ -97,27 +103,7 @@ fun PantryItemEditScreen(
                     style = MaterialTheme.typography.bodySmall,
                 )
 
-                var uri by remember { mutableStateOf<String?>(null) }
-
-                val painter = rememberAsyncImagePainter(
-                    model = uri,
-                    fallback = painterResource(designSystemR.drawable.bigcheese),
-                )
-
-                //val picture = rememberLauncherForActivityResult(TakePicture()) { a -> }
-                val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) {
-                    uri = it?.toString()
-                }
-                ImageSelect(
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(vertical = 16.dp)
-                        .aspectRatio(1.8f),
-                    onClick = {
-                        //picture.launch(Uri.EMPTY)
-                        pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
-                    },
-                    backgroundPainter = painter
-                )
+                PantryItemImageSelect()
                 PantryItemEditForm()
             }
         }
@@ -146,6 +132,48 @@ private fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Un
                 Text("Save")
             }
         }
+    )
+}
+
+@Composable
+private fun PantryItemImageSelect() {
+    var uri by remember { mutableStateOf<String?>(null) }
+
+    val painter = rememberAsyncImagePainter(
+        model = uri,
+        fallback = painterResource(designSystemR.drawable.bigcheese),
+    )
+
+    val context = LocalContext.current
+
+    // TODO: Only save to storage on form submit. Right now, this saves every photo taken.
+    // Generate random filename for the photo that the user takes.
+    val filename = Uuid.random().toString()
+    val file = File(context.filesDir, filename)
+    val fileUri = FileProvider.getUriForFile(
+        context,
+        context.packageName + ".provider",
+        file
+    )
+    val takePicture = rememberLauncherForActivityResult(TakePicture()) { success ->
+        uri = fileUri.toString()
+    }
+
+    val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) {
+        uri = it?.toString()
+    }
+
+    ImageSelect(
+        modifier = Modifier.fillMaxWidth()
+            .padding(vertical = 16.dp)
+            .aspectRatio(1.8f),
+        onTakePhoto = {
+            takePicture.launch(fileUri)
+        },
+        onPickPhoto = {
+            pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+        },
+        backgroundPainter = painter
     )
 }
 
