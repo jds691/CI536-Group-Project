@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.FeaturedVideo
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
@@ -47,7 +46,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.example.pantryplan.core.designsystem.text.pantryPlanExactFormat
-import kotlinx.datetime.*
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -113,27 +115,27 @@ fun PantryItemDetailsScreen(
             BottomAppBar(
                 actions = {
                     Row {
-                        if (item.state == PantryItemState.SEALED) { //TODO: change item state onClick, add icons for each button
+                        if (item.state == PantryItemState.SEALED) { //TODO: change item state onClick
                             //open
                             IconButton(onClick = {}) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Open")
+                                Icon(painterResource(R.drawable.mark_as_opened), "Open")
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             //freeze
                             IconButton(onClick = {}) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Freeze")
+                                Icon(painterResource(R.drawable.freeze), "Freeze")
                             }
                         }
                         if (item.state == PantryItemState.OPENED) {
                             //freeze
                             IconButton(onClick = {}) {
-                                Icon(Icons.AutoMirrored.Filled.FeaturedVideo, "Freeze")
+                                Icon(painterResource(R.drawable.freeze), "Freeze")
                             }
                         }
                         if (item.state == PantryItemState.FROZEN) {
                             //unfreeze
                             IconButton(onClick = {}) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Unfreeze")
+                                Icon(painterResource(R.drawable.unfreeze), "Unfreeze")
                             }
                         }
                     }
@@ -295,10 +297,10 @@ fun PantryItemDetailsScreenPreview() {
                 name = "Bacon",
                 quantity = 250,
                 expiryDate = Clock.System.now(),
-                expiresAfter = 1.days,
+                expiresAfter = 21.days,
                 inStateSince = Clock.System.now(),
                 imageUrl = null,
-                state = PantryItemState.OPENED
+                state = PantryItemState.SEALED
             )
         )
     }
