@@ -18,15 +18,15 @@ updates:
           - 'org.jetbrains.kotlin*'
         exclude-patterns:
           - 'org.jetbrains.kotlinx*'
-        hilt:
-          patterns:
-            - 'com.google.dagger*'
-          data-store:
-            patterns:
-              - 'androidx.datastore*'
-          room:
-            patterns:
-              - 'androidx.room*'
+      hilt:
+        patterns:
+          - 'com.google.dagger*'
+      data-store:
+        patterns:
+          - 'androidx.datastore*'
+      room:
+        patterns:
+          - 'androidx.room*'
 
 
   - package-ecosystem: "github-actions"
