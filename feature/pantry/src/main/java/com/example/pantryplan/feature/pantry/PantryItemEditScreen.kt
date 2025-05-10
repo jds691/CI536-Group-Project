@@ -156,7 +156,9 @@ private fun PantryItemImageSelect() {
         file
     )
     val takePicture = rememberLauncherForActivityResult(TakePicture()) { success ->
-        uri = fileUri.toString()
+        if (success) {
+            uri = fileUri?.toString()
+        }
     }
 
     val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) {
