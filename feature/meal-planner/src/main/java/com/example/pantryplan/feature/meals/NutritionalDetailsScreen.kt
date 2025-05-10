@@ -4,8 +4,10 @@ package com.example.pantryplan.feature.meals
 
 import android.icu.text.DecimalFormat
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -53,19 +55,21 @@ fun NutritionalDetailsScreen(
             )
         }
     ) { innerPadding ->
-        Column(
-            verticalArrangement = Arrangement
-                .spacedBy(8.dp),
-            modifier = modifier
-                .padding(innerPadding)
-                .padding(horizontal = dimensionResource(R.dimen.horizontal_margin))
-                .verticalScroll(rememberScrollState())
-        ) {
-            Macros()
+        Box (modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(
+                verticalArrangement = Arrangement
+                    .spacedBy(8.dp),
+                modifier = modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .padding(horizontal = dimensionResource(R.dimen.horizontal_margin))
+            ) {
+                Macros()
 
-            Nutrients()
+                Nutrients()
 
-            Tips()
+                Tips()
+            }
         }
     }
 }
