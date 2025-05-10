@@ -18,7 +18,8 @@ data class PantryStock(
     val quantity: Int,
     val inStateSince: Instant, // It just works ¯\_(ツ)_/¯
     val itemState: PantryItemState,
-    val imageRefURL: String? // TODO: Path once camera is functional
+    val imageRefURL: String?, // TODO: Path once camera is functional
+    val barcode: String?
 )
 
 fun PantryStock.asExternalModel() = PantryItem(
@@ -29,5 +30,6 @@ fun PantryStock.asExternalModel() = PantryItem(
     expiresAfter = expiresAfter,
     inStateSince = inStateSince,
     state = itemState,
-    imageUrl = imageRefURL
+    imageUrl = imageRefURL,
+    barcode = barcode
 )

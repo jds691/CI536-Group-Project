@@ -17,6 +17,9 @@ interface PantryDao {
     @Query("SELECT * FROM PantryStock WHERE itemID = :id")
     suspend fun searchById(id: UUID): PantryStock?
 
+    @Query("SELECT * FROM PantryStock WHERE barcode = :barcode")
+    suspend fun getStockByBarcode(barcode: String): PantryStock?
+
     @Query("SELECT * FROM PantryStock WHERE itemName LIKE :name")
     suspend fun fuzzySearchByName(name: String): List<PantryStock>
 

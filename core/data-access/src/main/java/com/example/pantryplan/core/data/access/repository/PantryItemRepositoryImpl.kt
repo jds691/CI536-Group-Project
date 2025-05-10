@@ -17,7 +17,8 @@ fun PantryItem.asEntity() = PantryStock(
     quantity = quantity,
     inStateSince = inStateSince,
     itemState = state,
-    imageRefURL = imageUrl
+    imageRefURL = imageUrl,
+    barcode = barcode
 )
 
 class PantryItemRepositoryImpl @Inject constructor(

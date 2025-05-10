@@ -9,6 +9,8 @@ import org.junit.Test
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.days
 
@@ -45,7 +47,22 @@ internal class PantryDaoTest : DatabaseTest() {
         assertEquals(item.itemName, searchedItem!!.itemName)
         assertEquals(item.itemState, searchedItem.itemState)
 
-        assertTrue(pantryDao.searchById(UUID.randomUUID()) == null)
+        assertNull(pantryDao.searchById(UUID.randomUUID()))
+    }
+
+    @Test
+    fun getItemByBarcode() = runTest {
+        val barcode = "123456789"
+        val item = testPantryStock(
+            name = "Barcode Item",
+            barcode = barcode
+        )
+
+        pantryDao.addItem(item)
+
+        val barcodeItem = pantryDao.getStockByBarcode(barcode)
+        assertNotNull(barcodeItem)
+        assertEquals(barcode, barcodeItem.barcode!!)
     }
 
     @Test
@@ -181,14 +198,16 @@ internal class PantryDaoTest : DatabaseTest() {
 private fun testPantryStock(
     id: UUID = UUID.randomUUID(),
     name: String,
-    state: PantryItemState = PantryItemState.OPENED
+    state: PantryItemState = PantryItemState.OPENED,
+    barcode: String? = null
 ) = PantryStock(
     itemID = id,
     itemName = name,
     dateExpiring = Clock.System.now().plus(7.days),
-    dateOpened = Clock.System.now(),
+    expiresAfter = 2.days,
     quantity = 0,
     inStateSince = Clock.System.now(),
     itemState = state,
-    imageRefURL = null
+    imageRefURL = null,
+    barcode = barcode
 )
