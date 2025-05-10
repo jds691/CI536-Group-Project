@@ -7,24 +7,25 @@ import androidx.room.Query
 import androidx.room.Update
 import com.example.pantryplan.core.database.model.PantryStock
 import com.example.pantryplan.core.models.PantryItemState
+import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
 @Dao
 interface PantryDao {
     @Query("SELECT * FROM PantryStock")
-    suspend fun showAll(): List<PantryStock>
+    fun showAll(): Flow<List<PantryStock>>
 
     @Query("SELECT * FROM PantryStock WHERE itemID = :id")
-    suspend fun searchById(id: UUID): PantryStock?
+    fun searchById(id: UUID): Flow<PantryStock>?
 
     @Query("SELECT * FROM PantryStock WHERE barcode = :barcode")
-    suspend fun getStockByBarcode(barcode: String): PantryStock?
+    fun getStockByBarcode(barcode: String): Flow<PantryStock>?
 
     @Query("SELECT * FROM PantryStock WHERE itemName LIKE :name")
-    suspend fun fuzzySearchByName(name: String): List<PantryStock>
+    fun fuzzySearchByName(name: String): Flow<List<PantryStock>>
 
     @Query("Select * FROM PantryStock WHERE itemState = :state")
-    suspend fun getItemsByState(state: PantryItemState): List<PantryStock>
+    fun getItemsByState(state: PantryItemState): Flow<List<PantryStock>>
 
     // Used by a function that wasn't required by the DB
     // check date opened and compare to date

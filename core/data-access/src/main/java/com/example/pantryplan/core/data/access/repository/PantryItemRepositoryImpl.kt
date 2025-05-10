@@ -6,6 +6,8 @@ import com.example.pantryplan.core.database.model.PantryStock
 import com.example.pantryplan.core.database.model.asExternalModel
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
 
@@ -32,16 +34,16 @@ class PantryItemRepositoryImpl @Inject constructor(
         pantryDao.removeItem(item.asEntity())
     }
 
-    override suspend fun getAllItems(): List<PantryItem> {
-        return pantryDao.showAll().map { it.asExternalModel() }
+    override fun getAllItems(): Flow<List<PantryItem>> {
+        return pantryDao.showAll().map { it.map(PantryStock::asExternalModel) }
     }
 
-    override suspend fun getItemById(id: UUID): PantryItem? {
-        return pantryDao.searchById(id)?.asExternalModel()
+    override fun getItemById(id: UUID): Flow<PantryItem>? {
+        return pantryDao.searchById(id)?.map { it.asExternalModel() }
     }
 
-    override suspend fun getItemByBarcode(barcode: String): PantryItem? {
-        return pantryDao.getStockByBarcode(barcode)?.asExternalModel()
+    override fun getItemByBarcode(barcode: String): Flow<PantryItem>? {
+        return pantryDao.getStockByBarcode(barcode)?.map { it.asExternalModel() }
     }
 
     override suspend fun updateItem(item: PantryItem) {
@@ -57,8 +59,8 @@ class PantryItemRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun searchForItemsByName(name: String): List<PantryItem> {
+    override fun searchForItemsByName(name: String): Flow<List<PantryItem>> {
         // % signs included as wildcards
-        return pantryDao.fuzzySearchByName("%$name%").map { it.asExternalModel() }
+        return pantryDao.fuzzySearchByName("%$name%").map { it.map(PantryStock::asExternalModel) }
     }
 }

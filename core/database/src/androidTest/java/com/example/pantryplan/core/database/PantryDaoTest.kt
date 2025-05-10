@@ -3,6 +3,7 @@ package com.example.pantryplan.core.database
 import com.example.pantryplan.core.database.dao.PantryStockStateUpdate
 import com.example.pantryplan.core.database.model.PantryStock
 import com.example.pantryplan.core.models.PantryItemState
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import org.junit.Test
@@ -27,7 +28,7 @@ internal class PantryDaoTest : DatabaseTest() {
         pantryDao.addItem(firstItem)
         pantryDao.addItem(secondItem)
 
-        val items = pantryDao.showAll()
+        val items = pantryDao.showAll().first()
 
         assertEquals(items.size, 2)
 
@@ -41,7 +42,7 @@ internal class PantryDaoTest : DatabaseTest() {
         )
 
         pantryDao.addItem(item)
-        val searchedItem = pantryDao.searchById(item.itemID)
+        val searchedItem = pantryDao.searchById(item.itemID)?.first()
 
         // Checking the entire object fails due to floating point errors on the Instants
         assertEquals(item.itemName, searchedItem!!.itemName)
@@ -60,7 +61,7 @@ internal class PantryDaoTest : DatabaseTest() {
 
         pantryDao.addItem(item)
 
-        val barcodeItem = pantryDao.getStockByBarcode(barcode)
+        val barcodeItem = pantryDao.getStockByBarcode(barcode)?.first()
         assertNotNull(barcodeItem)
         assertEquals(barcode, barcodeItem.barcode!!)
     }
@@ -88,7 +89,7 @@ internal class PantryDaoTest : DatabaseTest() {
         pantryDao.addItem(coconutMilk)
         pantryDao.addItem(borger)
 
-        val items = pantryDao.fuzzySearchByName("%Milk%")
+        val items = pantryDao.fuzzySearchByName("%Milk%").first()
 
         assertEquals(3, items.size)
         assertFalse(items.contains(borger))
@@ -115,7 +116,7 @@ internal class PantryDaoTest : DatabaseTest() {
         pantryDao.addItem(frozen2)
         pantryDao.addItem(expired)
 
-        val items = pantryDao.getItemsByState(PantryItemState.FROZEN)
+        val items = pantryDao.getItemsByState(PantryItemState.FROZEN).first()
 
         assertEquals(2, items.size)
         assertEquals(frozen.itemName, items[0].itemName)
@@ -136,7 +137,7 @@ internal class PantryDaoTest : DatabaseTest() {
 
         pantryDao.updateItem(newItem)
 
-        val updatedItem = pantryDao.searchById(newItem.itemID)
+        val updatedItem = pantryDao.searchById(newItem.itemID)?.first()
 
         assertEquals(newItem.itemName, updatedItem!!.itemName)
     }
@@ -157,7 +158,7 @@ internal class PantryDaoTest : DatabaseTest() {
             )
         )
 
-        val newItem = pantryDao.searchById(item.itemID)
+        val newItem = pantryDao.searchById(item.itemID)?.first()
 
         assertEquals(PantryItemState.OPENED, newItem!!.itemState)
     }
