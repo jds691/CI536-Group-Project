@@ -1,7 +1,9 @@
 package com.example.pantryplan.core.data.access.repository
 
 import com.example.pantryplan.core.database.dao.PantryDao
+import com.example.pantryplan.core.database.dao.PantryStockStateUpdate
 import com.example.pantryplan.core.database.model.PantryStock
+import com.example.pantryplan.core.database.model.asExternalModel
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import java.util.UUID
@@ -22,19 +24,19 @@ class PantryItemRepositoryImpl @Inject constructor(
     private val pantryDao: PantryDao
 ) : PantryItemRepository {
     override suspend fun addItemToRepository(item: PantryItem) {
-        TODO("Not yet implemented")
+        pantryDao.addItem(item.asEntity())
     }
 
     override suspend fun removeItemFromRepository(item: PantryItem) {
-        TODO("Not yet implemented")
+        pantryDao.removeItem(item.asEntity())
     }
 
     override suspend fun getAllItems(): List<PantryItem> {
-        TODO("Not yet implemented")
+        return pantryDao.showAll().map { it.asExternalModel() }
     }
 
     override suspend fun getItemById(id: UUID): PantryItem? {
-        TODO("Not yet implemented")
+        return pantryDao.searchById(id)?.asExternalModel()
     }
 
     override suspend fun getItemByBarcode(barcode: String): PantryItem? {
@@ -42,14 +44,20 @@ class PantryItemRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateItem(item: PantryItem) {
-        TODO("Not yet implemented")
+        pantryDao.updateItem(item.asEntity())
     }
 
     override suspend fun updateItemStateById(id: UUID, state: PantryItemState) {
-        TODO("Not yet implemented")
+        pantryDao.updateItemState(
+            PantryStockStateUpdate(
+                itemID = id,
+                itemState = state
+            )
+        )
     }
 
     override suspend fun searchForItemsByName(name: String): List<PantryItem> {
-        TODO("Not yet implemented")
+        // % signs included as wildcards
+        return pantryDao.fuzzySearchByName("%$name%").map { it.asExternalModel() }
     }
 }
