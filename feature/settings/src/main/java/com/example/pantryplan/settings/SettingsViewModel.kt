@@ -31,7 +31,6 @@ class SettingsViewModel @Inject constructor(
                 expiringSoonAmount = mutableStateOf(preferences.expiringSoonAmount)
             )
             settings.allergies.addAll(preferences.allergies)
-            settings.intolerances.addAll(preferences.intolerances)
 
             SettingsUiState(
                 settings = settings
@@ -60,12 +59,6 @@ class SettingsViewModel @Inject constructor(
             userPreferencesRepository.setAllergies(allergies)
         }
     }
-
-    fun updateIntolerances(intolerances: EnumSet<Allergen>) {
-        viewModelScope.launch {
-            userPreferencesRepository.setIntolerances(intolerances)
-        }
-    }
 }
 
 data class UserSettings(
@@ -73,7 +66,6 @@ data class UserSettings(
     val expiringSoonAmount: MutableState<Duration> = mutableStateOf(2.days),
 
     val allergies: SnapshotStateSet<Allergen> = mutableStateSetOf(),
-    val intolerances: SnapshotStateSet<Allergen> = mutableStateSetOf()
 )
 
 data class SettingsUiState(

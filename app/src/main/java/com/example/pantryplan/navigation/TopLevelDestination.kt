@@ -11,7 +11,7 @@ import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.pantryplan.feature.meals.navigation.MealPlanner
 import com.example.pantryplan.feature.pantry.navigation.PantryList
-import com.example.pantryplan.feature.recipes.navigation.RecipesRoute
+import com.example.pantryplan.feature.recipes.navigation.RecipesList
 import kotlin.reflect.KClass
 import com.example.pantryplan.feature.meals.R as mealsR
 import com.example.pantryplan.feature.pantry.R as pantryR
@@ -36,7 +36,7 @@ enum class TopLevelDestination (
         recipesR.string.feature_recipes_title,
         Icons.Rounded.Bookmark,
         Icons.Outlined.BookmarkBorder,
-        RecipesRoute::class
+        RecipesList::class
     ),
     MEAL_PLANNER(
         mealsR.string.feature_meals_icon,

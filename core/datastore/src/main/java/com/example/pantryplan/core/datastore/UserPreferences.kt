@@ -9,5 +9,4 @@ data class UserPreferences(
     val expiringSoonAmount: Duration,
 
     val allergies: EnumSet<Allergen>,
-    val intolerances: EnumSet<Allergen>
 )

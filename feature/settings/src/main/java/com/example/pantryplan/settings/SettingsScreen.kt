@@ -73,7 +73,7 @@ internal fun SettingsScreen(
         ) {
             SettingsRow(
                 title = "Allergies & Intolerances",
-                description = "${uiState.settings.allergies.count()} Allergies, ${uiState.settings.intolerances.count()} Intolerances",
+                description = "${uiState.settings.allergies.count()} Allergies and Intolerances",
                 onClick = onAllergySettingsClick
             )
 
