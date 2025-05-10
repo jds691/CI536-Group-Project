@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.FeaturedVideo
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
@@ -40,13 +41,45 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
-import java.util.Calendar
 import java.util.UUID
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.pantryplan.core.designsystem.text.pantryPlanExactFormat
+import kotlinx.datetime.*
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
+fun getFormattedExpiryDate(expiryDate: Instant, expiresAfter: Duration?): String {
+    val time = expiryDate + expiresAfter!!
+    val zone = TimeZone.currentSystemDefault()
+
+    val localDateTime = time.toLocalDateTime(zone).date
+    val localDateFormatted = localDateTime.pantryPlanExactFormat()
+    return (localDateFormatted)
+}
+
+fun getFormattedExpiresAfter(duration: Duration?): String {
+    if (duration != null) {
+        return when {
+            duration >= 7.days -> {
+                val weeks = duration.inWholeDays / 7
+                " (in $weeks week${if (weeks > 1) "s)" else ")"}"
+            }
+            duration >= 1.days -> {
+                val days = duration.inWholeDays
+                " (in $days day${if (days > 1) "s)" else ")"}"
+            }
+            else -> {
+                "Today"
+            }
+        }
+    }
+    else {
+        return ""
+    }
+}
 
 @Composable
 fun PantryItemDetailsScreen(
@@ -94,7 +127,7 @@ fun PantryItemDetailsScreen(
                         if (item.state == PantryItemState.OPENED) {
                             //freeze
                             IconButton(onClick = {}) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Freeze")
+                                Icon(Icons.AutoMirrored.Filled.FeaturedVideo, "Freeze")
                             }
                         }
                         if (item.state == PantryItemState.FROZEN) {
@@ -154,12 +187,12 @@ fun PantryItemDetailsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "add date here", // TODO: add date when new format is pulled to main
+                            text = getFormattedExpiryDate(item.expiryDate, item.expiresAfter),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = " (in x days)",// TODO: change this too
+                            text = getFormattedExpiresAfter(item.expiresAfter),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -261,15 +294,11 @@ fun PantryItemDetailsScreenPreview() {
                 id = UUID.randomUUID(),
                 name = "Bacon",
                 quantity = 250,
-                expiryDate = Calendar.getInstance().apply { //TODO: change this when date changes are pulled to main
-                    set(2025, Calendar.MAY, 1)
-                }.time,
-                expiresAfter = 2,
-                inStateSince = Calendar.getInstance().apply {
-                    set(2025, Calendar.DECEMBER, 12)
-                }.time,
+                expiryDate = Clock.System.now(),
+                expiresAfter = 1.days,
+                inStateSince = Clock.System.now(),
                 imageUrl = null,
-                state = PantryItemState.SEALED
+                state = PantryItemState.OPENED
             )
         )
     }
