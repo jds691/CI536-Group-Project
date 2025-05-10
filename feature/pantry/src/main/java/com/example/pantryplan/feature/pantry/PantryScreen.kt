@@ -204,7 +204,7 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
             imageUrl = null,
-            barcode = ""
+            barcode = null
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -215,7 +215,7 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             inStateSince = Clock.System.now(),
             state = PantryItemState.OPENED,
             imageUrl = null,
-            barcode = ""
+            barcode = null
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -226,7 +226,7 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             inStateSince = Clock.System.now(),
             state = PantryItemState.EXPIRED,
             imageUrl = null,
-            barcode = ""
+            barcode = null
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -237,7 +237,7 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             inStateSince = Clock.System.now(),
             state = PantryItemState.FROZEN,
             imageUrl = null,
-            barcode = ""
+            barcode = null
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -248,7 +248,7 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
             imageUrl = null,
-            barcode = ""
+            barcode = null
         ),
     ))
 }

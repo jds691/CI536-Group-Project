@@ -14,7 +14,7 @@ import dagger.hilt.components.SingletonComponent
 abstract class DataAccessModule {
     @Binds
     internal abstract fun bindPantryItemRepository(
-        pantryItemRepositoryImpl: PantryItemRepositoryImpl
+        pantryItemRepository: PantryItemRepositoryImpl
     ): PantryItemRepository
 
     @Binds
