@@ -18,7 +18,6 @@ composeBom = "2025.05.00"
 appcompat = "1.7.0"
 material = "1.12.0"
 androidxNavigation = "2.9.0"
-jetbrainsKotlinJvm = "2.1.0"
 kotlinxCoroutines = "1.10.2"
 kotlinxDatetime = "0.6.2"
 kotlinxSerializationJson = "1.8.1"
@@ -70,6 +69,6 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
