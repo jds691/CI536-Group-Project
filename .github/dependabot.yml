@@ -6,33 +6,33 @@
 version: 2
 updates:
   - package-ecosystem: "gradle"
-      reviewers:
-        - 'jds691'
-      directory: "/"
-      schedule:
-          interval: "weekly"
-      rebase-strategy: "disabled"
-      groups:
-          kotlin:
-              patterns:
-                - 'org.jetbrains.kotlin*'
-              exclude-patterns:
-                - 'org.jetbrains.kotlinx*'
-           hilt:
-               patterns:
-                 - 'com.google.dagger*'
-           data-store:
-               patterns:
-                 - 'androidx.datastore*'
-           room:
-               patterns:
-                 - 'androidx.room*'
-  
+    reviewers:
+      - 'jds691'
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    rebase-strategy: "disabled"
+    groups:
+      kotlin:
+        patterns:
+          - 'org.jetbrains.kotlin*'
+        exclude-patterns:
+          - 'org.jetbrains.kotlinx*'
+        hilt:
+          patterns:
+            - 'com.google.dagger*'
+          data-store:
+            patterns:
+              - 'androidx.datastore*'
+          room:
+            patterns:
+              - 'androidx.room*'
 
-    - package-ecosystem: "github-actions"
-      reviewers:
-        - 'jds691'
-      directory: "/"
-      schedule:
-          interval: "daily"
-      rebase-strategy: "disabled"
+
+  - package-ecosystem: "github-actions"
+    reviewers:
+      - 'jds691'
+    directory: "/"
+    schedule:
+      interval: "daily"
+    rebase-strategy: "disabled"
