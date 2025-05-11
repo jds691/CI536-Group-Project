@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/core/datastore" />
             <option value="$PROJECT_DIR$/core/design-system" />
             <option value="$PROJECT_DIR$/core/models" />
+            <option value="$PROJECT_DIR$/core/notifications" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/meal-planner" />
             <option value="$PROJECT_DIR$/feature/pantry" />
