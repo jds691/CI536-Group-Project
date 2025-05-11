@@ -69,7 +69,8 @@ fun NavGraphBuilder.pantrySection(
                     expiresAfter = 21.days,
                     inStateSince = Clock.System.now(),
                     imageUrl = null,
-                    state = PantryItemState.SEALED
+                    state = PantryItemState.SEALED,
+                    barcode = null
                 )
             )
         }

@@ -32,24 +32,24 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.pantryplan.core.designsystem.text.pantryPlanExactFormat
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
-import java.util.UUID
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import com.example.pantryplan.core.designsystem.text.pantryPlanExactFormat
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.Clock
+import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -300,7 +300,8 @@ fun PantryItemDetailsScreenPreview() {
                 expiresAfter = 21.days,
                 inStateSince = Clock.System.now(),
                 imageUrl = null,
-                state = PantryItemState.SEALED
+                state = PantryItemState.SEALED,
+                barcode = null
             )
         )
     }
