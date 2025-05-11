@@ -1,16 +1,20 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalUuidApi::class)
 
 package com.example.pantryplan.feature.pantry
 
 import android.icu.text.SimpleDateFormat
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -48,16 +52,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
+import coil3.compose.rememberAsyncImagePainter
 import com.example.pantryplan.core.designsystem.component.ImageSelect
 import kotlinx.datetime.Clock
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import kotlin.time.Duration.Companion.days
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 import com.example.pantryplan.core.designsystem.R as designSystemR
+import java.io.File
 
 @Composable
 fun PantryItemEditScreen(
@@ -75,27 +86,24 @@ fun PantryItemEditScreen(
             )
         },
     ) { contentPadding ->
-        Box (modifier = Modifier.verticalScroll(rememberScrollState())) {
-            Column(
-                modifier = Modifier
-                    .padding(contentPadding)
-                    .consumeWindowInsets(contentPadding)
-                    .padding(vertical = 8.dp)
-            ) {
-                Text(
-                    text = "Image",
-                    modifier = Modifier.padding(
-                        horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)
-                    ),
-                    color = MaterialTheme.colorScheme.outline,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                ImageSelect(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-                    onClick = { /* TODO: Actually add an image. */ },
-                )
-                PantryItemEditForm()
-            }
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(contentPadding)
+                .consumeWindowInsets(contentPadding)
+                .padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = "Image",
+                modifier = Modifier.padding(
+                    horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)
+                ),
+                color = MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.bodySmall,
+            )
+
+            PantryItemImageSelect()
+            PantryItemEditForm()
         }
     }
 }
@@ -122,6 +130,53 @@ private fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Un
                 Text("Save")
             }
         }
+    )
+}
+
+@Composable
+private fun PantryItemImageSelect() {
+    var uri by remember { mutableStateOf<String?>(null) }
+
+    val painter = rememberAsyncImagePainter(
+        model = uri,
+        fallback = painterResource(designSystemR.drawable.bigcheese),
+    )
+
+    val context = LocalContext.current
+
+    // TODO: Move temporary file to persistent storage on form submit.
+    // Generate random filename for the photo that the user takes/picks.
+    val filename = Uuid.random().toString()
+    val tempFile = File.createTempFile(filename, null, context.cacheDir)
+    val tempFileUri = FileProvider.getUriForFile(
+        context,
+        context.packageName + ".provider",
+        tempFile
+    )
+    val takePicture = rememberLauncherForActivityResult(TakePicture()) { success ->
+        if (success) {
+            uri = tempFileUri?.toString()
+        }
+    }
+
+    val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { picked ->
+        picked?.let {
+            context.contentResolver.openInputStream(it)!!.copyTo(tempFile.outputStream())
+            uri = tempFileUri?.toString()
+        }
+    }
+
+    ImageSelect(
+        modifier = Modifier.fillMaxWidth()
+            .padding(vertical = 16.dp)
+            .aspectRatio(1.8f),
+        onTakePhoto = {
+            takePicture.launch(tempFileUri)
+        },
+        onPickPhoto = {
+            pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+        },
+        backgroundPainter = painter
     )
 }
 

@@ -6,6 +6,7 @@ import android.icu.text.DecimalFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -57,9 +58,10 @@ fun NutritionalDetailsScreen(
             verticalArrangement = Arrangement
                 .spacedBy(8.dp),
             modifier = modifier
-                .padding(innerPadding)
-                .padding(horizontal = dimensionResource(R.dimen.horizontal_margin))
                 .verticalScroll(rememberScrollState())
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .padding(horizontal = dimensionResource(R.dimen.horizontal_margin))
         ) {
             Macros()
 
