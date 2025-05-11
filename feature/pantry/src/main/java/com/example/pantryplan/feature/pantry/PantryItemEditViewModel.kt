@@ -38,38 +38,28 @@ class PantryItemEditViewModel @Inject constructor(
     val uiState: StateFlow<PantryItemEditUiState> = _uiState.asStateFlow()
 
     fun updateName(name: String) {
-        viewModelScope.launch {
-            pantryItem = pantryItem.copy(name = name)
-            _uiState.update { it.copy(pantryItem = pantryItem) }
-        }
+        pantryItem = pantryItem.copy(name = name)
+        _uiState.update { it.copy(pantryItem = pantryItem) }
     }
 
     fun updateExpiryDate(expiryDate: Instant) {
-        viewModelScope.launch {
-            pantryItem = pantryItem.copy(expiryDate = expiryDate)
-            _uiState.update { it.copy(pantryItem = pantryItem) }
-        }
+        pantryItem = pantryItem.copy(expiryDate = expiryDate)
+        _uiState.update { it.copy(pantryItem = pantryItem) }
     }
 
     fun updateState(state: PantryItemState) {
-        viewModelScope.launch {
-            pantryItem = pantryItem.copy(state = state)
-            _uiState.update { it.copy(pantryItem = pantryItem) }
-        }
+        pantryItem = pantryItem.copy(state = state)
+        _uiState.update { it.copy(pantryItem = pantryItem) }
     }
 
     fun updateQuantity(quantity: Int) {
-        viewModelScope.launch {
-            pantryItem = pantryItem.copy(quantity = quantity)
-            _uiState.update { it.copy(pantryItem = pantryItem) }
-        }
+        pantryItem = pantryItem.copy(quantity = quantity)
+        _uiState.update { it.copy(pantryItem = pantryItem) }
     }
 
     fun updateExpiresAfter(expiresAfter: Duration) {
-        viewModelScope.launch {
-            pantryItem = pantryItem.copy(expiresAfter = expiresAfter)
-            _uiState.update { it.copy(pantryItem = pantryItem) }
-        }
+        pantryItem = pantryItem.copy(expiresAfter = expiresAfter)
+        _uiState.update { it.copy(pantryItem = pantryItem) }
     }
 
     fun savePantryItem() {
