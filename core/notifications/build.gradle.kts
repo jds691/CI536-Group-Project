@@ -27,6 +27,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:models"))
+    implementation(project(":core:data-access"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
