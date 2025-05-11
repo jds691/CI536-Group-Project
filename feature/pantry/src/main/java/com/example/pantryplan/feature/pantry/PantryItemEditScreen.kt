@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
@@ -297,16 +298,30 @@ private fun PantryItemEditForm(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // TODO: Replace with an enum string map when we swap to translation strings.
+            val measurementOptions = listOf("Grams", "Kilograms")
+            val measurementSelectState = rememberTextFieldState("Grams")
+
             OutlinedIntField(
-                value = quantity,
-                onValueChange = onChangeQuantity,
+                value = when (measurementSelectState.text) {
+                    "Kilograms" -> quantity / 1000
+                    else -> quantity
+                },
+                onValueChange = {
+                    onChangeQuantity(
+                        when (measurementSelectState.text) {
+                            "Kilograms" -> it * 1000
+                            else -> it
+                        }
+                    )
+                },
                 modifier = Modifier.weight(1f),
             )
 
-            val measurementOptions = listOf("Grams", "Kilograms")
             OutlinedSelectField(
-                modifier = Modifier.weight(1f),
                 options = measurementOptions,
+                textFieldState = measurementSelectState,
+                modifier = Modifier.weight(1f),
             )
         }
 
@@ -320,16 +335,33 @@ private fun PantryItemEditForm(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // TODO: Replace with an enum string map when we swap to translation strings.
+            val timeOptions = listOf("Days", "Weeks", "Months")
+            val timeSelectState = rememberTextFieldState("Days")
+
             OutlinedIntField(
-                value = expiresAfter.inWholeDays.toInt(),
-                onValueChange = { onChangeExpiresAfter(it.days) },
+                value = when (timeSelectState.text) {
+                    // TODO: Replace with .weeks and .months when type is changed to DatePeriod.
+                    "Weeks" -> expiresAfter.inWholeDays.toInt() / 7
+                    "Months" -> expiresAfter.inWholeDays.toInt() / 30
+                    else -> expiresAfter.inWholeDays.toInt()
+                },
+                onValueChange = {
+                    onChangeExpiresAfter(
+                        when (timeSelectState.text) {
+                            "Weeks" -> it.days * 7
+                            "Months" -> it.days * 30
+                            else -> it.days
+                        }
+                    )
+                },
                 modifier = Modifier.weight(1f)
             )
 
-            val timeOptions = listOf("Days", "Weeks", "Months")
             OutlinedSelectField(
-                modifier = Modifier.weight(1f),
                 options = timeOptions,
+                textFieldState = timeSelectState,
+                modifier = Modifier.weight(1f),
             )
         }
     }
@@ -449,12 +481,12 @@ private fun <E: Enum<E>> OutlinedEnumSelectField(
 
 @Composable
 private fun OutlinedSelectField(
+    options: List<String>,
+    textFieldState: TextFieldState,
     modifier: Modifier = Modifier,
     label: @Composable (TextFieldLabelScope.() -> Unit)? = null,
-    options: List<String>,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val textFieldState = rememberTextFieldState(options[0])
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it },
