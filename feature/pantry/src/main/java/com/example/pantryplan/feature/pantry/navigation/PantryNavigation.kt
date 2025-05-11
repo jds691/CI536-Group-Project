@@ -5,11 +5,15 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
+import com.example.pantryplan.core.models.PantryItem
+import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.PantryItemDetailsScreen
 import com.example.pantryplan.feature.pantry.PantryItemEditScreen
 import com.example.pantryplan.feature.pantry.PantryScreen
+import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
 
 // Route to Pantry screen
 @Serializable
@@ -49,15 +53,26 @@ fun NavGraphBuilder.pantrySection(
             )
         }
 
-        /*composable<PantryItemDetails> { entry ->
+        composable<PantryItemDetails> { entry ->
             val itemDetails = entry.toRoute<PantryItemDetails>()
 
             PantryItemDetailsScreen(
                 id = UUID.fromString(itemDetails.id),
                 onBackClick = onBackClick,
-                onEditItem = { onPantryItemEdit(it, null) }
+                onEditItem = { onPantryItemEdit(it, null) },
+
+                item = PantryItem ( //placeholder PantryItem
+                    id = UUID.randomUUID(),
+                    name = "Bacon",
+                    quantity = 250,
+                    expiryDate = Clock.System.now(),
+                    expiresAfter = 21.days,
+                    inStateSince = Clock.System.now(),
+                    imageUrl = null,
+                    state = PantryItemState.SEALED
+                )
             )
-        }*/
+        }
 
         composable<PantryItemEdit> { entry ->
             val itemEdit = entry.toRoute<PantryItemEdit>()
