@@ -58,9 +58,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import com.example.pantryplan.core.designsystem.component.ImageSelect
-import kotlinx.datetime.Clock
+import com.example.pantryplan.core.models.PantryItemState
+import kotlinx.datetime.Instant
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -69,20 +72,57 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import com.example.pantryplan.core.designsystem.R as designSystemR
 import java.io.File
+import kotlin.time.Duration
 
 @Composable
 fun PantryItemEditScreen(
+    viewModel: PantryItemEditViewModel = hiltViewModel(),
+
     existingId: UUID? = null,
     barcode: String? = null,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
-    Scaffold (
+    val pantryItemEditUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    PantryItemEditScreen(
+        pantryItemEditUiState = pantryItemEditUiState,
+        existingId = existingId,
+        barcode = barcode,
+        onBackClick = onBackClick,
+        onSaveClick = viewModel::savePantryItem,
+        onChangeName = viewModel::updateName,
+        onChangeExpiryDate = viewModel::updateExpiryDate,
+        onChangeState = viewModel::updateState,
+        onChangeQuantity = viewModel::updateQuantity,
+        onChangeExpiresAfter = viewModel::updateExpiresAfter
+    )
+}
+
+@Composable
+private fun PantryItemEditScreen(
+    pantryItemEditUiState: PantryItemEditUiState,
+    existingId: UUID?,
+    barcode: String? = null,
+    onBackClick: () -> Unit,
+    onSaveClick: () -> Unit,
+    onChangeName: (String) -> Unit,
+    onChangeExpiryDate: (Instant) -> Unit,
+    onChangeState: (PantryItemState) -> Unit,
+    onChangeQuantity: (Int) -> Unit,
+    onChangeExpiresAfter: (Duration) -> Unit,
+) {
+    val pantryItem = pantryItemEditUiState.pantryItem
+    Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
             PantryItemEditTopBar(
-                /* TODO: Pull pantry item name from the data layer. */
-                itemName = existingId?.toString(),
-                onBackClick = onBackClick
+                // If we're editing an existing, then item show the name in the top bar.
+                name = existingId?.let { pantryItem.name },
+                onSaveClick = {
+                    // Save and navigate to the previous screen.
+                    onSaveClick()
+                    onBackClick()
+                },
+                onBackClick = onBackClick,
             )
         },
     ) { contentPadding ->
@@ -103,19 +143,34 @@ fun PantryItemEditScreen(
             )
 
             PantryItemImageSelect()
-            PantryItemEditForm()
+            PantryItemEditForm(
+                name = pantryItem.name,
+                expiryDate = pantryItem.expiryDate,
+                state = pantryItem.state,
+                quantity = pantryItem.quantity,
+                expiresAfter = pantryItem.expiresAfter!!,
+                onChangeName = onChangeName,
+                onChangeExpiryDate = onChangeExpiryDate,
+                onChangeState = onChangeState,
+                onChangeQuantity = onChangeQuantity,
+                onChangeExpiresAfter = onChangeExpiresAfter,
+            )
         }
     }
 }
 
 @Composable
-private fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Unit) {
+private fun PantryItemEditTopBar(
+    name: String? = null,
+    onBackClick: () -> Unit,
+    onSaveClick: () -> Unit,
+) {
     TopAppBar(
         title = {
-            if (itemName == null) {
+            if (name == null) {
                 Text("Add Item")
             } else {
-                Text("Update ‘${itemName}’")
+                Text("Update ‘${name}’")
             }
         },
         navigationIcon = {
@@ -125,7 +180,7 @@ private fun PantryItemEditTopBar(itemName: String? = null, onBackClick: () -> Un
         },
         actions = {
             TextButton(
-                onClick = { /* TODO: Actually save */ }
+                onClick = onSaveClick
             ) {
                 Text("Save")
             }
@@ -167,7 +222,8 @@ private fun PantryItemImageSelect() {
     }
 
     ImageSelect(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(vertical = 16.dp)
             .aspectRatio(1.8f),
         onTakePhoto = {
@@ -181,34 +237,54 @@ private fun PantryItemImageSelect() {
 }
 
 @Composable
-private fun PantryItemEditForm() {
+private fun PantryItemEditForm(
+    name: String,
+    expiryDate: Instant,
+    state: PantryItemState,
+    quantity: Int,
+    expiresAfter: Duration,
+    onChangeName: (String) -> Unit,
+    onChangeExpiryDate: (Instant) -> Unit,
+    onChangeState: (PantryItemState) -> Unit,
+    onChangeQuantity: (Int) -> Unit,
+    onChangeExpiresAfter: (Duration) -> Unit,
+) {
     Column(
         modifier = Modifier
             .padding(horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        var name by remember { mutableStateOf("") }
-
         OutlinedTextField(
             value = name,
-            onValueChange = { name = it },
+            onValueChange = onChangeName,
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Name") },
             singleLine = true,
         )
 
         OutlinedDatePickerField(
+            value = expiryDate.toEpochMilliseconds(),
+            onValueChange = { expiryDateMillis ->
+                onChangeExpiryDate(
+                    Instant.fromEpochMilliseconds(expiryDateMillis!!)
+                )
+            },
             label = { Text("Expires") },
             modifier = Modifier.fillMaxWidth(),
-            initialSelectedDateMillis = (Clock.System.now() + 7.days).toEpochMilliseconds(),
         )
 
-        // TODO: Generate this from enum variants.
-        val stateOptions = listOf("Sealed", "Opened", "Frozen", "Expired")
-        OutlinedSelectField(
+        val stateOptions = mapOf(
+            PantryItemState.SEALED to "Sealed",
+            PantryItemState.OPENED to "Opened",
+            PantryItemState.FROZEN to "Frozen",
+            PantryItemState.EXPIRED to "Expired",
+        )
+        OutlinedEnumSelectField(
+            options = stateOptions,
+            value = state,
+            onValueChange = onChangeState,
             modifier = Modifier.fillMaxWidth(),
             label = { Text("State") },
-            options = stateOptions,
         )
 
         Text(
@@ -221,7 +297,11 @@ private fun PantryItemEditForm() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            OutlinedNumberField(modifier = Modifier.weight(1f))
+            OutlinedIntField(
+                value = quantity,
+                onValueChange = onChangeQuantity,
+                modifier = Modifier.weight(1f),
+            )
 
             val measurementOptions = listOf("Grams", "Kilograms")
             OutlinedSelectField(
@@ -240,7 +320,11 @@ private fun PantryItemEditForm() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            OutlinedNumberField(modifier = Modifier.weight(1f))
+            OutlinedIntField(
+                value = expiresAfter.inWholeDays.toInt(),
+                onValueChange = { onChangeExpiresAfter(it.days) },
+                modifier = Modifier.weight(1f)
+            )
 
             val timeOptions = listOf("Days", "Weeks", "Months")
             OutlinedSelectField(
@@ -253,11 +337,11 @@ private fun PantryItemEditForm() {
 
 @Composable
 private fun OutlinedDatePickerField(
+    value: Long?,
+    onValueChange: (Long?) -> Unit,
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
-    initialSelectedDateMillis: Long? = null,
 ) {
-    var selectedDate by remember { mutableStateOf<Long?>(initialSelectedDateMillis) }
     var showModal by remember { mutableStateOf(false) }
 
     /* TODO: Remove this function, do actual date formatting with kotlin library. */
@@ -267,10 +351,10 @@ private fun OutlinedDatePickerField(
     }
 
     OutlinedTextField(
-        value = selectedDate?.let { convertMillisToDate(it) } ?: "",
+        value = value?.let { convertMillisToDate(it) } ?: "",
         onValueChange = { },
         modifier = modifier
-            .pointerInput(selectedDate) {
+            .pointerInput(value) {
                 awaitEachGesture {
                     awaitFirstDown(pass = PointerEventPass.Initial)
                     val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
@@ -288,9 +372,9 @@ private fun OutlinedDatePickerField(
     )
     if (showModal) {
         DatePickerModal(
-            onDateSelected = { selectedDate = it },
+            onDateSelected = onValueChange,
             onDismiss = { showModal = false },
-            initialSelectedDateMillis = initialSelectedDateMillis,
+            initialSelectedDateMillis = value,
         )
     }
 }
@@ -321,6 +405,45 @@ private fun DatePickerModal(
         },
     ) {
         DatePicker(datePickerState)
+    }
+}
+
+@Composable
+private fun <E: Enum<E>> OutlinedEnumSelectField(
+    options: Map<E, String>,
+    value: E,
+    onValueChange: (E) -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = modifier,
+    ) {
+        OutlinedTextField(
+            readOnly = true,
+            value = options[value]!!,
+            onValueChange = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            label = label,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(selectionOption.value) },
+                    onClick = {
+                        expanded = false
+                        onValueChange(selectionOption.key)
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -361,17 +484,35 @@ private fun OutlinedSelectField(
     }
 }
 
-// TODO: Input validation, ensure value is actually a number.
 @Composable
-private fun OutlinedNumberField(
+private fun OutlinedIntField(
+    value: Int,
+    onValueChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
 ) {
-    var quantity by remember { mutableStateOf("") }
+    OutlinedNumberField(
+        value = value.toString(),
+        onValueChange = {
+            onValueChange(
+                runCatching { it.toInt() }.getOrDefault(0)
+            )
+        },
+        modifier = modifier,
+        label = label,
+    )
+}
 
+@Composable
+private fun OutlinedNumberField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+) {
     OutlinedTextField(
-        value = quantity,
-        onValueChange = { quantity = it },
+        value = value,
+        onValueChange = onValueChange,
         modifier = modifier,
         label = label,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

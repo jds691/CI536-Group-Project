@@ -33,6 +33,7 @@ android {
 
 dependencies {
     implementation(project(":core:models"))
+    implementation(project(":core:data-access"))
     implementation(project(":core:design-system"))
 
     implementation(libs.androidx.core.ktx)
