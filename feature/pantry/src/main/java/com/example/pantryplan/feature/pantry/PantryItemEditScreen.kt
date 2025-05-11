@@ -21,9 +21,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -42,7 +39,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldLabelScope
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -94,7 +90,9 @@ fun PantryItemEditScreen(
         onChangeExpiryDate = viewModel::updateExpiryDate,
         onChangeState = viewModel::updateState,
         onChangeQuantity = viewModel::updateQuantity,
-        onChangeExpiresAfter = viewModel::updateExpiresAfter
+        onChangeQuantityUnit = viewModel::updateQuantityUnit,
+        onChangeExpiresAfter = viewModel::updateExpiresAfter,
+        onChangeExpiresAfterUnit = viewModel::updateExpiresAfterUnit
     )
 }
 
@@ -109,7 +107,9 @@ private fun PantryItemEditScreen(
     onChangeExpiryDate: (Instant) -> Unit,
     onChangeState: (PantryItemState) -> Unit,
     onChangeQuantity: (Int) -> Unit,
+    onChangeQuantityUnit: (QuantityUnit) -> Unit,
     onChangeExpiresAfter: (Duration) -> Unit,
+    onChangeExpiresAfterUnit: (ExpiresAfterUnit) -> Unit,
 ) {
     val pantryItem = pantryItemEditUiState.pantryItem
     Scaffold(
@@ -149,12 +149,16 @@ private fun PantryItemEditScreen(
                 expiryDate = pantryItem.expiryDate,
                 state = pantryItem.state,
                 quantity = pantryItem.quantity,
+                quantityUnit = pantryItemEditUiState.quantityUnit,
                 expiresAfter = pantryItem.expiresAfter!!,
+                expiresAfterUnit = pantryItemEditUiState.expiresAfterUnit,
                 onChangeName = onChangeName,
                 onChangeExpiryDate = onChangeExpiryDate,
                 onChangeState = onChangeState,
                 onChangeQuantity = onChangeQuantity,
+                onChangeQuantityUnit = onChangeQuantityUnit,
                 onChangeExpiresAfter = onChangeExpiresAfter,
+                onChangeExpiresAfterUnit = onChangeExpiresAfterUnit,
             )
         }
     }
@@ -243,12 +247,16 @@ private fun PantryItemEditForm(
     expiryDate: Instant,
     state: PantryItemState,
     quantity: Int,
+    quantityUnit: QuantityUnit,
     expiresAfter: Duration,
+    expiresAfterUnit: ExpiresAfterUnit,
     onChangeName: (String) -> Unit,
     onChangeExpiryDate: (Instant) -> Unit,
     onChangeState: (PantryItemState) -> Unit,
     onChangeQuantity: (Int) -> Unit,
+    onChangeQuantityUnit: (QuantityUnit) -> Unit,
     onChangeExpiresAfter: (Duration) -> Unit,
+    onChangeExpiresAfterUnit: (ExpiresAfterUnit) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -298,29 +306,20 @@ private fun PantryItemEditForm(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // TODO: Replace with an enum string map when we swap to translation strings.
-            val measurementOptions = listOf("Grams", "Kilograms")
-            val measurementSelectState = rememberTextFieldState("Grams")
-
             OutlinedIntField(
-                value = when (measurementSelectState.text) {
-                    "Kilograms" -> quantity / 1000
-                    else -> quantity
-                },
-                onValueChange = {
-                    onChangeQuantity(
-                        when (measurementSelectState.text) {
-                            "Kilograms" -> it * 1000
-                            else -> it
-                        }
-                    )
-                },
+                value = quantity,
+                onValueChange = onChangeQuantity,
                 modifier = Modifier.weight(1f),
             )
 
-            OutlinedSelectField(
+            val measurementOptions = mapOf(
+                QuantityUnit.GRAMS to "Grams",
+                QuantityUnit.KILOGRAMS to "Kilograms",
+            )
+            OutlinedEnumSelectField(
                 options = measurementOptions,
-                textFieldState = measurementSelectState,
+                value = quantityUnit,
+                onValueChange = onChangeQuantityUnit,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -335,32 +334,21 @@ private fun PantryItemEditForm(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // TODO: Replace with an enum string map when we swap to translation strings.
-            val timeOptions = listOf("Days", "Weeks", "Months")
-            val timeSelectState = rememberTextFieldState("Days")
-
             OutlinedIntField(
-                value = when (timeSelectState.text) {
-                    // TODO: Replace with .weeks and .months when type is changed to DatePeriod.
-                    "Weeks" -> expiresAfter.inWholeDays.toInt() / 7
-                    "Months" -> expiresAfter.inWholeDays.toInt() / 30
-                    else -> expiresAfter.inWholeDays.toInt()
-                },
-                onValueChange = {
-                    onChangeExpiresAfter(
-                        when (timeSelectState.text) {
-                            "Weeks" -> it.days * 7
-                            "Months" -> it.days * 30
-                            else -> it.days
-                        }
-                    )
-                },
+                value = expiresAfter.inWholeDays.toInt(),
+                onValueChange = { onChangeExpiresAfter(it.days) },
                 modifier = Modifier.weight(1f)
             )
 
-            OutlinedSelectField(
+            val timeOptions = mapOf(
+                ExpiresAfterUnit.DAYS to "Days",
+                ExpiresAfterUnit.WEEKS to "Weeks",
+                ExpiresAfterUnit.MONTHS to "Months",
+            )
+            OutlinedEnumSelectField(
                 options = timeOptions,
-                textFieldState = timeSelectState,
+                value = expiresAfterUnit,
+                onValueChange = onChangeExpiresAfterUnit,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -472,43 +460,6 @@ private fun <E: Enum<E>> OutlinedEnumSelectField(
                     onClick = {
                         expanded = false
                         onValueChange(selectionOption.key)
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun OutlinedSelectField(
-    options: List<String>,
-    textFieldState: TextFieldState,
-    modifier: Modifier = Modifier,
-    label: @Composable (TextFieldLabelScope.() -> Unit)? = null,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = modifier,
-    ) {
-        OutlinedTextField(
-            readOnly = true,
-            state = textFieldState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-            label = label,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { selectionOption ->
-                DropdownMenuItem(
-                    text = { Text(text = selectionOption) },
-                    onClick = {
-                        textFieldState.setTextAndPlaceCursorAtEnd(selectionOption)
-                        expanded = false
                     }
                 )
             }

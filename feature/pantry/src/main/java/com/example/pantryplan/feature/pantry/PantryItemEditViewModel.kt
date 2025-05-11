@@ -34,7 +34,16 @@ class PantryItemEditViewModel @Inject constructor(
         barcode = null
     )
 
-    private val _uiState = MutableStateFlow(PantryItemEditUiState(pantryItem))
+    private var quantityUnit = QuantityUnit.GRAMS
+    private var expiresAfterUnit = ExpiresAfterUnit.DAYS
+
+    private val _uiState = MutableStateFlow(
+        PantryItemEditUiState(
+            pantryItem = pantryItem,
+            quantityUnit = quantityUnit,
+            expiresAfterUnit = expiresAfterUnit,
+        )
+    )
     val uiState: StateFlow<PantryItemEditUiState> = _uiState.asStateFlow()
 
     fun updateName(name: String) {
@@ -57,18 +66,54 @@ class PantryItemEditViewModel @Inject constructor(
         _uiState.update { it.copy(pantryItem = pantryItem) }
     }
 
+    fun updateQuantityUnit(quantityUnit: QuantityUnit) {
+        this.quantityUnit = quantityUnit
+        _uiState.update { it.copy(quantityUnit = quantityUnit) }
+    }
+
     fun updateExpiresAfter(expiresAfter: Duration) {
         pantryItem = pantryItem.copy(expiresAfter = expiresAfter)
         _uiState.update { it.copy(pantryItem = pantryItem) }
     }
 
+    fun updateExpiresAfterUnit(expiresAfterUnit: ExpiresAfterUnit) {
+        this.expiresAfterUnit = expiresAfterUnit
+        _uiState.update { it.copy(expiresAfterUnit = expiresAfterUnit) }
+    }
+
     fun savePantryItem() {
         viewModelScope.launch {
+            val newQuantity = pantryItem.quantity * when (quantityUnit) {
+                QuantityUnit.GRAMS -> 1
+                QuantityUnit.KILOGRAMS -> 1000
+            }
+
+            // TODO: Replace with .weeks and .months when type is changed to DatePeriod.
+            val newExpiresAfter = pantryItem.expiresAfter!! * when (expiresAfterUnit) {
+                ExpiresAfterUnit.DAYS -> 1
+                ExpiresAfterUnit.WEEKS -> 7
+                ExpiresAfterUnit.MONTHS -> 30
+            }
+
+            val pantryItem = pantryItem.copy(
+                quantity = newQuantity,
+                expiresAfter = newExpiresAfter,
+            )
             pantryItemRepository.addItemToRepository(pantryItem)
         }
     }
 }
 
 data class PantryItemEditUiState(
-    val pantryItem: PantryItem
+    val pantryItem: PantryItem,
+    val quantityUnit: QuantityUnit,
+    val expiresAfterUnit: ExpiresAfterUnit,
 )
+
+enum class QuantityUnit {
+    GRAMS, KILOGRAMS
+}
+
+enum class ExpiresAfterUnit {
+    DAYS, WEEKS, MONTHS
+}
