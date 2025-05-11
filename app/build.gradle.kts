@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.pantryplan"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -74,5 +74,6 @@ dependencies {
 
     // Hilt dependencies.
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
 }

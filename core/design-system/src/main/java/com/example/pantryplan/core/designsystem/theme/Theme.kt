@@ -55,3 +55,4 @@ fun PantryPlanTheme(
         content = content
     )
 }
+

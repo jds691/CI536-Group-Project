@@ -32,7 +32,9 @@ import com.example.pantryplan.feature.pantry.navigation.Pantry
 import com.example.pantryplan.feature.pantry.navigation.navigateToPantryItem
 import com.example.pantryplan.feature.pantry.navigation.navigateToPantryItemEdit
 import com.example.pantryplan.feature.pantry.navigation.pantrySection
-import com.example.pantryplan.feature.recipes.navigation.recipesScreen
+import com.example.pantryplan.feature.recipes.navigation.navigateToRecipeItem
+import com.example.pantryplan.feature.recipes.navigation.navigateToRecipeItemAdd
+import com.example.pantryplan.feature.recipes.navigation.recipeSection
 import com.example.pantryplan.navigation.TopLevelDestination
 import com.example.pantryplan.settings.navigation.navigateToAllergySettings
 import com.example.pantryplan.settings.navigation.navigateToPantrySettings
@@ -115,7 +117,11 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
                 onBackClick = appState.navController::popBackStack,
                 onPantryItemEdit = appState.navController::navigateToPantryItemEdit
             )
-            recipesScreen()
+            recipeSection(
+                onRecipeItemClick = appState.navController::navigateToRecipeItem,
+                onRecipeItemAdd = appState.navController::navigateToRecipeItemAdd,
+                onBackClick = appState.navController::popBackStack
+            )
             mealPlannerScreen(
                 onBackClick = appState.navController::popBackStack,
                 onRecipeClick = {}, // TODO: Implement when we have recipe sub-navigation done

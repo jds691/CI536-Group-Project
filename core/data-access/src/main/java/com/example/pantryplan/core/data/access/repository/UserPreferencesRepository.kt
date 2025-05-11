@@ -13,5 +13,4 @@ interface UserPreferencesRepository {
     suspend fun setExpiringSoonAmount(amount: Duration)
 
     suspend fun setAllergies(allergies: EnumSet<Allergen>)
-    suspend fun setIntolerances(intolerances: EnumSet<Allergen>)
 }

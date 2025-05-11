@@ -2,6 +2,7 @@
 
 package com.example.pantryplan.core.designsystem.recipes
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -60,6 +61,7 @@ internal fun cleanUpAllergenText(allergenName: String): String {
 @Composable
 fun RecipeItemCard(
     item: Recipe,
+    userAllergies: Set<Allergen>,
     modifier: Modifier = Modifier,
 
     onClick: () -> Unit = {},
@@ -76,8 +78,8 @@ fun RecipeItemCard(
             if (allergenLimitCounter >= 3) { allergenOverflowCounter++ }
             else {
                 var curAllergen = allergen.toString()
-                //TODO Will have users allergies checked against
-                if (curAllergen == "GLUTEN") {
+
+                if (userAllergies.contains(allergen)) {
                     pushStyle(SpanStyle(color = MaterialTheme.colorScheme.error))
                     curAllergen = cleanUpAllergenText(curAllergen)
                     if (allergen == item.allergens.last()) { append(curAllergen) }
@@ -224,6 +226,7 @@ fun RecipeItemCard(
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Preview
 @Composable
 internal fun RecipeItemCardPreviews() {
@@ -258,6 +261,9 @@ internal fun RecipeItemCardPreviews() {
     )
 
     PantryPlanTheme {
-        RecipeItemCard(item = recipe)
+        RecipeItemCard(
+            userAllergies = emptySet(),
+            item = recipe
+        )
     }
 }
