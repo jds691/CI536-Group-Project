@@ -15,6 +15,7 @@ android {
 
     defaultConfig {
         minSdk = 26
+        targetSdk = 35
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -35,6 +36,8 @@ dependencies {
     implementation(project(":core:models"))
     implementation(project(":core:data-access"))
     implementation(project(":core:design-system"))
+
+    implementation(libs.google.accompanist.permissions)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

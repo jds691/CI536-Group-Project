@@ -1,4 +1,5 @@
 [versions]
+accompanist = "0.37.0"
 agp = "8.10.0"
 androidxHiltNavigationCompose = "1.2.0"
 androidxComposeMaterial3 = "1.4.0-alpha14"
@@ -26,6 +27,7 @@ ksp = "2.1.20-2.0.1"
 room = "2.7.1"
 
 [libraries]
+google-accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

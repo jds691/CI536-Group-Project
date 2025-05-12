@@ -1,6 +1,9 @@
 package com.example.pantryplan.feature.pantry
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,9 +22,11 @@ import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,6 +42,9 @@ import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.ui.PantryItemCard
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus.Denied
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
@@ -85,6 +93,9 @@ fun PantryScreen(
                 modifier = Modifier.padding(contentPadding)
             )
         }
+
+        NotificationPermissionEffect()
+        ScheduleExactAlarmsPermissionEffect()
     }
 }
 
@@ -167,6 +178,43 @@ private fun PantryContentList(
                 onClick = { onClickPantryItem(item.id) },
                 onDelete = { onDeletePantryItem(item) },
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@SuppressLint("InlinedApi")
+@Composable
+private fun ScheduleExactAlarmsPermissionEffect() {
+    // Permission requests should only be made from an Activity Context, which is not present
+    // in previews
+    if (LocalInspectionMode.current) return
+    if (VERSION.SDK_INT < VERSION_CODES.S && VERSION.SDK_INT > VERSION_CODES.TIRAMISU) return
+    val alarmsPermissionState = rememberPermissionState(
+        android.Manifest.permission.SCHEDULE_EXACT_ALARM,
+    )
+    LaunchedEffect(alarmsPermissionState) {
+        val status = alarmsPermissionState.status
+        if (status is Denied && !status.shouldShowRationale) {
+            alarmsPermissionState.launchPermissionRequest()
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun NotificationPermissionEffect() {
+    // Permission requests should only be made from an Activity Context, which is not present
+    // in previews
+    if (LocalInspectionMode.current) return
+    if (VERSION.SDK_INT < VERSION_CODES.TIRAMISU) return
+    val notificationsPermissionState = rememberPermissionState(
+        android.Manifest.permission.POST_NOTIFICATIONS,
+    )
+    LaunchedEffect(notificationsPermissionState) {
+        val status = notificationsPermissionState.status
+        if (status is Denied && !status.shouldShowRationale) {
+            notificationsPermissionState.launchPermissionRequest()
         }
     }
 }
