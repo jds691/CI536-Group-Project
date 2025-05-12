@@ -86,6 +86,7 @@ fun PantryItemEditScreen(
         barcode = barcode,
         onBackClick = onBackClick,
         onSaveClick = viewModel::savePantryItem,
+        onChangeImageURI = viewModel::updateImageUri,
         onChangeName = viewModel::updateName,
         onChangeExpiryDate = viewModel::updateExpiryDate,
         onChangeState = viewModel::updateState,
@@ -103,6 +104,7 @@ private fun PantryItemEditScreen(
     barcode: String? = null,
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
+    onChangeImageURI: (String?) -> Unit,
     onChangeName: (String) -> Unit,
     onChangeExpiryDate: (Instant) -> Unit,
     onChangeState: (PantryItemState) -> Unit,
@@ -143,7 +145,10 @@ private fun PantryItemEditScreen(
                 style = MaterialTheme.typography.bodySmall,
             )
 
-            PantryItemImageSelect()
+            PantryItemImageSelect(
+                imageUri = pantryItem.imageUrl,
+                onChangeImageURI = onChangeImageURI,
+            )
             PantryItemEditForm(
                 name = pantryItem.name,
                 expiryDate = pantryItem.expiryDate,
@@ -194,20 +199,23 @@ private fun PantryItemEditTopBar(
 }
 
 @Composable
-private fun PantryItemImageSelect() {
-    var uri by remember { mutableStateOf<String?>(null) }
+private fun PantryItemImageSelect(
+    imageUri: String?,
+    onChangeImageURI: (String?) -> Unit,
+) {
+    val context = LocalContext.current
+    val tempFile by remember {
+        // TODO: Move temporary file to persistent storage on form submit.
+        // Generate random filename for the photo that the user takes/picks.
+        val filename = Uuid.random().toString()
+        mutableStateOf(File.createTempFile(filename, null, context.cacheDir))
+    }
 
     val painter = rememberAsyncImagePainter(
-        model = uri,
+        model = imageUri,
         fallback = painterResource(designSystemR.drawable.bigcheese),
     )
 
-    val context = LocalContext.current
-
-    // TODO: Move temporary file to persistent storage on form submit.
-    // Generate random filename for the photo that the user takes/picks.
-    val filename = Uuid.random().toString()
-    val tempFile = File.createTempFile(filename, null, context.cacheDir)
     val tempFileUri = FileProvider.getUriForFile(
         context,
         context.packageName + ".provider",
@@ -215,14 +223,14 @@ private fun PantryItemImageSelect() {
     )
     val takePicture = rememberLauncherForActivityResult(TakePicture()) { success ->
         if (success) {
-            uri = tempFileUri?.toString()
+            onChangeImageURI(tempFileUri?.toString())
         }
     }
 
     val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { picked ->
         picked?.let {
             context.contentResolver.openInputStream(it)!!.copyTo(tempFile.outputStream())
-            uri = tempFileUri?.toString()
+            onChangeImageURI(tempFileUri?.toString())
         }
     }
 

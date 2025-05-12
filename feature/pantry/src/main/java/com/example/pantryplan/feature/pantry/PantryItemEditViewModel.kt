@@ -52,6 +52,10 @@ class PantryItemEditViewModel @Inject constructor(
         PantryItemEditUiState(pantryItem.value, quantityUnit.value, expiresAfterUnit.value)
     )
 
+    fun updateImageUri(imageUri: String?) {
+        pantryItem.update { it.copy(imageUrl = imageUri) }
+    }
+
     fun updateName(name: String) {
         pantryItem.update { it.copy(name = name) }
     }
