@@ -8,22 +8,37 @@ import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -35,11 +50,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
@@ -164,7 +182,86 @@ private fun RecipeItemImageSelect() {
 }
 
 @Composable
+private fun OutlinedFloatField(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+) {
+    OutlinedNumberField(
+        value = value.toString(),
+        onValueChange = {
+            onValueChange(
+                runCatching { it.toFloat() }.getOrDefault(0f)
+            )
+        },
+        modifier = modifier,
+        label = label,
+    )
+}
+
+@Composable
+private fun OutlinedNumberField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        label = label,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        singleLine = true,
+        trailingIcon = {
+            Icon(Icons.Default.Clear, contentDescription = "Select date")
+        }
+    )
+}
+
+@Composable
+private fun <E : Enum<E>> OutlinedEnumSelectField(
+    options: Map<E, String>,
+    value: E,
+    onValueChange: (E) -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = modifier,
+    ) {
+        OutlinedTextField(
+            readOnly = true,
+            value = options[value]!!,
+            onValueChange = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            label = label,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(selectionOption.value) },
+                    onClick = {
+                        expanded = false
+                        onValueChange(selectionOption.key)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun RecipeItemAddScreen(
+
     recipeItemAddUiState: RecipeItemAddUiState,
     existingId: UUID? = null,
     onBackClick: () -> Unit,
@@ -180,6 +277,7 @@ fun RecipeItemAddScreen(
     onChangeCookTime: (Float) -> Unit,
     //onChangeNutritionalInfo: (NutritionalInfo) -> Unit,
 ) {
+
     val recipeItem = recipeItemAddUiState.recipeItem
     Scaffold(
         modifier = Modifier.imePadding(),
@@ -241,6 +339,7 @@ fun RecipeItemAddScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun RecipeItemEditForm(
     name: String,
@@ -268,18 +367,24 @@ private fun RecipeItemEditForm(
             .padding(horizontal = dimensionResource(R.dimen.form_horizontal_margin)),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+
         OutlinedTextField(
             value = name,
             onValueChange = onChangeName,
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Name") },
             singleLine = true,
+            trailingIcon = {
+                Icon(Icons.Default.Clear, contentDescription = "Select date")
+            }
         )
+
         Text(
             text = "Allergens",
-            color = MaterialTheme.colorScheme.outline,
+            color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleMedium,
         )
+
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -302,6 +407,124 @@ private fun RecipeItemEditForm(
                 )
             }
         }
+
+        HorizontalDivider(
+            modifier = Modifier
+                .padding(0.dp, 4.dp, 0.dp, 4.dp)
+        )
+
+        Text(
+            text = "Recipe Time",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
+        )
+
+        OutlinedFloatField(
+            value = prepTime,
+            onValueChange = onChangePrepTime,
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Prep Time (Minutes)") },
+        )
+
+        OutlinedFloatField(
+            value = cookTime,
+            onValueChange = onChangeCookTime,
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Cook Time (Minutes)") },
+        )
+
+        Text(
+            text = "Tags",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
+        )
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            OutlinedButton(
+                onClick = {},
+                shape = ButtonDefaults.outlinedShape,
+                enabled = true,
+                colors = ButtonColors(
+                    containerColor = Color.Unspecified,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    disabledContainerColor = Color.Unspecified,
+                    disabledContentColor = MaterialTheme.colorScheme.error
+                ),
+                content = {
+                    Icon(
+                        Icons.Filled.Add,
+                        contentDescription = ""
+                    )
+                    Spacer(Modifier.width(2.dp))
+                    Text("Add Tag")
+                }
+            )
+            for (tag in tags) {
+                AssistChip(
+                    onClick = {},
+                    label = { Text(tag) },
+                )
+            }
+
+        }
+        HorizontalDivider(
+            modifier = Modifier
+                .padding(0.dp, 4.dp, 0.dp, 4.dp)
+        )
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+            horizontalAlignment = Alignment.Start,
+        ) {
+
+        }
+        OutlinedTextField(
+            value = "",
+            onValueChange = {},
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Ingredient Name") },
+            singleLine = true,
+            trailingIcon = {
+                Icon(Icons.Default.Clear, contentDescription = "Select date")
+            }
+        )
+
+        Text(
+            text = "Quantity",
+            color = MaterialTheme.colorScheme.outline,
+            style = MaterialTheme.typography.bodySmall,
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("20") },
+                modifier = Modifier
+                    .width(180.dp)
+            )
+
+            val measurementOptions = mapOf(
+                QuantityUnit.GRAMS to "Grams",
+                QuantityUnit.KILOGRAMS to "Kilograms",
+            )
+            OutlinedEnumSelectField(
+                options = measurementOptions,
+                value = QuantityUnit.GRAMS,
+                onValueChange = { },
+                modifier = Modifier
+                    .weight(1f)
+                    .align(Alignment.Bottom)
+            )
+        }
+
     }
 }
 
