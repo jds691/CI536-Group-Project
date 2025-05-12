@@ -4,4 +4,11 @@
     <string name="core_notifications_pantry_expiration_notification_channel_description">Items that have expired in your pantry</string>
     <string name="core_notifications_pantry_expiring_soon_notification_channel_name">Item Expiring Soon</string>
     <string name="core_notifications_pantry_expiring_soon_notification_channel_description">Items that are going to expire soon</string>
+    <string name="core_notifications_pantry_expiration_title">\'%1$s\' has expired</string>
+    <string name="core_notifications_pantry_expiration_body">It may be unsafe to eat.</string>
+    <string name="core_notifications_pantry_expiring_soon_title">\'%1$s\' expires soon</string>
+    <plurals name="core_notifications_pantry_expiring_soon_body">
+        <item quantity="one">\'%1$s\' needs to be eaten by tomorrow.</item>
+        <item quantity="other">\'%1$s\' needs to be eaten within %2$d days.</item>
+    </plurals>
 </resources>

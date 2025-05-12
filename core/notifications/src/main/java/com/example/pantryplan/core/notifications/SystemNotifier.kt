@@ -5,6 +5,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -19,6 +20,9 @@ import javax.inject.Singleton
 private const val PANTRY_EXPIRATION_NOTIFICATION_CHANNEL_ID = "pantry_item_expiration"
 private const val PANTRY_EXPIRING_SOON_NOTIFICATION_CHANNEL_ID = "pantry_item_expiring_soon"
 
+private const val PANTRY_EXPIRATION_NOTIFICATION_ID_PREFIX = "pantry.expiration."
+private const val PANTRY_EXPIRING_SOON_NOTIFICATION_ID_PREFIX = "pantry.expiring_soon."
+
 @Singleton
 internal class SystemNotifier @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -29,35 +33,46 @@ internal class SystemNotifier @Inject constructor(
         if (!permissionsCheck()) {
             return
         }
-
-
     }
 }
 
-private fun Context.createPantryExpirationNotification(
-    block: NotificationCompat.Builder.() -> Unit,
-): Notification {
+private fun Context.createPantryExpirationNotificationIntent(
+    item: PantryItem
+): Intent {
+    val intent = Intent(this, Notification::class.java)
+
     ensurePantryExpirationNotificationChannelExists()
-    return NotificationCompat.Builder(
-        this,
-        PANTRY_EXPIRATION_NOTIFICATION_CHANNEL_ID,
+
+    intent.putExtra("ID", PANTRY_EXPIRATION_NOTIFICATION_ID_PREFIX + item.id)
+    intent.putExtra("CHANNEL_ID", PANTRY_EXPIRATION_NOTIFICATION_CHANNEL_ID)
+    intent.putExtra("PRIORITY", NotificationCompat.PRIORITY_DEFAULT)
+    intent.putExtra(
+        "TITLE",
+        getString(R.string.core_notifications_pantry_expiration_title, item.name)
     )
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        .apply(block)
-        .build()
+    intent.putExtra("BODY", getString(R.string.core_notifications_pantry_expiration_body))
+
+    return intent
 }
 
-private fun Context.createPantryExpiringSoonNotification(
-    block: NotificationCompat.Builder.() -> Unit,
-): Notification {
+private fun Context.createPantryExpiringSoonNotificationIntent(
+    item: PantryItem
+): Intent {
+    val intent = Intent(this, Notification::class.java)
+
     ensurePantryExpiringSoonNotificationChannelExists()
-    return NotificationCompat.Builder(
-        this,
-        PANTRY_EXPIRING_SOON_NOTIFICATION_CHANNEL_ID,
+
+    intent.putExtra("ID", PANTRY_EXPIRING_SOON_NOTIFICATION_ID_PREFIX + item.id)
+    intent.putExtra("CHANNEL_ID", PANTRY_EXPIRING_SOON_NOTIFICATION_CHANNEL_ID)
+    intent.putExtra("PRIORITY", NotificationCompat.PRIORITY_DEFAULT)
+    intent.putExtra("TITLE", getString(R.string.core_notifications_pantry_expiring_soon_title))
+    // TODO: Load days from UserPreferencesRepository
+    intent.putExtra(
+        "BODY",
+        resources.getQuantityString(R.plurals.core_notifications_pantry_expiring_soon_body, 2)
     )
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        .apply(block)
-        .build()
+
+    return intent
 }
 
 // MARK: Channel and group registration
