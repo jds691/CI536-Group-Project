@@ -6,7 +6,9 @@ import com.example.pantryplan.core.database.model.PantryStock
 import com.example.pantryplan.core.database.model.asExternalModel
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
+import com.example.pantryplan.core.notifications.Notifier
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
@@ -24,14 +26,25 @@ fun PantryItem.asEntity() = PantryStock(
 )
 
 class PantryItemRepositoryImpl @Inject constructor(
-    private val pantryDao: PantryDao
+    private val pantryDao: PantryDao,
+    private val notifier: Notifier
 ) : PantryItemRepository {
     override suspend fun addItemToRepository(item: PantryItem) {
         pantryDao.addItem(item.asEntity())
+        notifier.scheduleNotificationsForPantryItems(
+            listOf(
+                item
+            )
+        )
     }
 
     override suspend fun removeItemFromRepository(item: PantryItem) {
         pantryDao.removeItem(item.asEntity())
+        notifier.cancelNotificationsForPantryItems(
+            listOf(
+                item
+            )
+        )
     }
 
     override fun getAllItems(): Flow<List<PantryItem>> {
@@ -49,6 +62,11 @@ class PantryItemRepositoryImpl @Inject constructor(
 
     override suspend fun updateItem(item: PantryItem) {
         pantryDao.updateItem(item.asEntity())
+        notifier.scheduleNotificationsForPantryItems(
+            listOf(
+                item
+            )
+        )
     }
 
     override suspend fun updateItemStateById(id: UUID, state: PantryItemState) {
@@ -56,6 +74,14 @@ class PantryItemRepositoryImpl @Inject constructor(
             PantryStockStateUpdate(
                 itemID = id,
                 itemState = state
+            )
+        )
+
+        val item = pantryDao.searchById(id).first() ?: return
+
+        notifier.scheduleNotificationsForPantryItems(
+            listOf(
+                item.asExternalModel()
             )
         )
     }
