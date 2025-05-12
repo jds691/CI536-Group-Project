@@ -42,7 +42,7 @@ class RecipeItemAddViewModel @Inject constructor(
         ),
     )
 
-    //private var quantityUnit = QuantityUnit.GRAMS
+    private var quantityUnit = QuantityUnit.GRAMS
 
     private val _uiState = MutableStateFlow(
         RecipeItemAddUiState(
@@ -66,10 +66,7 @@ class RecipeItemAddViewModel @Inject constructor(
         _uiState.update { it.copy(recipeItem = recipeItem) }
     }
 
-    fun updateAllergens(allergen: Allergen) {
-        val allergenSet = EnumSet.noneOf(Allergen::class.java)
-        allergenSet.addAll(recipeItem.allergens)
-        allergenSet.add(allergen)
+    fun updateAllergens(allergenSet: EnumSet<Allergen>) {
         recipeItem = recipeItem.copy(allergens = allergenSet)
         _uiState.update { it.copy(recipeItem = recipeItem) }
     }

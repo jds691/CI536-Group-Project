@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -113,7 +114,7 @@ private fun RecipeItemEditTopBar(
     TopAppBar(
         title = {
             if (name == null) {
-                Text("Add Item")
+                Text("Add Recipe")
             } else {
                 Text("Update ‘${name}’")
             }
@@ -201,6 +202,25 @@ private fun OutlinedFloatField(
 }
 
 @Composable
+private fun OutlinedIntField(
+    value: Int,
+    onValueChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+) {
+    OutlinedNumberField(
+        value = value.toString(),
+        onValueChange = {
+            onValueChange(
+                runCatching { it.toInt() }.getOrDefault(0)
+            )
+        },
+        modifier = modifier,
+        label = label,
+    )
+}
+
+@Composable
 private fun OutlinedNumberField(
     value: String,
     onValueChange: (String) -> Unit,
@@ -214,9 +234,6 @@ private fun OutlinedNumberField(
         label = label,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         singleLine = true,
-        trailingIcon = {
-            Icon(Icons.Default.Clear, contentDescription = "Select date")
-        }
     )
 }
 
@@ -270,7 +287,7 @@ fun RecipeItemAddScreen(
     onChangeName: (String) -> Unit,
     onChangeDescription: (String) -> Unit,
     onChangeTags: (String) -> Unit,
-    onChangeAllergens: (Allergen) -> Unit,
+    onChangeAllergens: (EnumSet<Allergen>) -> Unit,
     onChangeInstructions: (String) -> Unit,
     //onChangeIngredients: (String) -> Unit,
     onChangePrepTime: (Float) -> Unit,
@@ -355,7 +372,7 @@ private fun RecipeItemEditForm(
     onChangeName: (String) -> Unit,
     onChangeDescription: (String) -> Unit,
     onChangeTags: (String) -> Unit,
-    onChangeAllergens: (Allergen) -> Unit,
+    onChangeAllergens: (EnumSet<Allergen>) -> Unit,
     onChangeInstructions: (String) -> Unit,
     //onChangeIngredients: (String) -> Unit,
     onChangePrepTime: (Float) -> Unit,
@@ -375,9 +392,30 @@ private fun RecipeItemEditForm(
             label = { Text("Name") },
             singleLine = true,
             trailingIcon = {
-                Icon(Icons.Default.Clear, contentDescription = "Select date")
+                IconButton(
+                    onClick = { onChangeName("") }
+                ) {
+                    Icon(Icons.Default.Clear, contentDescription = "Clear Field")
+                }
             }
         )
+
+        OutlinedTextField(
+            value = description,
+            onValueChange = onChangeDescription,
+            label = { Text("Description") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(90.dp),
+            trailingIcon = {
+                IconButton(
+                    onClick = { onChangeDescription("") }
+                ) {
+                    Icon(Icons.Default.Clear, contentDescription = "Clear Field")
+                }
+            }
+        )
+
 
         Text(
             text = "Allergens",
@@ -385,14 +423,26 @@ private fun RecipeItemEditForm(
             style = MaterialTheme.typography.titleMedium,
         )
 
+        val allergenSet = allergens
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             for (allergy in Allergen.entries) {
-                var selected = false
+                val selected = allergenSet.contains(allergy)
                 FilterChip(
                     selected = selected,
                     onClick = {
+                        if (selected)
+                            allergenSet.remove(allergy)
+                        else
+                            allergenSet.add(allergy)
+
+                        try {
+                            onChangeAllergens(EnumSet.copyOf(allergenSet))
+                        } catch (e: IllegalArgumentException) {
+                            // Thrown if set is empty when calling copyOf
+                            onChangeAllergens(EnumSet.noneOf(Allergen::class.java))
+                        }
                     },
                     label = { Text(stringResource(allergy.getDisplayNameId())) },
                     leadingIcon = {
@@ -439,12 +489,28 @@ private fun RecipeItemEditForm(
             style = MaterialTheme.typography.titleMedium,
         )
 
+        var tagText by remember { mutableStateOf("") }
+        OutlinedTextField(
+            value = tagText,
+            onValueChange = { tagText = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Tag") },
+            singleLine = true,
+            trailingIcon = {
+                IconButton(
+                    onClick = { tagText = "" }
+                ) {
+                    Icon(Icons.Default.Clear, contentDescription = "Clear Field")
+                }
+            }
+        )
+
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
             OutlinedButton(
-                onClick = {},
+                onClick = { onChangeTags(tagText) },
                 shape = ButtonDefaults.outlinedShape,
                 enabled = true,
                 colors = ButtonColors(
@@ -475,20 +541,19 @@ private fun RecipeItemEditForm(
                 .padding(0.dp, 4.dp, 0.dp, 4.dp)
         )
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
-            horizontalAlignment = Alignment.Start,
-        ) {
-
-        }
+        var ingredientText by remember { mutableStateOf("") }
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = ingredientText,
+            onValueChange = { ingredientText = it },
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Ingredient Name") },
             singleLine = true,
             trailingIcon = {
-                Icon(Icons.Default.Clear, contentDescription = "Select date")
+                IconButton(
+                    onClick = { ingredientText = "" }
+                ) {
+                    Icon(Icons.Default.Clear, contentDescription = "Clear Field")
+                }
             }
         )
 
@@ -503,10 +568,9 @@ private fun RecipeItemEditForm(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            OutlinedTextField(
-                value = "",
+            OutlinedIntField(
+                value = 20,
                 onValueChange = {},
-                label = { Text("20") },
                 modifier = Modifier
                     .width(180.dp)
             )
@@ -515,6 +579,7 @@ private fun RecipeItemEditForm(
                 QuantityUnit.GRAMS to "Grams",
                 QuantityUnit.KILOGRAMS to "Kilograms",
             )
+
             OutlinedEnumSelectField(
                 options = measurementOptions,
                 value = QuantityUnit.GRAMS,
@@ -524,6 +589,169 @@ private fun RecipeItemEditForm(
                     .align(Alignment.Bottom)
             )
         }
+
+        OutlinedButton(
+            onClick = {},
+            shape = ButtonDefaults.outlinedShape,
+            enabled = true,
+            colors = ButtonColors(
+                containerColor = Color.Unspecified,
+                contentColor = MaterialTheme.colorScheme.primary,
+                disabledContainerColor = Color.Unspecified,
+                disabledContentColor = MaterialTheme.colorScheme.error
+            ),
+            content = {
+                Icon(
+                    Icons.Filled.Add,
+                    contentDescription = ""
+                )
+                Spacer(Modifier.width(2.dp))
+                Text("Add Ingredient")
+            }
+        )
+
+        Text(
+            text = "Ingredients",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
+        )
+
+        Text(
+            text = "Instructions",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
+        )
+
+        var stepText by remember { mutableStateOf("") }
+        OutlinedTextField(
+            value = stepText,
+            onValueChange = { stepText = it },
+            label = { Text("Step") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp),
+            trailingIcon = {
+                IconButton(
+                    onClick = { stepText = "" }
+                ) {
+                    Icon(Icons.Default.Clear, contentDescription = "Clear Field")
+                }
+            }
+        )
+
+        OutlinedButton(
+            onClick = {
+                onChangeInstructions(stepText)
+            },
+            shape = ButtonDefaults.outlinedShape,
+            enabled = true,
+            colors = ButtonColors(
+                containerColor = Color.Unspecified,
+                contentColor = MaterialTheme.colorScheme.primary,
+                disabledContainerColor = Color.Unspecified,
+                disabledContentColor = MaterialTheme.colorScheme.error
+            ),
+            content = {
+                Icon(
+                    Icons.Filled.Add,
+                    contentDescription = ""
+                )
+                Spacer(Modifier.width(2.dp))
+                Text("Add Step")
+            }
+        )
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
+            horizontalAlignment = Alignment.Start
+        ) {
+            var stepNum = 1
+            instructions.forEach { instruction ->
+                Text(
+                    text = "Step $stepNum - $instruction",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                stepNum++
+            }
+        }
+
+        Text(
+            text = "Nutritional Information",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
+        )
+
+        OutlinedIntField(
+            value = nutrition.calories,
+            onValueChange = {},
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Calories") },
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedFloatField(
+                value = nutrition.fats,
+                onValueChange = {},
+                modifier = Modifier.width(160.dp),
+                label = { Text("Fat") },
+            )
+            OutlinedFloatField(
+                value = nutrition.saturatedFats,
+                onValueChange = {},
+                modifier = Modifier.width(160.dp),
+                label = { Text("Saturated Fats") },
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedFloatField(
+                value = nutrition.carbohydrates,
+                onValueChange = {},
+                modifier = Modifier.width(160.dp),
+                label = { Text("Carbohydrate") },
+            )
+            OutlinedFloatField(
+                value = nutrition.sugar,
+                onValueChange = {},
+                modifier = Modifier.width(160.dp),
+                label = { Text("Sugar") },
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedFloatField(
+                value = nutrition.fiber,
+                onValueChange = {},
+                modifier = Modifier.width(100.dp),
+                label = { Text("Fiber") },
+            )
+            OutlinedFloatField(
+                value = nutrition.protein,
+                onValueChange = {},
+                modifier = Modifier.width(100.dp),
+                label = { Text("Protein") },
+            )
+            OutlinedFloatField(
+                value = nutrition.sodium,
+                onValueChange = {},
+                modifier = Modifier.width(100.dp),
+                label = { Text("Sodium") },
+            )
+        }
+
+
 
     }
 }
