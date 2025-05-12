@@ -81,6 +81,7 @@ fun PantryScreen(
             PantryContentList(
                 pantryState = uiState.value,
                 onClickPantryItem = onClickPantryItem,
+                onDeletePantryItem = viewModel::deletePantryItem,
                 modifier = Modifier.padding(contentPadding)
             )
         }
@@ -149,6 +150,7 @@ private fun PantryContentUnavailable(modifier: Modifier = Modifier) {
 private fun PantryContentList(
     pantryState: PantryUiState,
     onClickPantryItem: (UUID) -> Unit,
+    onDeletePantryItem: (PantryItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn (
@@ -162,7 +164,8 @@ private fun PantryContentList(
         items(pantryState.pantryItems) { item ->
             PantryItemCard(
                 item = item,
-                onClick = { onClickPantryItem(item.id) }
+                onClick = { onClickPantryItem(item.id) },
+                onDelete = { onDeletePantryItem(item) },
             )
         }
     }
@@ -177,7 +180,8 @@ private fun PantryPopulatedPreview(
         Surface {
             PantryContentList(
                 pantryState = PantryUiState(pantryItems),
-                onClickPantryItem = {}
+                onClickPantryItem = {},
+                onDeletePantryItem = {},
             )
         }
     }
