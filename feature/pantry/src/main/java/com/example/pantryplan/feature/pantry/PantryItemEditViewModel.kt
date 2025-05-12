@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -52,31 +53,31 @@ class PantryItemEditViewModel @Inject constructor(
     )
 
     fun updateName(name: String) {
-        pantryItem.value = pantryItem.value.copy(name = name)
+        pantryItem.update { it.copy(name = name) }
     }
 
     fun updateExpiryDate(expiryDate: Instant) {
-        pantryItem.value = pantryItem.value.copy(expiryDate = expiryDate)
+        pantryItem.update { it.copy(expiryDate = expiryDate) }
     }
 
     fun updateState(state: PantryItemState) {
-        pantryItem.value = pantryItem.value.copy(state = state)
+        pantryItem.update { it.copy(state = state) }
     }
 
     fun updateQuantity(quantity: Int) {
-        pantryItem.value = pantryItem.value.copy(quantity = quantity)
+        pantryItem.update { it.copy(quantity = quantity) }
     }
 
     fun updateQuantityUnit(quantityUnit: QuantityUnit) {
-        this.quantityUnit.value = quantityUnit
+        this.quantityUnit.update { quantityUnit }
     }
 
     fun updateExpiresAfter(expiresAfter: Duration) {
-        pantryItem.value = pantryItem.value.copy(expiresAfter = expiresAfter)
+        pantryItem.update { it.copy(expiresAfter = expiresAfter) }
     }
 
     fun updateExpiresAfterUnit(expiresAfterUnit: ExpiresAfterUnit) {
-        this.expiresAfterUnit.value = expiresAfterUnit
+        this.expiresAfterUnit.update { expiresAfterUnit }
     }
 
     fun savePantryItem() {
