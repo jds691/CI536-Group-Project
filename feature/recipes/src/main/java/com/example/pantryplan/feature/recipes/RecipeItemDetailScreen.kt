@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
@@ -36,6 +37,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldLabelScope
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -100,6 +102,9 @@ internal fun RecipeItemDetailsScreen(
     onBackClick: () -> Unit,
     onEditItem: (UUID) -> Unit
 ) {
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -112,7 +117,7 @@ internal fun RecipeItemDetailsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = { showDeleteDialog = true }) {
                         Icon(Icons.Outlined.Delete, "")
                     }
                 }
@@ -344,6 +349,53 @@ internal fun RecipeItemDetailsScreen(
                                 label = { Text(tag) }
                             )
                         }
+                    }
+
+                    if (showDeleteDialog) {
+                        AlertDialog(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            onDismissRequest = { showDeleteDialog = false },
+                            title = {
+                                Text(
+                                    text = "Delete '${item.title}'?",
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = "This recipe cannot be restored. Are you sure you want to delete it?",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        //TODO: add functionality to delete recipe
+                                        showDeleteDialog = false
+
+                                        onBackClick() // pops back to pantry screen when item is deleted
+                                    }
+                                ) {
+                                    Text(
+                                        text = "Delete",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showDeleteDialog = false }) {
+                                    Text(
+                                        text = "Cancel",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+
+                                }
+                            }
+                        )
                     }
 
                 }
