@@ -37,18 +37,10 @@ internal class SystemNotifier @Inject constructor(
             return
         }
 
+        val alarmManager = this.getSystemService(AlarmManager::class.java)
+        cancelNotificationsForPantryItems(items)
+
         for (item in items) {
-            val alarmManager = this.getSystemService(AlarmManager::class.java)
-
-            alarmManager.cancelNotification(
-                PANTRY_EXPIRATION_NOTIFICATION_ID_PREFIX + item.id,
-                context
-            )
-            alarmManager.cancelNotification(
-                PANTRY_EXPIRING_SOON_NOTIFICATION_ID_PREFIX + item.id,
-                context
-            )
-
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 item.expiryDate.toEpochMilliseconds(),
@@ -60,6 +52,21 @@ internal class SystemNotifier @Inject constructor(
                 AlarmManager.RTC_WAKEUP,
                 item.expiryDate.minus(2.days).toEpochMilliseconds(),
                 createPantryExpiringSoonNotificationIntent(item)
+            )
+        }
+    }
+
+    override fun cancelNotificationsForPantryItems(items: List<PantryItem>) = with(context) {
+        val alarmManager = this.getSystemService(AlarmManager::class.java)
+
+        for (item in items) {
+            alarmManager.cancelNotification(
+                PANTRY_EXPIRATION_NOTIFICATION_ID_PREFIX + item.id,
+                context
+            )
+            alarmManager.cancelNotification(
+                PANTRY_EXPIRING_SOON_NOTIFICATION_ID_PREFIX + item.id,
+                context
             )
         }
     }
