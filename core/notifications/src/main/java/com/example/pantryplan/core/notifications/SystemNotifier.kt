@@ -15,7 +15,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.pantryplan.core.models.PantryItem
+import com.example.pantryplan.core.models.PantryItemState
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.days
@@ -41,18 +43,27 @@ internal class SystemNotifier @Inject constructor(
         cancelNotificationsForPantryItems(items)
 
         for (item in items) {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                item.expiryDate.toEpochMilliseconds(),
-                createPantryExpirationNotificationIntent(item)
-            )
+            if (item.state == PantryItemState.FROZEN) continue
 
+            val now = Clock.System.now()
             // TODO: Load days from UserPreferencesRepository
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                item.expiryDate.minus(2.days).toEpochMilliseconds(),
-                createPantryExpiringSoonNotificationIntent(item)
-            )
+            val expiringSoonDate = item.expiryDate.minus(2.days)
+
+            if (now < item.expiryDate) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    item.expiryDate.toEpochMilliseconds(),
+                    createPantryExpirationNotificationIntent(item)
+                )
+            }
+
+            if (now < expiringSoonDate) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    expiringSoonDate.toEpochMilliseconds(),
+                    createPantryExpiringSoonNotificationIntent(item)
+                )
+            }
         }
     }
 
