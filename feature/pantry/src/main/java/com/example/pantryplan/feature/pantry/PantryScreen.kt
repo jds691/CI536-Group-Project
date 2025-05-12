@@ -97,7 +97,8 @@ private fun scanBarcode(
     val options = GmsBarcodeScannerOptions
         .Builder()
         .setBarcodeFormats(
-            Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E
+            Barcode.FORMAT_EAN_13,
+            Barcode.FORMAT_EAN_8,
         )
         .build()
     val scanner = GmsBarcodeScanning.getClient(context, options)
