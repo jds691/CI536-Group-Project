@@ -30,6 +30,8 @@ private const val PANTRY_EXPIRING_SOON_NOTIFICATION_CHANNEL_ID = "pantry_item_ex
 private const val PANTRY_EXPIRATION_NOTIFICATION_ID_PREFIX = "pantry.expiration."
 private const val PANTRY_EXPIRING_SOON_NOTIFICATION_ID_PREFIX = "pantry.expiring_soon."
 
+// TODO: Fix the alarm manager not triggering scheduled notifications
+
 @Singleton
 internal class SystemNotifier @Inject constructor(
     @ApplicationContext private val context: Context,
