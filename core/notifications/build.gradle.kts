@@ -29,7 +29,10 @@ android {
 
 dependencies {
     implementation(project(":core:models"))
-    implementation(project(":core:data-access"))
+    implementation(project(":core:datastore"))
+
+
+    implementation(libs.kotlinx.datetime)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

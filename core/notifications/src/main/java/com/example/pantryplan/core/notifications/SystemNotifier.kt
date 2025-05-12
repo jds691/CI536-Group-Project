@@ -14,13 +14,15 @@ import android.os.Build.VERSION_CODES
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.pantryplan.core.datastore.UserPreferencesDataSource
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.days
+import kotlin.time.DurationUnit
 
 private const val PANTRY_EXPIRATION_NOTIFICATION_CHANNEL_ID = "pantry_item_expiration"
 private const val PANTRY_EXPIRING_SOON_NOTIFICATION_CHANNEL_ID = "pantry_item_expiring_soon"
@@ -31,13 +33,16 @@ private const val PANTRY_EXPIRING_SOON_NOTIFICATION_ID_PREFIX = "pantry.expiring
 @Singleton
 internal class SystemNotifier @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val userPreferenceSource: UserPreferencesDataSource
 ) : Notifier {
-    override fun scheduleNotificationsForPantryItems(
+    override suspend fun scheduleNotificationsForPantryItems(
         items: List<PantryItem>
     ) = with(context) {
         if (!permissionsCheck()) {
             return
         }
+
+        val preferences = userPreferenceSource.preferences.first()
 
         val alarmManager = this.getSystemService(AlarmManager::class.java)
         cancelNotificationsForPantryItems(items)
@@ -46,8 +51,7 @@ internal class SystemNotifier @Inject constructor(
             if (item.state == PantryItemState.FROZEN) continue
 
             val now = Clock.System.now()
-            // TODO: Load days from UserPreferencesRepository
-            val expiringSoonDate = item.expiryDate.minus(2.days)
+            val expiringSoonDate = item.expiryDate.minus(preferences.expiringSoonAmount)
 
             if (now < item.expiryDate) {
                 alarmManager.setExactAndAllowWhileIdle(
@@ -61,7 +65,10 @@ internal class SystemNotifier @Inject constructor(
                 alarmManager.setExactAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
                     expiringSoonDate.toEpochMilliseconds(),
-                    createPantryExpiringSoonNotificationIntent(item)
+                    createPantryExpiringSoonNotificationIntent(
+                        item,
+                        preferences.expiringSoonAmount.toInt(DurationUnit.DAYS)
+                    )
                 )
             }
         }
@@ -123,7 +130,8 @@ private fun Context.createPantryExpirationNotificationIntent(
 }
 
 private fun Context.createPantryExpiringSoonNotificationIntent(
-    item: PantryItem
+    item: PantryItem,
+    expiringSoonAmount: Int
 ): PendingIntent {
     val intent = Intent(this, Notification::class.java)
     val id = PANTRY_EXPIRING_SOON_NOTIFICATION_ID_PREFIX + item.id
@@ -134,10 +142,12 @@ private fun Context.createPantryExpiringSoonNotificationIntent(
     intent.putExtra("CHANNEL_ID", PANTRY_EXPIRING_SOON_NOTIFICATION_CHANNEL_ID)
     intent.putExtra("PRIORITY", NotificationCompat.PRIORITY_DEFAULT)
     intent.putExtra("TITLE", getString(R.string.core_notifications_pantry_expiring_soon_title))
-    // TODO: Load days from UserPreferencesRepository
     intent.putExtra(
         "BODY",
-        resources.getQuantityString(R.plurals.core_notifications_pantry_expiring_soon_body, 2)
+        resources.getQuantityString(
+            R.plurals.core_notifications_pantry_expiring_soon_body,
+            expiringSoonAmount
+        )
     )
 
     return PendingIntent.getBroadcast(
