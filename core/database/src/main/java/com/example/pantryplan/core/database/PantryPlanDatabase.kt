@@ -7,6 +7,7 @@ import com.example.pantryplan.core.database.converter.DurationConverter
 import com.example.pantryplan.core.database.converter.InstantConverter
 import com.example.pantryplan.core.database.converter.UUIDConverter
 import com.example.pantryplan.core.database.dao.PantryDao
+import com.example.pantryplan.core.database.dao.RecipeDao
 import com.example.pantryplan.core.database.model.PantryStock
 
 // Create Database with supported entities
@@ -22,5 +23,6 @@ import com.example.pantryplan.core.database.model.PantryStock
     UUIDConverter::class
 )
 internal abstract class PantryPlanDatabase : RoomDatabase() { //Database class
-    abstract fun pantryDao(): PantryDao // Hook data entity up to interface
+    abstract fun pantryDao(): PantryDao // Hook data entities up to interface
+    abstract fun recipeDao(): RecipeDao
 }
