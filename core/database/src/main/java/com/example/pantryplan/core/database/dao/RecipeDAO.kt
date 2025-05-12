@@ -1,8 +1,11 @@
 package com.example.pantryplan.core.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.Query
 import com.example.pantryplan.core.database.model.RecipeInformation
+import com.example.pantryplan.core.models.Recipe
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -24,6 +27,15 @@ interface RecipeDao {
     fun filterByTag(tag: List<String>): Flow<RecipeInformation>
 
     /**
-     *
+     * Deletes all items from a user selection
      */
+    @Delete
+    suspend fun removeRecipe(recipe: List<Recipe>)
+
+    /**
+     * Create new recipe
+     */
+    @Insert
+    suspend fun addRecipe(recipe: Recipe)
+
 }
