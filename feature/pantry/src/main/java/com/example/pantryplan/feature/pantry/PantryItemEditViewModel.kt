@@ -33,27 +33,34 @@ class PantryItemEditViewModel @Inject constructor(
 ) : ViewModel() {
     private val existingId = savedStateHandle
         .toRoute<PantryItemEdit>()
-        .id?.let { UUID.fromString(it) }
+        .id?.let(UUID::fromString)
+
+    private val barcode = savedStateHandle.toRoute<PantryItemEdit>().barcode
+
+    private val newPantryItem = PantryItem(
+        id = UUID.randomUUID(),
+        name = "",
+        quantity = 0,
+        expiryDate = Clock.System.now() + 7.days,
+        expiresAfter = Duration.ZERO,
+        inStateSince = Clock.System.now(),
+        state = PantryItemState.SEALED,
+        imageUrl = null,
+        barcode = barcode,
+    )
 
     private var pantryItem: MutableStateFlow<PantryItem> =
         MutableStateFlow(
-            if (existingId == null) {
-                PantryItem(
-                    id = UUID.randomUUID(),
-                    name = "",
-                    quantity = 0,
-                    expiryDate = Clock.System.now() + 7.days,
-                    expiresAfter = Duration.ZERO,
-                    inStateSince = Clock.System.now(),
-                    state = PantryItemState.SEALED,
-                    imageUrl = null,
-                    barcode = null
-                )
-            } else {
+            if (existingId != null) {
                 runBlocking { pantryItemRepository.getItemById(existingId).first()!! }
+            } else {
+                barcode?.let {
+                    runBlocking {
+                        pantryItemRepository.getItemByBarcode(barcode).first()
+                    }?.copy(id = UUID.randomUUID())
+                } ?: newPantryItem
             }
         )
-
 
     private var quantityUnit = MutableStateFlow(QuantityUnit.GRAMS)
     private var expiresAfterUnit = MutableStateFlow(ExpiresAfterUnit.DAYS)

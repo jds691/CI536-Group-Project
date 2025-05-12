@@ -76,14 +76,12 @@ fun PantryItemEditScreen(
     viewModel: PantryItemEditViewModel = hiltViewModel(),
 
     existingId: UUID? = null,
-    barcode: String? = null,
     onBackClick: () -> Unit,
 ) {
     val pantryItemEditUiState by viewModel.uiState.collectAsStateWithLifecycle()
     PantryItemEditScreen(
         pantryItemEditUiState = pantryItemEditUiState,
         existingId = existingId,
-        barcode = barcode,
         onBackClick = onBackClick,
         onSaveClick = viewModel::savePantryItem,
         onChangeImageURI = viewModel::updateImageUri,
@@ -101,7 +99,6 @@ fun PantryItemEditScreen(
 private fun PantryItemEditScreen(
     pantryItemEditUiState: PantryItemEditUiState,
     existingId: UUID?,
-    barcode: String? = null,
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
     onChangeImageURI: (String?) -> Unit,
