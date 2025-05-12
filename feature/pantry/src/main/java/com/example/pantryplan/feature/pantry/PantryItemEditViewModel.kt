@@ -7,9 +7,10 @@ import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -17,12 +18,13 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class PantryItemEditViewModel @Inject constructor(
     private val pantryItemRepository: PantryItemRepository,
 ) : ViewModel() {
-    private var pantryItem = PantryItem(
+    private var pantryItem = MutableStateFlow(PantryItem(
         id = UUID.randomUUID(),
         name = "",
         quantity = 0,
@@ -32,70 +34,66 @@ class PantryItemEditViewModel @Inject constructor(
         state = PantryItemState.SEALED,
         imageUrl = null,
         barcode = null
-    )
+    ))
 
-    private var quantityUnit = QuantityUnit.GRAMS
-    private var expiresAfterUnit = ExpiresAfterUnit.DAYS
+    private var quantityUnit = MutableStateFlow(QuantityUnit.GRAMS)
+    private var expiresAfterUnit = MutableStateFlow(ExpiresAfterUnit.DAYS)
 
-    private val _uiState = MutableStateFlow(
-        PantryItemEditUiState(
-            pantryItem = pantryItem,
-            quantityUnit = quantityUnit,
-            expiresAfterUnit = expiresAfterUnit,
-        )
+    val uiState: StateFlow<PantryItemEditUiState> = combine(
+        pantryItem,
+        quantityUnit,
+        expiresAfterUnit,
+    ) { pantryItem, quantityUnit, expiresAfterUnit ->
+        PantryItemEditUiState(pantryItem, quantityUnit, expiresAfterUnit)
+    }.stateIn(
+        scope = viewModelScope,
+        started = WhileSubscribed(5.seconds.inWholeMilliseconds),
+        PantryItemEditUiState(pantryItem.value, quantityUnit.value, expiresAfterUnit.value)
     )
-    val uiState: StateFlow<PantryItemEditUiState> = _uiState.asStateFlow()
 
     fun updateName(name: String) {
-        pantryItem = pantryItem.copy(name = name)
-        _uiState.update { it.copy(pantryItem = pantryItem) }
+        pantryItem.value = pantryItem.value.copy(name = name)
     }
 
     fun updateExpiryDate(expiryDate: Instant) {
-        pantryItem = pantryItem.copy(expiryDate = expiryDate)
-        _uiState.update { it.copy(pantryItem = pantryItem) }
+        pantryItem.value = pantryItem.value.copy(expiryDate = expiryDate)
     }
 
     fun updateState(state: PantryItemState) {
-        pantryItem = pantryItem.copy(state = state)
-        _uiState.update { it.copy(pantryItem = pantryItem) }
+        pantryItem.value = pantryItem.value.copy(state = state)
     }
 
     fun updateQuantity(quantity: Int) {
-        pantryItem = pantryItem.copy(quantity = quantity)
-        _uiState.update { it.copy(pantryItem = pantryItem) }
+        pantryItem.value = pantryItem.value.copy(quantity = quantity)
     }
 
     fun updateQuantityUnit(quantityUnit: QuantityUnit) {
-        this.quantityUnit = quantityUnit
-        _uiState.update { it.copy(quantityUnit = quantityUnit) }
+        this.quantityUnit.value = quantityUnit
     }
 
     fun updateExpiresAfter(expiresAfter: Duration) {
-        pantryItem = pantryItem.copy(expiresAfter = expiresAfter)
-        _uiState.update { it.copy(pantryItem = pantryItem) }
+        pantryItem.value = pantryItem.value.copy(expiresAfter = expiresAfter)
     }
 
     fun updateExpiresAfterUnit(expiresAfterUnit: ExpiresAfterUnit) {
-        this.expiresAfterUnit = expiresAfterUnit
-        _uiState.update { it.copy(expiresAfterUnit = expiresAfterUnit) }
+        this.expiresAfterUnit.value = expiresAfterUnit
     }
 
     fun savePantryItem() {
         viewModelScope.launch {
-            val newQuantity = pantryItem.quantity * when (quantityUnit) {
+            val newQuantity = pantryItem.value.quantity * when (quantityUnit.value) {
                 QuantityUnit.GRAMS -> 1
                 QuantityUnit.KILOGRAMS -> 1000
             }
 
             // TODO: Replace with .weeks and .months when type is changed to DatePeriod.
-            val newExpiresAfter = pantryItem.expiresAfter!! * when (expiresAfterUnit) {
+            val newExpiresAfter = pantryItem.value.expiresAfter!! * when (expiresAfterUnit.value) {
                 ExpiresAfterUnit.DAYS -> 1
                 ExpiresAfterUnit.WEEKS -> 7
                 ExpiresAfterUnit.MONTHS -> 30
             }
 
-            val pantryItem = pantryItem.copy(
+            val pantryItem = pantryItem.value.copy(
                 quantity = newQuantity,
                 expiresAfter = newExpiresAfter,
             )
