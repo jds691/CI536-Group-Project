@@ -9,12 +9,14 @@ import com.example.pantryplan.core.database.converter.UUIDConverter
 import com.example.pantryplan.core.database.dao.PantryDao
 import com.example.pantryplan.core.database.dao.RecipeDao
 import com.example.pantryplan.core.database.model.PantryStock
+import com.example.pantryplan.core.database.model.RecipeInformation
 
 // Create Database with supported entities
 @Database(
     version = 1,
     entities = [
-        PantryStock::class
+        PantryStock::class,
+        RecipeInformation::class
     ]
 )
 @TypeConverters(
