@@ -28,7 +28,7 @@ class Notification : BroadcastReceiver() {
 
         // Build the notification using NotificationCompat.Builder
         val notification = NotificationCompat.Builder(context, channelId)
-            //.setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.notification_icon)
             .setContentTitle(intent.getStringExtra(title)) // Set title from intent
             .setContentText(intent.getStringExtra(body)) // Set content text from intent
             .setPriority(priority)
