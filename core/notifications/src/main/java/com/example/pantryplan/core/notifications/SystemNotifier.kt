@@ -1,9 +1,11 @@
 package com.example.pantryplan.core.notifications
 
 import android.Manifest.permission
+import android.app.AlarmManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -16,6 +18,7 @@ import com.example.pantryplan.core.models.PantryItem
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.days
 
 private const val PANTRY_EXPIRATION_NOTIFICATION_CHANNEL_ID = "pantry_item_expiration"
 private const val PANTRY_EXPIRING_SOON_NOTIFICATION_CHANNEL_ID = "pantry_item_expiring_soon"
@@ -33,17 +36,58 @@ internal class SystemNotifier @Inject constructor(
         if (!permissionsCheck()) {
             return
         }
+
+        for (item in items) {
+            val alarmManager = this.getSystemService(AlarmManager::class.java)
+
+            alarmManager.cancelNotification(
+                PANTRY_EXPIRATION_NOTIFICATION_ID_PREFIX + item.id,
+                context
+            )
+            alarmManager.cancelNotification(
+                PANTRY_EXPIRING_SOON_NOTIFICATION_ID_PREFIX + item.id,
+                context
+            )
+
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                item.expiryDate.toEpochMilliseconds(),
+                createPantryExpirationNotificationIntent(item)
+            )
+
+            // TODO: Load days from UserPreferencesRepository
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                item.expiryDate.minus(2.days).toEpochMilliseconds(),
+                createPantryExpiringSoonNotificationIntent(item)
+            )
+        }
     }
+}
+
+private fun AlarmManager.cancelNotification(
+    id: String,
+    context: Context
+) {
+    cancel(
+        PendingIntent.getBroadcast(
+            context,
+            id.hashCode(),
+            Intent(context, Notification::class.java),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    )
 }
 
 private fun Context.createPantryExpirationNotificationIntent(
     item: PantryItem
-): Intent {
+): PendingIntent {
     val intent = Intent(this, Notification::class.java)
+    val id = PANTRY_EXPIRATION_NOTIFICATION_ID_PREFIX + item.id
 
     ensurePantryExpirationNotificationChannelExists()
 
-    intent.putExtra("ID", PANTRY_EXPIRATION_NOTIFICATION_ID_PREFIX + item.id)
+    intent.putExtra("ID", id)
     intent.putExtra("CHANNEL_ID", PANTRY_EXPIRATION_NOTIFICATION_CHANNEL_ID)
     intent.putExtra("PRIORITY", NotificationCompat.PRIORITY_DEFAULT)
     intent.putExtra(
@@ -52,17 +96,23 @@ private fun Context.createPantryExpirationNotificationIntent(
     )
     intent.putExtra("BODY", getString(R.string.core_notifications_pantry_expiration_body))
 
-    return intent
+    return PendingIntent.getBroadcast(
+        this,
+        id.hashCode(),
+        Intent(this, Notification::class.java),
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+    )
 }
 
 private fun Context.createPantryExpiringSoonNotificationIntent(
     item: PantryItem
-): Intent {
+): PendingIntent {
     val intent = Intent(this, Notification::class.java)
+    val id = PANTRY_EXPIRING_SOON_NOTIFICATION_ID_PREFIX + item.id
 
     ensurePantryExpiringSoonNotificationChannelExists()
 
-    intent.putExtra("ID", PANTRY_EXPIRING_SOON_NOTIFICATION_ID_PREFIX + item.id)
+    intent.putExtra("ID", id)
     intent.putExtra("CHANNEL_ID", PANTRY_EXPIRING_SOON_NOTIFICATION_CHANNEL_ID)
     intent.putExtra("PRIORITY", NotificationCompat.PRIORITY_DEFAULT)
     intent.putExtra("TITLE", getString(R.string.core_notifications_pantry_expiring_soon_title))
@@ -72,7 +122,12 @@ private fun Context.createPantryExpiringSoonNotificationIntent(
         resources.getQuantityString(R.plurals.core_notifications_pantry_expiring_soon_body, 2)
     )
 
-    return intent
+    return PendingIntent.getBroadcast(
+        this,
+        id.hashCode(),
+        Intent(this, Notification::class.java),
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+    )
 }
 
 // MARK: Channel and group registration
