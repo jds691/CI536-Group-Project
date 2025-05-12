@@ -1,18 +1,23 @@
 package com.example.pantryplan.feature.pantry
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.example.pantryplan.core.data.access.repository.PantryItemRepository
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
+import com.example.pantryplan.feature.pantry.navigation.PantryItemEdit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.util.UUID
@@ -23,19 +28,32 @@ import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class PantryItemEditViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val pantryItemRepository: PantryItemRepository,
 ) : ViewModel() {
-    private var pantryItem = MutableStateFlow(PantryItem(
-        id = UUID.randomUUID(),
-        name = "",
-        quantity = 0,
-        expiryDate = Clock.System.now() + 7.days,
-        expiresAfter = Duration.ZERO,
-        inStateSince = Clock.System.now(),
-        state = PantryItemState.SEALED,
-        imageUrl = null,
-        barcode = null
-    ))
+    private val existingId = savedStateHandle
+        .toRoute<PantryItemEdit>()
+        .id?.let { UUID.fromString(it) }
+
+    private var pantryItem: MutableStateFlow<PantryItem> =
+        MutableStateFlow(
+            if (existingId == null) {
+                PantryItem(
+                    id = UUID.randomUUID(),
+                    name = "",
+                    quantity = 0,
+                    expiryDate = Clock.System.now() + 7.days,
+                    expiresAfter = Duration.ZERO,
+                    inStateSince = Clock.System.now(),
+                    state = PantryItemState.SEALED,
+                    imageUrl = null,
+                    barcode = null
+                )
+            } else {
+                runBlocking { pantryItemRepository.getItemById(existingId).first()!! }
+            }
+        )
+
 
     private var quantityUnit = MutableStateFlow(QuantityUnit.GRAMS)
     private var expiresAfterUnit = MutableStateFlow(ExpiresAfterUnit.DAYS)
@@ -102,7 +120,12 @@ class PantryItemEditViewModel @Inject constructor(
                 quantity = newQuantity,
                 expiresAfter = newExpiresAfter,
             )
-            pantryItemRepository.addItemToRepository(pantryItem)
+
+            if (existingId == null) {
+                pantryItemRepository.addItemToRepository(pantryItem)
+            } else {
+                pantryItemRepository.updateItem(pantryItem)
+            }
         }
     }
 }
