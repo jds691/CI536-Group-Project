@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_notifications_pantry_expiration_notification_channel_name">Item Expired</string>
+    <string name="core_notifications_pantry_expiration_notification_channel_description">Items that have expired in your pantry</string>
+    <string name="core_notifications_pantry_expiring_soon_notification_channel_name">Item Expiring Soon</string>
+    <string name="core_notifications_pantry_expiring_soon_notification_channel_description">Items that are going to expire soon</string>
+</resources>
