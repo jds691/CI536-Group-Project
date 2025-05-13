@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -47,8 +48,15 @@ import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.meals.ui.MacrosCard
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.DayOfWeekNames
+import kotlinx.datetime.toLocalDateTime
 import java.util.EnumSet
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
@@ -305,8 +313,14 @@ private fun NextThreeDays(
         previewMeal
     )
 
+    val format = LocalDate.Format {
+        dayOfWeek(DayOfWeekNames.ENGLISH_FULL)
+    }
+    val twoDaysAwayDayName = Clock.System.now().plus(2.days)
+        .toLocalDateTime(TimeZone.currentSystemDefault()).date.format(format)
+
     var selectedIndex by remember { mutableIntStateOf(0) }
-    val options = listOf("Today", "Tomorrow", "Wednesday")
+    val options = listOf("Today", "Tomorrow", twoDaysAwayDayName)
 
     Column(
         modifier = modifier,
@@ -318,7 +332,10 @@ private fun NextThreeDays(
             color = MaterialTheme.colorScheme.primary
         )
 
-        SingleChoiceSegmentedButtonRow {
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
             options.forEachIndexed { index, label ->
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(
