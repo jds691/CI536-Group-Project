@@ -2,7 +2,7 @@ package com.example.pantryplan.feature.recipes
 
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -89,11 +90,21 @@ internal fun RecipesScreen(
 @Composable
 internal fun RecipesFABs(onCreateRecipeItem: () -> Unit) {
     MultiFAB {
-        val importRecipe = rememberLauncherForActivityResult(OpenDocument()) { uri ->
+        val context = LocalContext.current
+        val importRecipe = rememberLauncherForActivityResult(GetContent()) { uri ->
             Log.d("JSON", uri.toString())
+            if (uri != null) {
+                val json = context
+                    .contentResolver
+                    .openInputStream(uri)!!
+                    .bufferedReader()
+                    .readText()
+                Log.d("JSON", json)
+            }
         }
+
         SmallFloatingActionButton(
-            onClick = { importRecipe.launch(arrayOf("application/json")) }
+            onClick = { importRecipe.launch("application/json") }
         ) {
             Icon(
                 painter = painterResource(R.drawable.download_symbol),
