@@ -2,7 +2,6 @@
 
 package com.example.pantryplan.feature.meals
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.example.pantryplan.core.designsystem.recipes.RecipeItemCard
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
@@ -229,33 +229,30 @@ private fun CarouselMealCard(
         modifier = modifier
             .clickable(onClick = onClick)
     ){
-        if (meal.imageUrl != null) {
-            // TODO: Show image async loaded (afaik not supported by Compose natively)
-        } else {
-            Image(
-                painter = painterResource(R.drawable.default_recipe_thumbnail),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(316.dp)
-                    .height(205.dp)
+        AsyncImage(
+            model = meal.imageUrl,
+            modifier = Modifier
+                .width(316.dp)
+                .height(205.dp)
 
-                    // Slight gradient overlay as shown in Figma
-                    .drawWithContent {
-                        drawContent()
+                // Slight gradient overlay as shown in Figma
+                .drawWithContent {
+                    drawContent()
 
-                        drawRect(
-                            Brush.linearGradient(
-                                listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent),
+                    drawRect(
+                        Brush.linearGradient(
+                            listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent),
 
-                                // Rotates the gradient by 90 degrees
-                                start = Offset(0f, Float.POSITIVE_INFINITY),
-                                end = Offset(0f, 0f)
-                            )
+                            // Rotates the gradient by 90 degrees
+                            start = Offset(0f, Float.POSITIVE_INFINITY),
+                            end = Offset(0f, 0f)
                         )
-                    }
-            )
-        }
+                    )
+                },
+            fallback = painterResource(R.drawable.default_recipe_thumbnail),
+            contentDescription = null,
+            contentScale = ContentScale.Crop
+        )
 
         Column(
             modifier = Modifier
