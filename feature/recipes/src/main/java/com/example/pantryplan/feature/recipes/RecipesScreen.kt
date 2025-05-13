@@ -1,6 +1,5 @@
 package com.example.pantryplan.feature.recipes
 
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.layout.Arrangement
@@ -92,14 +91,13 @@ internal fun RecipesFABs(onCreateRecipeItem: () -> Unit) {
     MultiFAB {
         val context = LocalContext.current
         val importRecipe = rememberLauncherForActivityResult(GetContent()) { uri ->
-            Log.d("JSON", uri.toString())
             if (uri != null) {
                 val json = context
                     .contentResolver
                     .openInputStream(uri)!!
                     .bufferedReader()
                     .readText()
-                Log.d("JSON", json)
+                // TODO: call out to the repository once it's in RecipesViewModel.
             }
         }
 
