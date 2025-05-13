@@ -1,10 +1,14 @@
 package com.example.pantryplan.feature.recipes
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.example.pantryplan.core.data.access.repository.RecipeRepository
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
+import com.example.pantryplan.feature.recipes.navigation.RecipeItemAdd
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,8 +21,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RecipeItemAddViewModel @Inject constructor(
-    //private val recipeItemRepository: RecipeItemRepository,
+    private val savedStateHandle: SavedStateHandle,
+    private val recipeItemRepository: RecipeRepository,
 ) : ViewModel() {
+    private val existingId = savedStateHandle
+        .toRoute<RecipeItemAdd>()
+        .id?.let(UUID::fromString)
+
     private var recipeItem = Recipe(
         id = UUID.randomUUID(),
         title = "",
@@ -99,7 +108,12 @@ class RecipeItemAddViewModel @Inject constructor(
         viewModelScope.launch {
             val recipeItem = recipeItem.copy(
             )
-            //recipeItemRepository.addItemToRepository(recipeItem)
+
+            if (existingId == null) {
+                recipeItemRepository.addRecipe(recipeItem)
+            } else {
+                recipeItemRepository.updateRecipe(recipeItem)
+            }
         }
     }
 }
