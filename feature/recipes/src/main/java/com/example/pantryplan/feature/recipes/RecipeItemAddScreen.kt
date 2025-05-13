@@ -99,7 +99,7 @@ fun RecipeItemAddScreen(
         //onChangeIngredients = viewModel::upIngredients,
         onChangePrepTime = viewModel::updatePrepTime,
         onChangeCookTime = viewModel::updateCookTime,
-        //onChangeNutritionalInfo = viewModel::updateNutritionalInfo
+        onChangeNutritionalInfo = viewModel::updateNutritionalInfo
     )
 }
 
@@ -292,7 +292,7 @@ fun RecipeItemAddScreen(
     //onChangeIngredients: (String) -> Unit,
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
-    //onChangeNutritionalInfo: (NutritionalInfo) -> Unit,
+    onChangeNutritionalInfo: (NutritionInfo) -> Unit,
 ) {
 
     val recipeItem = recipeItemAddUiState.recipeItem
@@ -347,7 +347,7 @@ fun RecipeItemAddScreen(
                 //onChangeIngredients = onChangeIngredients,
                 onChangePrepTime = onChangePrepTime,
                 onChangeCookTime = onChangeCookTime,
-                //onChangeNutritionalInfo = onChangeNutritionalInfo
+                onChangeNutritionalInfo = onChangeNutritionalInfo
 
 
             )
@@ -377,7 +377,7 @@ private fun RecipeItemEditForm(
     //onChangeIngredients: (String) -> Unit,
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
-    //onChangeNutritionalInfo: (NutritionalInfo) -> Unit,
+    onChangeNutritionalInfo: (NutritionInfo) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -423,10 +423,10 @@ private fun RecipeItemEditForm(
             style = MaterialTheme.typography.titleMedium,
         )
 
-        val allergenSet = allergens
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            val allergenSet = allergens
             for (allergy in Allergen.entries) {
                 val selected = allergenSet.contains(allergy)
                 FilterChip(
@@ -510,7 +510,11 @@ private fun RecipeItemEditForm(
         ) {
 
             OutlinedButton(
-                onClick = { onChangeTags(tagText) },
+                onClick = {
+                    if (tagText != "") {
+                        onChangeTags(tagText)
+                    }
+                },
                 shape = ButtonDefaults.outlinedShape,
                 enabled = true,
                 colors = ButtonColors(
@@ -536,6 +540,7 @@ private fun RecipeItemEditForm(
             }
 
         }
+
         HorizontalDivider(
             modifier = Modifier
                 .padding(0.dp, 4.dp, 0.dp, 4.dp)
@@ -568,9 +573,10 @@ private fun RecipeItemEditForm(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+            var quantityAmount by remember { mutableStateOf(20) }
             OutlinedIntField(
-                value = 20,
-                onValueChange = {},
+                value = quantityAmount,
+                onValueChange = { quantityAmount = it },
                 modifier = Modifier
                     .width(180.dp)
             )
@@ -616,10 +622,9 @@ private fun RecipeItemEditForm(
             style = MaterialTheme.typography.titleMedium,
         )
 
-        Text(
-            text = "Instructions",
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleMedium,
+        HorizontalDivider(
+            modifier = Modifier
+                .padding(0.dp, 4.dp, 0.dp, 4.dp)
         )
 
         var stepText by remember { mutableStateOf("") }
@@ -641,7 +646,9 @@ private fun RecipeItemEditForm(
 
         OutlinedButton(
             onClick = {
-                onChangeInstructions(stepText)
+                if (stepText != "") {
+                    onChangeInstructions(stepText)
+                }
             },
             shape = ButtonDefaults.outlinedShape,
             enabled = true,
@@ -661,6 +668,12 @@ private fun RecipeItemEditForm(
             }
         )
 
+        Text(
+            text = "Instructions",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
+        )
+
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start
@@ -675,6 +688,11 @@ private fun RecipeItemEditForm(
             }
         }
 
+        HorizontalDivider(
+            modifier = Modifier
+                .padding(0.dp, 4.dp, 0.dp, 4.dp)
+        )
+
         Text(
             text = "Nutritional Information",
             color = MaterialTheme.colorScheme.primary,
@@ -683,8 +701,22 @@ private fun RecipeItemEditForm(
 
         OutlinedIntField(
             value = nutrition.calories,
-            onValueChange = {},
-            modifier = Modifier.fillMaxWidth(),
+            onValueChange = {
+                onChangeNutritionalInfo(
+                    NutritionInfo(
+                        calories = it,
+                        fats = nutrition.fats,
+                        saturatedFats = nutrition.saturatedFats,
+                        carbohydrates = nutrition.carbohydrates,
+                        sugar = nutrition.sugar,
+                        fiber = nutrition.fiber,
+                        protein = nutrition.protein,
+                        sodium = nutrition.sodium
+                    )
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
             label = { Text("Calories") },
         )
 
@@ -695,13 +727,39 @@ private fun RecipeItemEditForm(
         ) {
             OutlinedFloatField(
                 value = nutrition.fats,
-                onValueChange = {},
+                onValueChange = {
+                    onChangeNutritionalInfo(
+                        NutritionInfo(
+                            calories = nutrition.calories,
+                            fats = it,
+                            saturatedFats = nutrition.saturatedFats,
+                            carbohydrates = nutrition.carbohydrates,
+                            sugar = nutrition.sugar,
+                            fiber = nutrition.fiber,
+                            protein = nutrition.protein,
+                            sodium = nutrition.sodium
+                        )
+                    )
+                },
                 modifier = Modifier.width(160.dp),
                 label = { Text("Fat") },
             )
             OutlinedFloatField(
                 value = nutrition.saturatedFats,
-                onValueChange = {},
+                onValueChange = {
+                    onChangeNutritionalInfo(
+                        NutritionInfo(
+                            calories = nutrition.calories,
+                            fats = nutrition.fats,
+                            saturatedFats = it,
+                            carbohydrates = nutrition.carbohydrates,
+                            sugar = nutrition.sugar,
+                            fiber = nutrition.fiber,
+                            protein = nutrition.protein,
+                            sodium = nutrition.sodium
+                        )
+                    )
+                },
                 modifier = Modifier.width(160.dp),
                 label = { Text("Saturated Fats") },
             )
@@ -714,13 +772,39 @@ private fun RecipeItemEditForm(
         ) {
             OutlinedFloatField(
                 value = nutrition.carbohydrates,
-                onValueChange = {},
+                onValueChange = {
+                    onChangeNutritionalInfo(
+                        NutritionInfo(
+                            calories = nutrition.calories,
+                            fats = nutrition.fats,
+                            saturatedFats = nutrition.saturatedFats,
+                            carbohydrates = it,
+                            sugar = nutrition.sugar,
+                            fiber = nutrition.fiber,
+                            protein = nutrition.protein,
+                            sodium = nutrition.sodium
+                        )
+                    )
+                },
                 modifier = Modifier.width(160.dp),
                 label = { Text("Carbohydrate") },
             )
             OutlinedFloatField(
                 value = nutrition.sugar,
-                onValueChange = {},
+                onValueChange = {
+                    onChangeNutritionalInfo(
+                        NutritionInfo(
+                            calories = nutrition.calories,
+                            fats = nutrition.fats,
+                            saturatedFats = nutrition.saturatedFats,
+                            carbohydrates = nutrition.carbohydrates,
+                            sugar = it,
+                            fiber = nutrition.fiber,
+                            protein = nutrition.protein,
+                            sodium = nutrition.sodium
+                        )
+                    )
+                },
                 modifier = Modifier.width(160.dp),
                 label = { Text("Sugar") },
             )
@@ -733,19 +817,58 @@ private fun RecipeItemEditForm(
         ) {
             OutlinedFloatField(
                 value = nutrition.fiber,
-                onValueChange = {},
+                onValueChange = {
+                    onChangeNutritionalInfo(
+                        NutritionInfo(
+                            calories = nutrition.calories,
+                            fats = nutrition.fats,
+                            saturatedFats = nutrition.saturatedFats,
+                            carbohydrates = nutrition.carbohydrates,
+                            sugar = nutrition.sugar,
+                            fiber = it,
+                            protein = nutrition.protein,
+                            sodium = nutrition.sodium
+                        )
+                    )
+                },
                 modifier = Modifier.width(100.dp),
                 label = { Text("Fiber") },
             )
             OutlinedFloatField(
                 value = nutrition.protein,
-                onValueChange = {},
+                onValueChange = {
+                    onChangeNutritionalInfo(
+                        NutritionInfo(
+                            calories = nutrition.calories,
+                            fats = nutrition.fats,
+                            saturatedFats = nutrition.saturatedFats,
+                            carbohydrates = nutrition.carbohydrates,
+                            sugar = nutrition.sugar,
+                            fiber = nutrition.fiber,
+                            protein = it,
+                            sodium = nutrition.sodium
+                        )
+                    )
+                },
                 modifier = Modifier.width(100.dp),
                 label = { Text("Protein") },
             )
             OutlinedFloatField(
                 value = nutrition.sodium,
-                onValueChange = {},
+                onValueChange = {
+                    onChangeNutritionalInfo(
+                        NutritionInfo(
+                            calories = nutrition.calories,
+                            fats = nutrition.fats,
+                            saturatedFats = nutrition.saturatedFats,
+                            carbohydrates = nutrition.carbohydrates,
+                            sugar = nutrition.sugar,
+                            fiber = nutrition.fiber,
+                            protein = nutrition.protein,
+                            sodium = it
+                        )
+                    )
+                },
                 modifier = Modifier.width(100.dp),
                 label = { Text("Sodium") },
             )

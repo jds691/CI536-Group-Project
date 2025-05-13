@@ -90,9 +90,10 @@ class RecipeItemAddViewModel @Inject constructor(
         _uiState.update { it.copy(recipeItem = recipeItem) }
     }
 
-    /* TODO: Update ingredients when more are added
-    fun updateNutritionalInformation(nutritionalInfo: )
-     */
+    fun updateNutritionalInfo(nutritionalInfo: NutritionInfo) {
+        recipeItem = recipeItem.copy(nutrition = nutritionalInfo)
+        _uiState.update { it.copy(recipeItem = recipeItem) }
+    }
 
     fun saveRecipeItem() {
         viewModelScope.launch {
