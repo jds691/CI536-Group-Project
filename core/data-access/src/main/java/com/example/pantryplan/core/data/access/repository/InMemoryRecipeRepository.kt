@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.util.UUID
+import javax.inject.Inject
 
-class InMemoryRecipeRepository : RecipeRepository {
+class InMemoryRecipeRepository @Inject constructor() : RecipeRepository {
     private var recipes: MutableList<Recipe> = mutableListOf()
     private val FLOW_REFRESH_DELAY: Long = 5000
 
