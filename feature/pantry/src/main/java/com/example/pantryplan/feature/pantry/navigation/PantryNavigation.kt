@@ -57,21 +57,11 @@ fun NavGraphBuilder.pantrySection(
             val itemDetails = entry.toRoute<PantryItemDetails>()
 
             PantryItemDetailsScreen(
-                id = UUID.fromString(itemDetails.id),
+                id = itemDetails.id.let(UUID::fromString),
                 onBackClick = onBackClick,
                 onEditItem = { onPantryItemEdit(it, null) },
 
-                item = PantryItem ( //placeholder PantryItem
-                    id = UUID.randomUUID(),
-                    name = "Bacon",
-                    quantity = 250,
-                    expiryDate = Clock.System.now(),
-                    expiresAfter = 21.days,
-                    inStateSince = Clock.System.now(),
-                    imageUrl = null,
-                    state = PantryItemState.SEALED,
-                    barcode = null
-                )
+
             )
         }
 
