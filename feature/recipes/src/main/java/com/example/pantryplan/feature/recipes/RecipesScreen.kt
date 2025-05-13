@@ -1,5 +1,8 @@
 package com.example.pantryplan.feature.recipes
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -86,8 +89,11 @@ internal fun RecipesScreen(
 @Composable
 internal fun RecipesFABs(onCreateRecipeItem: () -> Unit) {
     MultiFAB {
+        val importRecipe = rememberLauncherForActivityResult(OpenDocument()) { uri ->
+            Log.d("JSON", uri.toString())
+        }
         SmallFloatingActionButton(
-            onClick = { /* TODO: Recipe download stuff. */ }
+            onClick = { importRecipe.launch(arrayOf("application/json")) }
         ) {
             Icon(
                 painter = painterResource(R.drawable.download_symbol),
@@ -142,6 +148,7 @@ internal fun RecipesContentList(
     }
 }
 
+@Preview
 @Composable
 fun RecipesEmptyPreview() {
     PantryPlanTheme {
