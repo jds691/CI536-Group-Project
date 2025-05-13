@@ -56,8 +56,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
+import com.example.pantryplan.core.models.Ingredient
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
+import com.example.pantryplan.feature.recipes.ui.IngredientCard
 import java.util.EnumSet
 import java.util.UUID
 
@@ -304,6 +307,23 @@ internal fun RecipeItemDetailsScreen(
                         }
                     }
 
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        item.ingredients.forEach { ingredient ->
+                            IngredientCard(
+                                modifier = Modifier,
+                                Ingredient(
+                                    name = ingredient.name,
+                                    amount = ingredient.amount,
+                                    measurement = ingredient.measurement,
+                                    linkedPantryItem = ingredient.linkedPantryItem
+                                ),
+                            )
+                        }
+                    }
+
                     HorizontalDivider(
                         modifier = Modifier
                             .padding(0.dp, 4.dp, 0.dp, 4.dp)
@@ -453,12 +473,24 @@ fun RecipesDetailPreview() {
         imageUrl = null,
         instructions = listOf("Cook Burger", "Eat burger"),
         ingredients = listOf(
-            "Beef Burger",
-            "Burger Buns",
-            "American Cheese",
-            "Lettuce",
-            "Red Onion",
-            "Bacon"
+            Ingredient(
+                name = "American Cheese",
+                amount = 200f,
+                measurement = Measurement.GRAMS,
+                linkedPantryItem = null
+            ),
+            Ingredient(
+                name = "American Cheese",
+                amount = 200f,
+                measurement = Measurement.GRAMS,
+                linkedPantryItem = null
+            ),
+            Ingredient(
+                name = "American Cheese",
+                amount = 200f,
+                measurement = Measurement.GRAMS,
+                linkedPantryItem = null
+            )
         ),
         prepTime = 10f,
         cookTime = 15f,

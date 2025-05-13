@@ -1,15 +1,15 @@
 package com.example.pantryplan.feature.recipes
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
-import com.example.pantryplan.core.data.access.repository.RecipeRepository
+import com.example.pantryplan.core.data.access.repository.PantryItemRepository
 import com.example.pantryplan.core.models.Allergen
+import com.example.pantryplan.core.models.Ingredient
 import com.example.pantryplan.core.models.NutritionInfo
+import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.Recipe
-import com.example.pantryplan.feature.recipes.navigation.RecipeItemAdd
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,12 +21,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RecipeItemAddViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
-    private val recipeItemRepository: RecipeRepository,
+    //private val savedStateHandle: SavedStateHandle,
+    //private val recipeItemRepository: RecipeRepository,
+    private val pantryItemRepository: PantryItemRepository
 ) : ViewModel() {
-    private val existingId = savedStateHandle
+    /*private val existingId = savedStateHandle
         .toRoute<RecipeItemAdd>()
-        .id?.let(UUID::fromString)
+        .id?.let(UUID::fromString)*/
 
     private var recipeItem = Recipe(
         id = UUID.randomUUID(),
@@ -85,9 +86,10 @@ class RecipeItemAddViewModel @Inject constructor(
         _uiState.update { it.copy(recipeItem = recipeItem) }
     }
 
-    /* TODO: Update ingredients when more are added
-    fun updateIngredients(ingredient: )
-     */
+    fun updateIngredients(ingredient: Ingredient) {
+        recipeItem = recipeItem.copy(ingredients = recipeItem.ingredients.plus(ingredient))
+        _uiState.update { it.copy(recipeItem = recipeItem) }
+    }
 
     fun updatePrepTime(prepMins: Float) {
         recipeItem = recipeItem.copy(prepTime = prepMins)
@@ -104,16 +106,20 @@ class RecipeItemAddViewModel @Inject constructor(
         _uiState.update { it.copy(recipeItem = recipeItem) }
     }
 
+    fun checkForPantryMatch(possibleName: String): Flow<List<PantryItem>> {
+        return pantryItemRepository.searchForItemsByName(possibleName)
+    }
+
     fun saveRecipeItem() {
         viewModelScope.launch {
             val recipeItem = recipeItem.copy(
             )
 
-            if (existingId == null) {
+            /*if (existingId == null) {
                 recipeItemRepository.addRecipe(recipeItem)
             } else {
                 recipeItemRepository.updateRecipe(recipeItem)
-            }
+            }*/
         }
     }
 }
@@ -123,5 +129,5 @@ data class RecipeItemAddUiState(
 )
 
 enum class QuantityUnit {
-    GRAMS, KILOGRAMS
+    GRAMS, KILOGRAMS, OTHER
 }

@@ -12,7 +12,7 @@ data class Recipe(
     val imageUrl: String?,
     val instructions: List<String>,
     // REVIEW: Is this suitable enough for generic referencing of pantry items
-    val ingredients: List<String>,
+    val ingredients: List<Ingredient>,
 
     // Metadata
     val prepTime: Float,

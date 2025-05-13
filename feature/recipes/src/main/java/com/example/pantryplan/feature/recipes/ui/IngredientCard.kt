@@ -41,22 +41,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.designsystem.component.DeleteAlertDialog
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import com.example.pantryplan.core.models.Ingredient
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.feature.recipes.R
 
 @Composable
 fun IngredientCard(
     modifier: Modifier = Modifier,
+    ingredientData: Ingredient,
 
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     onDelete: () -> Unit = {},
 ) {
-    //TODO Get name and gram amount specified when created
-    val ingredientName = "American Cheese"
-    val gramAmount = 20
-
     val showDeleteAlert = remember { mutableStateOf(false) }
     val isResetting = remember { mutableStateOf(false) }
+
+    var measurementSignifier = ""
+
+    measurementSignifier = when (ingredientData.measurement) {
+        Measurement.GRAMS -> "g"
+        Measurement.KILOGRAMS -> "kg"
+        Measurement.OTHER -> ""
+    }
 
     val dismissState = rememberSwipeToDismissBoxState()
     SwipeToDismissBox(
@@ -137,11 +144,11 @@ fun IngredientCard(
 
 
                     Text(
-                        text = ingredientName,
+                        text = ingredientData.name,
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "Uses: " + gramAmount + "g",
+                        text = "Uses: " + ingredientData.amount + measurementSignifier,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -151,7 +158,7 @@ fun IngredientCard(
 
     if (showDeleteAlert.value) {
         DeleteAlertDialog(
-            itemName = ingredientName,
+            itemName = ingredientData.name,
             showAlert = showDeleteAlert,
             onDelete = onDelete
         )
@@ -188,6 +195,14 @@ fun IngredientCard(
 @Composable
 fun IngredientCardPreview() {
     PantryPlanTheme {
-        IngredientCard()
+        IngredientCard(
+            modifier = Modifier,
+            Ingredient(
+                name = "American Cheese",
+                amount = 200f,
+                measurement = Measurement.GRAMS,
+                linkedPantryItem = null
+            )
+        )
     }
 }

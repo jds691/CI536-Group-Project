@@ -28,18 +28,28 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import com.example.pantryplan.core.models.Ingredient
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.feature.recipes.R
 
 @Composable
 fun RecipeIngredientCard(
     modifier: Modifier = Modifier,
+    ingredientData: Ingredient,
 
     onClick: () -> Unit = {},
 ) {
 
     //TODO Will pass in recipe ingredient amount and pantry item amount
-    val gramsNeeded = 100
     val gramsOfItem = 600
+
+    var measurementSignifier = ""
+
+    measurementSignifier = when (ingredientData.measurement) {
+        Measurement.GRAMS -> "g"
+        Measurement.KILOGRAMS -> "kg"
+        Measurement.OTHER -> ""
+    }
 
     ElevatedCard(
         modifier = Modifier
@@ -75,21 +85,21 @@ fun RecipeIngredientCard(
                 horizontalAlignment = Alignment.Start,
             ) {
 
-                val progressAmount = gramsNeeded.toFloat() / gramsOfItem.toFloat()
+                val progressAmount = ingredientData.amount / gramsOfItem.toFloat()
                 var progressColor = Color.Green
 
                 Text(
-                    text = "Beef Burger",
+                    text = ingredientData.name,
                     style = MaterialTheme.typography.titleMedium
                 )
                 if (progressAmount < 1.0f) {
                     Text(
-                        text = "In pantry: " + gramsOfItem + "g - Uses: " + gramsNeeded + "g",
+                        text = "In pantry: " + gramsOfItem + measurementSignifier + " - Uses: " + ingredientData.amount + measurementSignifier,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 } else {
                     Text(
-                        text = "! Not enough | In pantry: " + gramsOfItem + "g - Uses: " + gramsNeeded + "g",
+                        text = "! Not enough | In pantry: " + gramsOfItem + measurementSignifier + " - Uses: " + ingredientData.amount + measurementSignifier,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error
                     )
@@ -112,6 +122,14 @@ fun RecipeIngredientCard(
 @Composable
 fun RecipeIngredientCardPreview() {
     PantryPlanTheme {
-        RecipeIngredientCard()
+        RecipeIngredientCard(
+            modifier = Modifier,
+            Ingredient(
+                name = "Beef Burger",
+                amount = 500f,
+                measurement = Measurement.GRAMS,
+                linkedPantryItem = null
+            )
+        )
     }
 }
