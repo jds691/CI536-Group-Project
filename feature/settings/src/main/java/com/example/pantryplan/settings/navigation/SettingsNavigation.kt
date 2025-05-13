@@ -7,6 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.example.pantryplan.settings.AllergiesSettingsScreen
+import com.example.pantryplan.settings.MealPlannerSettingsScreen
 import com.example.pantryplan.settings.PantrySettingsScreen
 import com.example.pantryplan.settings.SettingsScreen
 import com.example.pantryplan.settings.SettingsViewModel
@@ -18,19 +19,22 @@ data object SettingsBase
 data object Settings
 @Serializable
 data object AllergySettings
-
 @Serializable
 data object PantrySettings
+@Serializable
+data object MealPlannerSettings
 
 fun NavController.navigateToSettings() = navigate(route = Settings)
 fun NavController.navigateToAllergySettings() = navigate(route = AllergySettings)
 fun NavController.navigateToPantrySettings() = navigate(route = PantrySettings)
+fun NavController.navigateToMealPlannerSettings() = navigate(route = MealPlannerSettings)
 
 fun NavGraphBuilder.settingsSection(
     navController: NavController,
     onBackClick: () -> Unit,
     onAllergySettingsClick: () -> Unit,
-    onPantrySettingsClick: () -> Unit
+    onPantrySettingsClick: () -> Unit,
+    onMealPlannerSettingsClick: () -> Unit
 ) {
     navigation<SettingsBase>(startDestination = Settings) {
         composable<Settings> {
@@ -44,7 +48,8 @@ fun NavGraphBuilder.settingsSection(
                 viewModel = settingsViewModel,
                 onBackClick = onBackClick,
                 onAllergySettingsClick = onAllergySettingsClick,
-                onPantrySettingsClick = onPantrySettingsClick
+                onPantrySettingsClick = onPantrySettingsClick,
+                onMealPlannerSettingsClick = onMealPlannerSettingsClick
             )
         }
 
@@ -69,6 +74,19 @@ fun NavGraphBuilder.settingsSection(
             val settingsViewModel: SettingsViewModel = hiltViewModel(parentEntry)
 
             PantrySettingsScreen(
+                viewModel = settingsViewModel,
+                onBackClick = onBackClick
+            )
+        }
+
+        composable<MealPlannerSettings> {
+            val parentEntry = remember(it) {
+                navController.getBackStackEntry(SettingsBase)
+            }
+
+            val settingsViewModel: SettingsViewModel = hiltViewModel(parentEntry)
+
+            MealPlannerSettingsScreen(
                 viewModel = settingsViewModel,
                 onBackClick = onBackClick
             )

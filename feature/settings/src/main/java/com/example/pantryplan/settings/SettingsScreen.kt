@@ -30,7 +30,8 @@ internal fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onAllergySettingsClick: () -> Unit,
-    onPantrySettingsClick: () -> Unit
+    onPantrySettingsClick: () -> Unit,
+    onMealPlannerSettingsClick: () -> Unit
 ) {
     val settingsUiState: SettingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -38,7 +39,8 @@ internal fun SettingsScreen(
         uiState = settingsUiState,
         onBackClick = onBackClick,
         onAllergySettingsClick = onAllergySettingsClick,
-        onPantrySettingsClick = onPantrySettingsClick
+        onPantrySettingsClick = onPantrySettingsClick,
+        onMealPlannerSettingsClick = onMealPlannerSettingsClick
     )
 }
 
@@ -48,7 +50,8 @@ internal fun SettingsScreen(
     uiState: SettingsUiState,
     onBackClick: () -> Unit,
     onAllergySettingsClick: () -> Unit,
-    onPantrySettingsClick: () -> Unit
+    onPantrySettingsClick: () -> Unit,
+    onMealPlannerSettingsClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -82,6 +85,12 @@ internal fun SettingsScreen(
                 description = "Pantry Settings",
                 onClick = onPantrySettingsClick
             )
+
+            SettingsRow(
+                title = "Meal Planner",
+                description = "Meal Planner Settings",
+                onClick = onMealPlannerSettingsClick
+            )
         }
     }
 }
@@ -94,7 +103,8 @@ private fun SettingsScreenPreview() {
             uiState = SettingsUiState(),
             onBackClick = {},
             onAllergySettingsClick = {},
-            onPantrySettingsClick = {}
+            onPantrySettingsClick = {},
+            onMealPlannerSettingsClick = {}
         )
     }
 }
