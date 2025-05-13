@@ -15,6 +15,26 @@ import java.io.ObjectOutputStream
 import java.util.EnumSet
 import java.util.UUID
 
+@Serializable
+data class Recipe(
+    @Serializable(with = UUIDSerializer::class)
+    val id: UUID,
+    val title: String,
+    val description: String,
+    val tags: List<String>,
+    @Serializable(with = EnumSetSerializer::class)
+    val allergens: EnumSet<Allergen>,
+    val imageUrl: String?,
+    val instructions: List<String>,
+    // REVIEW: Is this suitable enough for generic referencing of pantry items
+    val ingredients: List<String>,
+
+    // Metadata
+    val prepTime: Float,
+    val cookTime: Float,
+    val nutrition: NutritionInfo
+)
+
 // Implement serializers for the properties which use Java classes.
 object UUIDSerializer : KSerializer<UUID> {
     override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
@@ -36,8 +56,7 @@ object EnumSetSerializer : KSerializer<EnumSet<*>> {
 
     override fun deserialize(decoder: Decoder): EnumSet<*> {
         val bis = ByteArrayInputStream(decoder.decodeSerializableValue(ByteArraySerializer()))
-        val input = ObjectInputStream(bis)
-        val obj = input.readObject()
+        val obj = ObjectInputStream(bis).readObject()
 
         if (obj is EnumSet<*>) {
             return obj
@@ -59,22 +78,3 @@ object EnumSetSerializer : KSerializer<EnumSet<*>> {
         encoder.encodeSerializableValue(ByteArraySerializer(), bos.toByteArray())
     }
 }
-
-@Serializable
-data class Recipe(
-    @Serializable(with = UUIDSerializer::class)
-    val id: UUID,
-    val title: String,
-    val description: String,
-    val tags: List<String>,
-    @Serializable(with = EnumSetSerializer::class) val allergens: EnumSet<Allergen>,
-    val imageUrl: String?,
-    val instructions: List<String>,
-    // REVIEW: Is this suitable enough for generic referencing of pantry items
-    val ingredients: List<String>,
-
-    // Metadata
-    val prepTime: Float,
-    val cookTime: Float,
-    val nutrition: NutritionInfo
-)
