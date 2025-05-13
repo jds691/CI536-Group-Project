@@ -79,8 +79,7 @@ fun NavGraphBuilder.pantrySection(
             val itemEdit = entry.toRoute<PantryItemEdit>()
 
             PantryItemEditScreen(
-                existingId = if (itemEdit.id != null) UUID.fromString(itemEdit.id) else null,
-                barcode = itemEdit.barcode,
+                existingId = itemEdit.id?.let(UUID::fromString),
                 onBackClick = onBackClick
             )
         }

@@ -4,7 +4,6 @@ package com.example.pantryplan.feature.pantry.ui
 
 import android.text.format.DateUtils
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
@@ -183,18 +183,16 @@ fun PantryItemCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (item.imageUrl != null) {
-                    //TODO: Place food item image in card when there is an active image passed in
-                } else {
-                    Image(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .aspectRatio(1.0f),
-                        painter = painterResource(R.drawable.beefburger),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                AsyncImage(
+                    model = item.imageUrl,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .aspectRatio(1.0f),
+                    fallback = painterResource(R.drawable.beefburger),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
                     horizontalAlignment = Alignment.Start,
