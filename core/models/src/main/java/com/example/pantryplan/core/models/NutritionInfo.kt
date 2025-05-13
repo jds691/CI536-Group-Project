@@ -1,5 +1,8 @@
 package com.example.pantryplan.core.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class NutritionInfo(
     val calories: Int,
     val fats: Float,
