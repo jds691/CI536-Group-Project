@@ -23,6 +23,7 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -32,6 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.R
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.NutritionInfo
@@ -39,6 +42,22 @@ import com.example.pantryplan.feature.meals.ui.MacrosCard
 
 @Composable
 fun NutritionalDetailsScreen(
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: NutritionalDetailsViewModel = hiltViewModel()
+) {
+    val uiState: NutritionalDetailsUiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    NutritionalDetailsScreen(
+        uiState = uiState,
+        onBackClick = onBackClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun NutritionalDetailsScreen(
+    uiState: NutritionalDetailsUiState,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -63,9 +82,13 @@ fun NutritionalDetailsScreen(
                 .consumeWindowInsets(innerPadding)
                 .padding(horizontal = dimensionResource(R.dimen.horizontal_margin))
         ) {
-            Macros()
+            Macros(
+                uiState = uiState
+            )
 
-            Nutrients()
+            Nutrients(
+                uiState = uiState
+            )
 
             Tips()
         }
@@ -74,6 +97,7 @@ fun NutritionalDetailsScreen(
 
 @Composable
 private fun Macros(
+    uiState: NutritionalDetailsUiState,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -89,16 +113,7 @@ private fun Macros(
         )
 
         MacrosCard(
-            item = NutritionInfo(
-                calories = 500,
-                fats = 13.35f,
-                saturatedFats = 22f,
-                carbohydrates = 65f,
-                sugar = 12f,
-                fiber = 34f,
-                protein = 30f,
-                sodium = 12f
-            )
+            item = uiState.nutrition
         )
 
         Text(
@@ -163,7 +178,7 @@ private fun BulletedNutrientGoal(
 private fun NutrientRow(
     name: String,
     amount: Float,
-    target: Float,
+    //target: Float,
 
     modifier: Modifier = Modifier,
     unit: String = "g"
@@ -184,7 +199,7 @@ private fun NutrientRow(
         )
 
         Text(
-            text = "${formatter.format(amount)}/${formatter.format(target)}${unit}",
+            text = "${formatter.format(amount)}${unit}",
             style = MaterialTheme.typography.bodyMedium
         )
     }
@@ -192,8 +207,11 @@ private fun NutrientRow(
 
 @Composable
 private fun Nutrients(
+    uiState: NutritionalDetailsUiState,
     modifier: Modifier = Modifier
 ) {
+    val nutrition = uiState.nutrition
+
     Column(
         verticalArrangement = Arrangement
             .spacedBy(4.dp),
@@ -208,65 +226,57 @@ private fun Nutrients(
 
         NutrientRow(
             name = "Calories",
-            amount = 0f,
-            target = 2000f,
-            unit = "kcal"
+            amount = nutrition.calories.toFloat(),
+            unit = " kcal"
         )
 
         HorizontalDivider()
 
         NutrientRow(
             name = "Fat",
-            amount = 0f,
-            target = 2000f,
+            amount = nutrition.fats,
         )
 
         HorizontalDivider()
 
         NutrientRow(
             name = "Saturated Fat",
-            amount = 0f,
-            target = 2000f,
+            amount = nutrition.saturatedFats,
         )
 
         HorizontalDivider()
 
         NutrientRow(
             name = "Carbohydrates",
-            amount = 0f,
-            target = 2000f,
+            amount = nutrition.carbohydrates,
         )
 
         HorizontalDivider()
 
         NutrientRow(
             name = "Sugar",
-            amount = 0f,
-            target = 2000f,
+            amount = nutrition.sugar,
         )
 
         HorizontalDivider()
 
         NutrientRow(
             name = "Fiber",
-            amount = 0f,
-            target = 2000f,
+            amount = nutrition.fiber,
         )
 
         HorizontalDivider()
 
         NutrientRow(
             name = "Protein",
-            amount = 0f,
-            target = 2000f,
+            amount = nutrition.protein,
         )
 
         HorizontalDivider()
 
         NutrientRow(
             name = "Sodium",
-            amount = 0f,
-            target = 2000f,
+            amount = nutrition.sodium,
         )
     }
 }
@@ -298,6 +308,18 @@ private fun Tips(
 private fun NutritionalDetailsScreenPreview() {
     PantryPlanTheme {
         NutritionalDetailsScreen(
+            uiState = NutritionalDetailsUiState(
+                nutrition = NutritionInfo(
+                    calories = 500,
+                    fats = 13.35f,
+                    saturatedFats = 22f,
+                    carbohydrates = 65f,
+                    sugar = 12f,
+                    fiber = 34f,
+                    protein = 30f,
+                    sodium = 12f
+                )
+            ),
             onBackClick = {}
         )
     }

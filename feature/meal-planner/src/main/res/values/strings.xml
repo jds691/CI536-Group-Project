@@ -2,4 +2,6 @@
 <resources>
     <string name="feature_meals_icon">Meal Plan</string>
     <string name="feature_meals_title">Meals</string>
+    <string name="feature_meals_macros_error_title">You have not logged any meals today!</string>
+    <string name="feature_meals_macros_error_body">Log at least 1 meal today to see your macro breakdown.</string>
 </resources>
