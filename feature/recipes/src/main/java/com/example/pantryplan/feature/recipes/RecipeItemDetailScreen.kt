@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
@@ -59,10 +61,16 @@ import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.Ingredient
 import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.NutritionInfo
+import com.example.pantryplan.core.models.PantryItem
+import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.ui.IngredientCard
+import com.example.pantryplan.feature.recipes.ui.RecipeIngredientCard
+import kotlinx.datetime.Clock
 import java.util.EnumSet
 import java.util.UUID
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
 
 internal fun cleanUpAllergenText(allergenName: String): String {
@@ -147,6 +155,7 @@ internal fun RecipeItemDetailsScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
+                .verticalScroll(rememberScrollState())
                 .consumeWindowInsets(innerPadding)
                 .padding(innerPadding)
         ) {
@@ -227,7 +236,7 @@ internal fun RecipeItemDetailsScreen(
                             .fillMaxWidth()
                             .padding(32.dp, 0.dp, 32.dp, 0.dp)
                     ) {
-                        val recipeTime = DecimalFormat("#")
+                        val recipeTime = DecimalFormat("#.##")
                         val timeColor = MaterialTheme.colorScheme.onSurfaceVariant
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -312,15 +321,26 @@ internal fun RecipeItemDetailsScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         item.ingredients.forEach { ingredient ->
-                            IngredientCard(
-                                modifier = Modifier,
-                                Ingredient(
-                                    name = ingredient.name,
-                                    amount = ingredient.amount,
-                                    measurement = ingredient.measurement,
-                                    linkedPantryItem = ingredient.linkedPantryItem
-                                ),
-                            )
+                            if (ingredient.linkedPantryItem == null) {
+                                IngredientCard(
+                                    modifier = Modifier,
+                                    Ingredient(
+                                        name = ingredient.name,
+                                        amount = ingredient.amount,
+                                        measurement = ingredient.measurement,
+                                        linkedPantryItem = ingredient.linkedPantryItem
+                                    ),
+                                )
+                            } else {
+                                RecipeIngredientCard(
+                                    ingredientData = Ingredient(
+                                        name = ingredient.name,
+                                        amount = ingredient.amount,
+                                        measurement = ingredient.measurement,
+                                        linkedPantryItem = ingredient.linkedPantryItem
+                                    )
+                                )
+                            }
                         }
                     }
 
@@ -477,13 +497,17 @@ fun RecipesDetailPreview() {
                 name = "American Cheese",
                 amount = 200f,
                 measurement = Measurement.GRAMS,
-                linkedPantryItem = null
-            ),
-            Ingredient(
-                name = "American Cheese",
-                amount = 200f,
-                measurement = Measurement.GRAMS,
-                linkedPantryItem = null
+                linkedPantryItem = PantryItem(
+                    id = UUID.randomUUID(),
+                    name = "Beef Burgers",
+                    quantity = 600,
+                    expiryDate = Clock.System.now() + 7.days,
+                    expiresAfter = Duration.ZERO,
+                    inStateSince = Clock.System.now(),
+                    state = PantryItemState.SEALED,
+                    imageUrl = null,
+                    barcode = null,
+                )
             ),
             Ingredient(
                 name = "American Cheese",

@@ -2,6 +2,7 @@
 
 package com.example.pantryplan.feature.recipes.ui
 
+import android.icu.text.DecimalFormat
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -57,9 +58,7 @@ fun IngredientCard(
     val showDeleteAlert = remember { mutableStateOf(false) }
     val isResetting = remember { mutableStateOf(false) }
 
-    var measurementSignifier = ""
-
-    measurementSignifier = when (ingredientData.measurement) {
+    val measurementSignifier: String = when (ingredientData.measurement) {
         Measurement.GRAMS -> "g"
         Measurement.KILOGRAMS -> "kg"
         Measurement.OTHER -> ""
@@ -125,9 +124,9 @@ fun IngredientCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                //if (null == false) {
-                //TODO: Place recipe item image in card when there is an active image passed in
-                //} else {
+                if (ingredientData.linkedPantryItem?.imageUrl != null) {
+                    //TODO Pass in image url
+                } else {
                 Image(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -136,7 +135,7 @@ fun IngredientCard(
                     contentDescription = null,
                     contentScale = ContentScale.Crop
                 )
-                //}
+                }
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
                     horizontalAlignment = Alignment.Start,
@@ -147,8 +146,9 @@ fun IngredientCard(
                         text = ingredientData.name,
                         style = MaterialTheme.typography.titleMedium
                     )
+                    val displayAmount = DecimalFormat("#.##")
                     Text(
-                        text = "Uses: " + ingredientData.amount + measurementSignifier,
+                        text = "Uses: " + displayAmount.format(ingredientData.amount) + measurementSignifier,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -199,7 +199,7 @@ fun IngredientCardPreview() {
             modifier = Modifier,
             Ingredient(
                 name = "American Cheese",
-                amount = 200f,
+                amount = 200.5f,
                 measurement = Measurement.GRAMS,
                 linkedPantryItem = null
             )
