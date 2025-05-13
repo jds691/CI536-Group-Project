@@ -4,12 +4,15 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.pantryplan.core.database.model.RecipeInformation
-import com.example.pantryplan.core.models.Recipe
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import java.util.UUID
 
 @Dao
 interface RecipeDao {
+
     /**
      * Retrieves all recipes from database.
      *
@@ -19,23 +22,42 @@ interface RecipeDao {
     fun showAllRecipes(): Flow<List<RecipeInformation>>
 
     /**
+     * Retrieve recipe with specified UUID or name
+     */
+    @Query("SELECT * FROM RecipeInformation WHERE :uuidSearched = recipeUUID")
+    fun searchById(uuidSearched: UUID): Flow<RecipeInformation>
+    fun searchDistinctByIdUntilChanged(id: UUID): Flow<RecipeInformation?> =
+        searchById(id).distinctUntilChanged()
+
+    @Query("SELECT * FROM RecipeInformation WHERE :nameSearched LIKE recipeName")
+    fun searchByName(nameSearched: String): Flow<RecipeInformation>
+
+    /**
      * Retrieves all items of a given tag
      *
      * @return stream containing [RecipeInformation] of the same [tag]
      */
-    @Query("SELECT * FROM RecipeInformation WHERE recipeTags = :tag")
-    fun filterByTag(tag: List<String>): Flow<RecipeInformation>
+    @Query("SELECT * FROM RecipeInformation WHERE :tag LIKE '%' || recipeTags || '%'")
+    fun filterByTag(tag: String): Flow<RecipeInformation>
+
+    /**
+     * Update recipe in database
+     */
+    @Update
+    suspend fun updateRecipe(recipeInformation: RecipeInformation)
 
     /**
      * Deletes all items from a user selection
      */
     @Delete
-    suspend fun removeRecipe(recipe: List<Recipe>)
+    suspend fun removeRecipeByName(vararg recipeInformation: RecipeInformation)
+    @Delete
+    suspend fun removeRecipeById(vararg recipeInformation: RecipeInformation)
 
     /**
      * Create new recipe
      */
     @Insert
-    suspend fun addRecipe(recipe: Recipe)
-
+    suspend fun addRecipe(recipeInformation: RecipeInformation)
+    companion object
 }

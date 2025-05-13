@@ -1,5 +1,6 @@
 package com.example.pantryplan.core.database.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.pantryplan.core.models.Allergen
@@ -18,7 +19,7 @@ data class RecipeInformation(
     val recipeCookTime: Float,
     val recipeDesc: String,
     val recipeIngredients: List<String>,
-    val nutritionalInformation: NutritionInfo,
+    @Embedded val nutritionalInformation: NutritionInfo,
     val recipeTags: List<String>,
     val imageUrl: String,
     val recipeInstructions: List<String>
