@@ -25,4 +25,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         dataSource.setAllergies(allergies)
     }
 
+    override suspend fun setExpectedMealsCount(expectedMeals: Int) {
+        dataSource.setExpectedMealsCount(expectedMeals)
+    }
 }

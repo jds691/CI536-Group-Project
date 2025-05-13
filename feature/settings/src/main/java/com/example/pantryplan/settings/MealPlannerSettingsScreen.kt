@@ -43,14 +43,16 @@ internal fun MealPlannerSettingsScreen(
 
     MealPlannerSettingsScreen(
         uiState = settingsUiState,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onUpdateExpectedMeals = viewModel::updateExpectedMealCount
     )
 }
 
 @Composable
 internal fun MealPlannerSettingsScreen(
     uiState: SettingsUiState,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onUpdateExpectedMeals: (Int) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -80,8 +82,8 @@ internal fun MealPlannerSettingsScreen(
             ) {
                 Box(Modifier.width(125.dp)) {
                     OutlinedIntField(
-                        3,
-                        {}
+                        uiState.settings.expectedMealCount.intValue,
+                        onUpdateExpectedMeals
                     )
                 }
             }
@@ -132,7 +134,8 @@ private fun MealPlannerSettingsScreenPreview() {
     PantryPlanTheme {
         MealPlannerSettingsScreen(
             uiState = SettingsUiState(),
-            onBackClick = {}
+            onBackClick = {},
+            onUpdateExpectedMeals = {}
         )
     }
 }
