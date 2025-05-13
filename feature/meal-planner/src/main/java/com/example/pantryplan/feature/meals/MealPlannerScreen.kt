@@ -76,7 +76,6 @@ fun MealPlannerScreen(
         onMacroCardClick = onMacroCardClick,
 
         modifier = modifier
-
     )
 }
 
@@ -106,6 +105,7 @@ fun MealPlannerScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             TodaysMeals(
+                uiState = mealPlannerUiState,
                 onRecipeClick = onRecipeClick
             )
 
@@ -115,7 +115,7 @@ fun MealPlannerScreen(
             )
 
             NextThreeDays(
-                mealPlannerUiState = mealPlannerUiState,
+                uiState = mealPlannerUiState,
                 onRecipeClick = onRecipeClick
             )
 
@@ -148,6 +148,7 @@ private fun Macros(
 
 @Composable
 private fun TodaysMeals(
+    uiState: MealPlannerUiState,
     onRecipeClick: (UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -175,13 +176,10 @@ private fun TodaysMeals(
     )
 
     // TODO: Create this list from the recommender system
-    val meals = listOf(
-        previewMeal,
-        previewMeal,
-        previewMeal
-    )
+    val meals = List(uiState.expectedMealCount.intValue) { _ -> previewMeal }
+    val mealsEaten = uiState.mealsEatenToday.intValue - 1
 
-    val carouselState = rememberCarouselState { meals.size }
+    val carouselState = rememberCarouselState(if (mealsEaten < 0) 0 else mealsEaten) { meals.size }
 
     Column(
         modifier = modifier
@@ -271,7 +269,7 @@ private fun CarouselMealCard(
 
 @Composable
 private fun NextThreeDays(
-    mealPlannerUiState: MealPlannerUiState,
+    uiState: MealPlannerUiState,
     onRecipeClick: (UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -299,11 +297,7 @@ private fun NextThreeDays(
     )
 
     // TODO: Create this list from the recommender system
-    val meals = listOf(
-        previewMeal,
-        previewMeal,
-        previewMeal
-    )
+    val meals = List(uiState.expectedMealCount.intValue) { _ -> previewMeal }
 
     val format = LocalDate.Format {
         dayOfWeek(DayOfWeekNames.ENGLISH_FULL)
@@ -354,7 +348,7 @@ private fun NextThreeDays(
                 onClick = {
                     onRecipeClick(meal.id)
                 },
-                userAllergies = mealPlannerUiState.allergies
+                userAllergies = uiState.allergies
             )
         }
     }
@@ -384,7 +378,10 @@ private fun Tips(modifier: Modifier = Modifier) {
 @Composable
 private fun TodaysMealsPreview() {
     PantryPlanTheme {
-        TodaysMeals(onRecipeClick = {})
+        TodaysMeals(
+            uiState = MealPlannerUiState(),
+            onRecipeClick = {}
+        )
     }
 }
 
@@ -425,7 +422,7 @@ private fun NextThreeDaysPreview() {
     PantryPlanTheme {
         NextThreeDays(
             onRecipeClick = {},
-            mealPlannerUiState = MealPlannerUiState(),
+            uiState = MealPlannerUiState(),
         )
     }
 }

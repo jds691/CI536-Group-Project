@@ -1,6 +1,8 @@
 package com.example.pantryplan.feature.meals
 
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.snapshots.SnapshotStateSet
@@ -27,7 +29,10 @@ class MealPlannerViewModel @Inject constructor(
             recipeAllergySet.addAll(preferences.allergies)
 
             MealPlannerUiState(
-                allergies = recipeAllergySet
+                allergies = recipeAllergySet,
+                // TODO: Load from a repository to determine
+                mealsEatenToday = mutableIntStateOf(0),
+                expectedMealCount = mutableIntStateOf(preferences.expectedMealCount)
             )
         }
         .stateIn(
@@ -51,5 +56,7 @@ data class MealPlannerUiState(
             sodium = 0f
         )
     ),
-    val allergies: SnapshotStateSet<Allergen> = mutableStateSetOf()
+    val allergies: SnapshotStateSet<Allergen> = mutableStateSetOf(),
+    val mealsEatenToday: MutableIntState = mutableIntStateOf(0),
+    val expectedMealCount: MutableIntState = mutableIntStateOf(3)
 )
