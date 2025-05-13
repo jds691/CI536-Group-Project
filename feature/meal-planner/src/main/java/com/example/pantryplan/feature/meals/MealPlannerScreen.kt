@@ -2,6 +2,7 @@
 
 package com.example.pantryplan.feature.meals
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -108,6 +110,7 @@ fun MealPlannerScreen(
             )
 
             Macros(
+                uiState = mealPlannerUiState,
                 onMacroCardClick = onMacroCardClick
             )
 
@@ -123,6 +126,7 @@ fun MealPlannerScreen(
 
 @Composable
 private fun Macros(
+    uiState: MealPlannerUiState,
     onMacroCardClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -136,16 +140,7 @@ private fun Macros(
         )
 
         MacrosCard(
-            item = NutritionInfo(
-                calories = 500,
-                fats = 13.35f,
-                saturatedFats = 22f,
-                carbohydrates = 65f,
-                sugar = 12f,
-                fiber = 34f,
-                protein = 30f,
-                sodium = 12f
-            ),
+            item = uiState.dailyNutrition.value,
             onClick = onMacroCardClick
         )
     }
@@ -393,6 +388,7 @@ private fun TodaysMealsPreview() {
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Preview(
     group = "Macros",
     showBackground = true
@@ -400,7 +396,23 @@ private fun TodaysMealsPreview() {
 @Composable
 private fun MacrosPreview() {
     PantryPlanTheme {
-        Macros(onMacroCardClick = {})
+        Macros(
+            uiState = MealPlannerUiState(
+                dailyNutrition = mutableStateOf(
+                    NutritionInfo(
+                        calories = 500,
+                        fats = 13.35f,
+                        saturatedFats = 22f,
+                        carbohydrates = 65f,
+                        sugar = 12f,
+                        fiber = 34f,
+                        protein = 30f,
+                        sodium = 12f
+                    )
+                )
+            ),
+            onMacroCardClick = {}
+        )
     }
 }
 
