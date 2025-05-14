@@ -2,6 +2,7 @@
 
 package com.example.pantryplan.feature.pantry
 
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
+import coil.compose.rememberAsyncImagePainter
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -28,10 +30,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,12 +43,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pantryplan.core.designsystem.text.pantryPlanExactFormat
-import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -73,6 +74,10 @@ fun getFormattedExpiresAfter(duration: Duration?): String {
                 val days = duration.inWholeDays
                 " (in $days day${if (days > 1) "s)" else ")"}"
             }
+            duration >= 30.days -> {
+                val months = duration.inWholeDays / 30
+                " (in $months week${if (months > 1) "s)" else ")"}"
+            }
             else -> {
                 "Today"
             }
@@ -86,12 +91,19 @@ fun getFormattedExpiresAfter(duration: Duration?): String {
 @Composable
 fun PantryItemDetailsScreen(
     id: UUID,
-    item: PantryItem,
 
-    onBackClick: () -> Unit,
     onEditItem: (UUID) -> Unit,
+    onBackClick: () -> Unit,
+    viewModel: PantryItemDetailsViewModel = hiltViewModel()
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val item by viewModel.item.collectAsState()
+
+    val formatter = DecimalFormat("0.#")
+
+    LaunchedEffect(Unit) {
+        viewModel.loadItem()
+    }
 
     Scaffold(
         topBar = {
@@ -115,26 +127,29 @@ fun PantryItemDetailsScreen(
             BottomAppBar(
                 actions = {
                     Row {
-                        if (item.state == PantryItemState.SEALED) { //TODO: change item state onClick
+                        if (item.state == PantryItemState.SEALED) {
                             //open
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = {viewModel.updateState(PantryItemState.OPENED)}) {
                                 Icon(painterResource(R.drawable.mark_as_opened), "Open")
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             //freeze
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = {viewModel.updateState(PantryItemState.FROZEN)}) {
                                 Icon(painterResource(R.drawable.freeze), "Freeze")
                             }
                         }
                         if (item.state == PantryItemState.OPENED) {
                             //freeze
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = {viewModel.updateState(PantryItemState.FROZEN)}) {
                                 Icon(painterResource(R.drawable.freeze), "Freeze")
                             }
                         }
                         if (item.state == PantryItemState.FROZEN) {
                             //unfreeze
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = {
+                                viewModel.updateState(PantryItemState.OPENED)
+                                viewModel.updateExpiresAfter(1.days)
+                            }) {
                                 Icon(painterResource(R.drawable.unfreeze), "Unfreeze")
                             }
                         }
@@ -163,7 +178,10 @@ fun PantryItemDetailsScreen(
                 modifier = Modifier
                     .height(200.dp)
                     .fillMaxWidth(),
-                painter = painterResource(R.drawable.smugcat), // will be item.imageURL later
+                painter = rememberAsyncImagePainter(
+                    item.imageUrl,
+                    fallback = painterResource(R.drawable.smugcat)
+                ),
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds
 
@@ -231,7 +249,11 @@ fun PantryItemDetailsScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = (item.quantity).toString() + "g",
+                    text =if (item.quantity > 999) {
+                        "${formatter.format(item.quantity/1000.0)}kg"
+                    } else {
+                        "${formatter.format(item.quantity)}g"
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -253,11 +275,11 @@ fun PantryItemDetailsScreen(
                         confirmButton = {
                             TextButton(
                                 onClick = {
-                                    //TODO: add functionality to delete item
                                     showDeleteDialog = false
-
-                                    onBackClick() // pops back to pantry screen when item is deleted
+                                    viewModel.deleteItem()
+                                    onBackClick()
                                 }
+
                             ) {
                                 Text(
                                     text = "Delete",
@@ -280,29 +302,5 @@ fun PantryItemDetailsScreen(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PantryItemDetailsScreenPreview() {
-    Surface {
-        PantryItemDetailsScreen(
-            id = UUID.randomUUID(),
-            onBackClick = {},
-            onEditItem = {},
-
-            item = PantryItem (
-                id = UUID.randomUUID(),
-                name = "Bacon",
-                quantity = 250,
-                expiryDate = Clock.System.now(),
-                expiresAfter = 21.days,
-                inStateSince = Clock.System.now(),
-                imageUrl = null,
-                state = PantryItemState.SEALED,
-                barcode = null
-            )
-        )
     }
 }
