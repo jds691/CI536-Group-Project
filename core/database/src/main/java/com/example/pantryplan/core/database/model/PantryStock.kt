@@ -16,7 +16,7 @@ data class PantryStock(
     val itemName: String,
     val dateExpiring: Instant,
     val expiresAfter: Duration?,
-    val quantity: Int,
+    val quantity: Float,
     val inStateSince: Instant, // It just works ¯\_(ツ)_/¯
     val itemState: PantryItemState,
     val imageRefURL: String?, // TODO: Path once camera is functional

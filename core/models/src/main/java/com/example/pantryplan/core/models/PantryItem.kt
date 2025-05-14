@@ -11,7 +11,7 @@ enum class PantryItemState {
 data class PantryItem(
     val id: UUID,
     val name: String,
-    val quantity: Int,
+    val quantity: Float,
     val expiryDate: Instant,
     // How long until an item will expire
     val expiresAfter: Duration?,

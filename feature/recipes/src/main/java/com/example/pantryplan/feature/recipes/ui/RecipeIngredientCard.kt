@@ -156,7 +156,7 @@ fun RecipeIngredientCardPreview() {
                 linkedPantryItem = PantryItem(
                     id = UUID.randomUUID(),
                     name = "Beef Burgers",
-                    quantity = 1500,
+                    quantity = 1500f,
                     expiryDate = Clock.System.now() + 7.days,
                     expiresAfter = Duration.ZERO,
                     inStateSince = Clock.System.now(),

@@ -106,7 +106,7 @@ private fun PantryItemEditScreen(
     onChangeName: (String) -> Unit,
     onChangeExpiryDate: (Instant) -> Unit,
     onChangeState: (PantryItemState) -> Unit,
-    onChangeQuantity: (Int) -> Unit,
+    onChangeQuantity: (Float) -> Unit,
     onChangeMeasurementUnit: (Measurement) -> Unit,
     onChangeExpiresAfter: (Duration) -> Unit,
     onChangeExpiresAfterUnit: (ExpiresAfterUnit) -> Unit,
@@ -252,14 +252,14 @@ private fun PantryItemEditForm(
     name: String,
     expiryDate: Instant,
     state: PantryItemState,
-    quantity: Int,
+    quantity: Float,
     measurementUnit: Measurement,
     expiresAfter: Duration,
     expiresAfterUnit: ExpiresAfterUnit,
     onChangeName: (String) -> Unit,
     onChangeExpiryDate: (Instant) -> Unit,
     onChangeState: (PantryItemState) -> Unit,
-    onChangeQuantity: (Int) -> Unit,
+    onChangeQuantity: (Float) -> Unit,
     onChangeMeasurementUnit: (Measurement) -> Unit,
     onChangeExpiresAfter: (Duration) -> Unit,
     onChangeExpiresAfterUnit: (ExpiresAfterUnit) -> Unit,
@@ -312,7 +312,7 @@ private fun PantryItemEditForm(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            OutlinedIntField(
+            OutlinedFloatField(
                 value = quantity,
                 onValueChange = onChangeQuantity,
                 modifier = Modifier.weight(1f),
@@ -486,6 +486,25 @@ private fun OutlinedIntField(
         onValueChange = {
             onValueChange(
                 runCatching { it.toInt() }.getOrDefault(0)
+            )
+        },
+        modifier = modifier,
+        label = label,
+    )
+}
+
+@Composable
+private fun OutlinedFloatField(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+) {
+    OutlinedNumberField(
+        value = value.toString(),
+        onValueChange = {
+            onValueChange(
+                runCatching { it.toFloat() }.getOrDefault(0f)
             )
         },
         modifier = modifier,

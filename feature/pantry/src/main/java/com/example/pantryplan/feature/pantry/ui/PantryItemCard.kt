@@ -329,7 +329,7 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
         PantryItem(
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = 1.days,
             inStateSince = Clock.System.now(),
@@ -341,7 +341,7 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
         PantryItem(
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = 3.days,
             inStateSince = Clock.System.now(),
@@ -353,7 +353,7 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
         PantryItem(
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = null,
             inStateSince = Clock.System.now(),
@@ -365,7 +365,7 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
         PantryItem(
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = null,
             inStateSince = Clock.System.now(),

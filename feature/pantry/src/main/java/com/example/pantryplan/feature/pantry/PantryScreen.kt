@@ -201,7 +201,7 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
         PantryItem(
             id = UUID.randomUUID(),
             name = "Bacon",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = 7.5.days,
             inStateSince = Clock.System.now(),
@@ -213,7 +213,7 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
         PantryItem(
             id = UUID.randomUUID(),
             name = "Cheese",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = 1.days,
             inStateSince = Clock.System.now(),
@@ -225,7 +225,7 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
         PantryItem(
             id = UUID.randomUUID(),
             name = "Milk",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = 1.days,
             inStateSince = Clock.System.now(),
@@ -237,7 +237,7 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
         PantryItem(
             id = UUID.randomUUID(),
             name = "Pasta Bake",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = 7.days,
             inStateSince = Clock.System.now(),
@@ -249,7 +249,7 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
         PantryItem(
             id = UUID.randomUUID(),
             name = "Egg",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = Int.MAX_VALUE.days,
             inStateSince = Clock.System.now(),

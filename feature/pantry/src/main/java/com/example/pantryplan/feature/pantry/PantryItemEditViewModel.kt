@@ -41,7 +41,7 @@ class PantryItemEditViewModel @Inject constructor(
     private val newPantryItem = PantryItem(
         id = UUID.randomUUID(),
         name = "",
-        quantity = 0,
+        quantity = 0f,
         expiryDate = Clock.System.now() + 7.days,
         expiresAfter = Duration.ZERO,
         inStateSince = Clock.System.now(),
@@ -93,7 +93,7 @@ class PantryItemEditViewModel @Inject constructor(
         pantryItem.update { it.copy(state = state) }
     }
 
-    fun updateQuantity(quantity: Int) {
+    fun updateQuantity(quantity: Float) {
         pantryItem.update { it.copy(quantity = quantity) }
     }
 
