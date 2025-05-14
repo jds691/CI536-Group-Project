@@ -14,4 +14,8 @@
     <string name="feature_design_system_allergen_mustard">Mustard</string>
     <string name="feature_design_system_allergen_sulphides">Sulphides</string>
     <string name="feature_design_system_allergen_crustaceans">Crustaceans</string>
+    <string name="feature_design_system_pantry_item_state_sealed">Sealed</string>
+    <string name="feature_design_system_pantry_item_state_opened">Opened</string>
+    <string name="feature_design_system_pantry_item_state_frozen">Frozen</string>
+    <string name="feature_design_system_pantry_item_state_expired">Expired</string>
 </resources>

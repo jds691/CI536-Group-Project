@@ -60,6 +60,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import com.example.pantryplan.core.designsystem.component.ImageSelect
+import com.example.pantryplan.core.designsystem.text.getDisplayNameId
 import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItemState
 import kotlinx.datetime.Instant
@@ -273,7 +274,7 @@ private fun PantryItemEditForm(
             value = name,
             onValueChange = onChangeName,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Name") },
+            label = { Text(stringResource(R.string.feature_pantry_name)) },
             singleLine = true,
         )
 
@@ -284,16 +285,13 @@ private fun PantryItemEditForm(
                     Instant.fromEpochMilliseconds(expiryDateMillis!!)
                 )
             },
-            label = { Text("Expires") },
+            label = { Text(stringResource(R.string.feature_pantry_expires)) },
             modifier = Modifier.fillMaxWidth(),
         )
 
-        val stateOptions = mapOf(
-            PantryItemState.SEALED to "Sealed",
-            PantryItemState.OPENED to "Opened",
-            PantryItemState.FROZEN to "Frozen",
-            PantryItemState.EXPIRED to "Expired",
-        )
+        val stateOptions = PantryItemState.entries.associate {
+            it to stringResource(it.getDisplayNameId())
+        }
         OutlinedEnumSelectField(
             options = stateOptions,
             value = state,

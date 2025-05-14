@@ -6,4 +6,6 @@
     <string name="feature_pantry_scan_barcode">Scan barcode</string>
     <string name="feature_pantry_add_item">Add Item</string>
     <string name="feature_pantry_update_item">Update ‘%1$s’</string>
+    <string name="feature_pantry_name">Name</string>
+    <string name="feature_pantry_expires">Expires</string>
 </resources>

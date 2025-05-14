@@ -3,20 +3,7 @@ package com.example.pantryplan.core.designsystem.text
 import androidx.annotation.StringRes
 import com.example.pantryplan.core.designsystem.R
 import com.example.pantryplan.core.models.Allergen
-import com.example.pantryplan.core.models.Allergen.CELERY
-import com.example.pantryplan.core.models.Allergen.CRUSTACEANS
-import com.example.pantryplan.core.models.Allergen.EGGS
-import com.example.pantryplan.core.models.Allergen.FISH
-import com.example.pantryplan.core.models.Allergen.GLUTEN
-import com.example.pantryplan.core.models.Allergen.LUPIN
-import com.example.pantryplan.core.models.Allergen.MILK
-import com.example.pantryplan.core.models.Allergen.MOLLUSCS
-import com.example.pantryplan.core.models.Allergen.MUSTARD
-import com.example.pantryplan.core.models.Allergen.PEANUTS
-import com.example.pantryplan.core.models.Allergen.SESAME
-import com.example.pantryplan.core.models.Allergen.SOYBEANS
-import com.example.pantryplan.core.models.Allergen.SULPHIDES
-import com.example.pantryplan.core.models.Allergen.TREE_NUTS
+import com.example.pantryplan.core.models.Allergen.*
 
 @StringRes
 fun Allergen.getDisplayNameId(): Int {
