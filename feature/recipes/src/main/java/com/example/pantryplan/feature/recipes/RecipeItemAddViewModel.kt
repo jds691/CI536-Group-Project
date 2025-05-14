@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.EnumSet
@@ -99,8 +100,17 @@ class RecipeItemAddViewModel @Inject constructor(
     }
 
     fun updateIngredients(ingredient: Ingredient) {
-        recipeItem = recipeItem.copy(ingredients = recipeItem.ingredients.plus(ingredient))
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+        viewModelScope.launch {
+            val itemList = pantryItemRepository.searchForItemsByName(ingredient.name)
+            val linkedPantryItem = itemList.firstOrNull()?.firstOrNull()
+
+            recipeItem = recipeItem.copy(
+                ingredients = recipeItem.ingredients.plus(
+                    ingredient.copy(linkedPantryItem = linkedPantryItem)
+                )
+            )
+            _uiState.update { it.copy(recipeItem = recipeItem) }
+        }
     }
 
     fun updatePrepTime(prepMins: Float) {
