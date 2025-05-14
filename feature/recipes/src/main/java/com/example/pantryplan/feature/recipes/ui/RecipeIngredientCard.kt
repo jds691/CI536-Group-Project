@@ -86,25 +86,43 @@ fun RecipeIngredientCard(
                 horizontalAlignment = Alignment.Start,
             ) {
 
-                val progressAmount =
-                    ingredientData.amount / ingredientData.linkedPantryItem!!.quantity.toFloat()
+                var actualUseAmount = ingredientData.amount
+                if (ingredientData.measurement == Measurement.KILOGRAMS) {
+                    actualUseAmount *= 1000
+                }
+
+                val progressDecrease =
+                    actualUseAmount / ingredientData.linkedPantryItem!!.quantity.toFloat()
+                val progressAmount = 1.0f - progressDecrease
                 var progressColor = Color.Green
 
                 val displayAmount = DecimalFormat("#.##")
+
+                var displayPantryAmount = ingredientData.linkedPantryItem!!.quantity.toFloat()
+                var pantryMeasurementSignifier = "g"
+
+                if (ingredientData.linkedPantryItem!!.quantity.toFloat() > 999) {
+                    displayPantryAmount =
+                        ingredientData.linkedPantryItem!!.quantity.toFloat() / 1000
+                    pantryMeasurementSignifier = "kg"
+                }
+
                 Text(
                     text = ingredientData.name,
                     style = MaterialTheme.typography.titleMedium
                 )
-                if (progressAmount < 1.0f) {
+                if (progressAmount >= 0f) {
                     Text(
-                        text = "In pantry: " + ingredientData.linkedPantryItem!!.quantity + measurementSignifier + " - Uses: " + displayAmount.format(
+                        text = "In pantry: " + displayAmount.format(displayPantryAmount) + pantryMeasurementSignifier + " - Uses: " + displayAmount.format(
                             ingredientData.amount
                         ) + measurementSignifier,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 } else {
                     Text(
-                        text = "! Not enough | In pantry: " + ingredientData.linkedPantryItem!!.quantity + measurementSignifier + " - Uses: " + displayAmount.format(
+                        text = "! Not enough | In pantry: " + displayAmount.format(
+                            displayPantryAmount
+                        ) + pantryMeasurementSignifier + " - Uses: " + displayAmount.format(
                             ingredientData.amount
                         ) + measurementSignifier,
                         style = MaterialTheme.typography.bodyMedium,
@@ -133,12 +151,12 @@ fun RecipeIngredientCardPreview() {
             modifier = Modifier,
             Ingredient(
                 name = "Beef Burgers",
-                amount = 500f,
+                amount = 200f,
                 measurement = Measurement.GRAMS,
                 linkedPantryItem = PantryItem(
                     id = UUID.randomUUID(),
                     name = "Beef Burgers",
-                    quantity = 600,
+                    quantity = 1500,
                     expiryDate = Clock.System.now() + 7.days,
                     expiresAfter = Duration.ZERO,
                     inStateSince = Clock.System.now(),
