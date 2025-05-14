@@ -50,7 +50,6 @@ import com.example.pantryplan.core.models.PantryItemState
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import okhttp3.internal.format
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
