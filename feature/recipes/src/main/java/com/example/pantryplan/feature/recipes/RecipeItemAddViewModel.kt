@@ -9,14 +9,13 @@ import com.example.pantryplan.core.data.access.repository.RecipeRepository
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.Ingredient
 import com.example.pantryplan.core.models.NutritionInfo
-import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.navigation.RecipeItemAdd
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.EnumSet
@@ -99,8 +98,17 @@ class RecipeItemAddViewModel @Inject constructor(
     }
 
     fun updateIngredients(ingredient: Ingredient) {
-        recipeItem = recipeItem.copy(ingredients = recipeItem.ingredients.plus(ingredient))
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+        viewModelScope.launch {
+            val itemList = pantryItemRepository.searchForItemsByName(ingredient.name)
+            val linkedPantryItem = itemList.firstOrNull()?.firstOrNull()
+
+            recipeItem = recipeItem.copy(
+                ingredients = recipeItem.ingredients.plus(
+                    ingredient.copy(linkedPantryItem = linkedPantryItem)
+                )
+            )
+            _uiState.update { it.copy(recipeItem = recipeItem) }
+        }
     }
 
     fun updatePrepTime(prepMins: Float) {
@@ -116,15 +124,6 @@ class RecipeItemAddViewModel @Inject constructor(
     fun updateNutritionalInfo(nutritionalInfo: NutritionInfo) {
         recipeItem = recipeItem.copy(nutrition = nutritionalInfo)
         _uiState.update { it.copy(recipeItem = recipeItem) }
-    }
-
-    suspend fun checkForPantryMatch(possibleName: String): PantryItem? {
-        val itemList = pantryItemRepository.searchForItemsByName(possibleName)
-        if (itemList != emptyList<PantryItem>()) {
-            return itemList.first().first()
-        } else {
-            return null
-        }
     }
 
     fun saveRecipeItem() {

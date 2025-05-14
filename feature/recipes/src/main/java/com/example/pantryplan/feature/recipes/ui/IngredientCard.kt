@@ -4,7 +4,6 @@ package com.example.pantryplan.feature.recipes.ui
 
 import android.icu.text.DecimalFormat
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.pantryplan.core.designsystem.component.DeleteAlertDialog
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Ingredient
@@ -124,18 +124,15 @@ fun IngredientCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (ingredientData.linkedPantryItem?.imageUrl != null) {
-                    //TODO Pass in image url
-                } else {
-                Image(
+                AsyncImage(
+                    model = ingredientData.linkedPantryItem?.imageUrl,
                     modifier = Modifier
                         .fillMaxHeight()
                         .aspectRatio(1.0f),
-                    painter = painterResource(R.drawable.americancheese),
+                    fallback = painterResource(R.drawable.americancheese),
                     contentDescription = null,
                     contentScale = ContentScale.Crop
                 )
-                }
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
                     horizontalAlignment = Alignment.Start,
