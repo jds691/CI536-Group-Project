@@ -2,6 +2,7 @@
 
 package com.example.pantryplan.feature.pantry
 
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,6 +50,7 @@ import com.example.pantryplan.core.models.PantryItemState
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import okhttp3.internal.format
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -98,6 +100,8 @@ fun PantryItemDetailsScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     val item by viewModel.item.collectAsState()
 
+    val formatter = DecimalFormat("0.#")
+
     LaunchedEffect(Unit) {
         viewModel.loadItem()
     }
@@ -143,7 +147,10 @@ fun PantryItemDetailsScreen(
                         }
                         if (item.state == PantryItemState.FROZEN) {
                             //unfreeze
-                            IconButton(onClick = {viewModel.updateState(PantryItemState.SEALED)}) {
+                            IconButton(onClick = {
+                                viewModel.updateState(PantryItemState.OPENED)
+                                viewModel.updateExpiresAfter(1.days)
+                            }) {
                                 Icon(painterResource(R.drawable.unfreeze), "Unfreeze")
                             }
                         }
@@ -244,9 +251,9 @@ fun PantryItemDetailsScreen(
                 )
                 Text(
                     text =if (item.quantity > 999) {
-                        "${item.quantity/1000.0}kg"
+                        "${formatter.format(item.quantity/1000.0)}kg"
                     } else {
-                        "${item.quantity}g"
+                        "${formatter.format(item.quantity)}g"
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,

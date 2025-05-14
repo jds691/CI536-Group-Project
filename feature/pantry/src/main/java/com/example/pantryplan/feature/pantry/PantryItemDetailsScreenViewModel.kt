@@ -16,6 +16,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.time.Duration
 
 @HiltViewModel
 class PantryItemDetailsViewModel @Inject constructor(
@@ -47,6 +48,16 @@ class PantryItemDetailsViewModel @Inject constructor(
     fun updateState(newState: PantryItemState) {
         pantryItem.update {
             it.copy(state = newState, inStateSince = Clock.System.now())
+        }
+
+        viewModelScope.launch {
+            pantryItemRepository.updateItem(pantryItem.value)
+        }
+    }
+
+    fun updateExpiresAfter(duration: Duration) {
+        pantryItem.update {
+            it.copy(expiresAfter = duration)
         }
 
         viewModelScope.launch {
