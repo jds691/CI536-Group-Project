@@ -168,7 +168,7 @@ fun RecipeItemCard(
                         modifier = Modifier
                             .fillMaxHeight()
                             .aspectRatio(1.0f),
-                        painter = painterResource(R.drawable.cheeseburger),
+                        painter = painterResource(R.drawable.default_recipe_thumbnail),
                         contentDescription = null,
                         contentScale = ContentScale.Crop
                     )

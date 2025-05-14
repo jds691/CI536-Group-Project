@@ -166,9 +166,9 @@ internal fun RecipeItemDetailsScreen(
                 modifier = Modifier
                     .height(200.dp)
                     .fillMaxWidth(),
-                painter = painterResource(R.drawable.cheeseburger),
+                painter = painterResource(R.drawable.default_recipe_thumbnail),
                 contentDescription = null,
-                contentScale = ContentScale.FillBounds
+                contentScale = ContentScale.Crop
 
             )
             Column(

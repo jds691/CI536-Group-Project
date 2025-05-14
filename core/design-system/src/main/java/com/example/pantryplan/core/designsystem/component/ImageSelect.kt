@@ -36,7 +36,7 @@ fun ImageSelect(
     modifier: Modifier = Modifier,
     onTakePhoto: () -> Unit,
     onPickPhoto: () -> Unit,
-    backgroundPainter: (Painter) = painterResource(R.drawable.bigcheese)
+    backgroundPainter: (Painter) = painterResource(R.drawable.default_recipe_thumbnail)
 ) {
     Box(
         modifier = modifier,
