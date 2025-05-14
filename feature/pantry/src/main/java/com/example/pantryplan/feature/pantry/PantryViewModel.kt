@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -49,7 +48,7 @@ private fun pantryUiState(
 
     val preferencesFlow: Flow<UserPreferences> = userPreferencesRepository.preferences
 
-    return combine(pantryItemsFlow, preferencesFlow, ::Pair).map { (pantryItems, preferences) ->
+    return combine(pantryItemsFlow, preferencesFlow) { pantryItems, preferences ->
         PantryUiState(
             pantryItems = pantryItems,
             expiringSoonDuration = preferences.expiringSoonAmount
