@@ -74,7 +74,9 @@ import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.Ingredient
 import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.NutritionInfo
+import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.ui.IngredientCard
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.util.EnumSet
 import java.util.UUID
@@ -304,6 +306,11 @@ fun RecipeItemAddScreen(
 ) {
 
     val recipeItem = recipeItemAddUiState.recipeItem
+    val allergens = recipeItemAddUiState
+        .jsonForAllergenSet
+        .let { Json.decodeFromString<Recipe>(it) }
+        .allergens
+
     Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
@@ -340,7 +347,7 @@ fun RecipeItemAddScreen(
                 name = recipeItem.title,
                 description = recipeItem.description,
                 tags = recipeItem.tags,
-                allergens = recipeItem.allergens,
+                allergens = allergens,
                 instructions = recipeItem.instructions,
                 ingredients = recipeItem.ingredients,
                 prepTime = recipeItem.prepTime,
@@ -441,17 +448,12 @@ private fun RecipeItemEditForm(
                 FilterChip(
                     selected = selected,
                     onClick = {
-                        if (selected)
-                            allergenSet.remove(allergy)
-                        else
-                            allergenSet.add(allergy)
-
-                        try {
-                            onChangeAllergens(EnumSet.copyOf(allergenSet))
-                        } catch (e: IllegalArgumentException) {
-                            // Thrown if set is empty when calling copyOf
-                            onChangeAllergens(EnumSet.noneOf(Allergen::class.java))
+                        // Toggle the allergen on or off.
+                        if (!allergens.add(allergy)) {
+                            allergens.remove(allergy)
                         }
+
+                        onChangeAllergens(allergens)
                     },
                     label = { Text(stringResource(allergy.getDisplayNameId())) },
                     leadingIcon = {
