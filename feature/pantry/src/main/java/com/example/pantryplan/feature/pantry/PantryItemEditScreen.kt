@@ -52,6 +52,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
@@ -175,11 +176,10 @@ private fun PantryItemEditTopBar(
 ) {
     TopAppBar(
         title = {
-            if (name == null) {
-                Text("Add Item")
-            } else {
-                Text("Update ‘${name}’")
-            }
+            Text(
+                name?.let { stringResource(R.string.feature_pantry_update_item, name) }
+                    ?: stringResource(R.string.feature_pantry_add_item)
+            )
         },
         navigationIcon = {
             IconButton(onClick = onBackClick) {

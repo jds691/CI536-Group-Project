@@ -4,4 +4,6 @@
     <string name="feature_pantry_empty_error">No Items</string>
     <string name="feature_pantry_empty_description">Your pantry is empty. Add some items to get started.</string>
     <string name="feature_pantry_scan_barcode">Scan barcode</string>
+    <string name="feature_pantry_add_item">Add Item</string>
+    <string name="feature_pantry_update_item">Update ‘%1$s’</string>
 </resources>
