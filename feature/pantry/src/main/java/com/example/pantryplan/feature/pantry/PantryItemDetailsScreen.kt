@@ -45,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.example.pantryplan.core.designsystem.text.asRelativeFormattedDate
 import com.example.pantryplan.core.designsystem.text.pantryPlanExactFormat
 import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItemState
@@ -52,41 +53,13 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.util.UUID
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
-fun getFormattedExpiryDate(expiryDate: Instant, expiresAfter: Duration?): String {
-    val time = expiryDate + expiresAfter!!
+fun getFormattedExpiryDate(expiryDate: Instant): String {
     val zone = TimeZone.currentSystemDefault()
 
-    val localDateTime = time.toLocalDateTime(zone).date
-    val localDateFormatted = localDateTime.pantryPlanExactFormat()
-    return (localDateFormatted)
-}
-
-fun getFormattedExpiresAfter(duration: Duration?): String {
-    if (duration != null) {
-        return when {
-            duration >= 7.days -> {
-                val weeks = duration.inWholeDays / 7
-                " (in $weeks week${if (weeks > 1) "s)" else ")"}"
-            }
-            duration >= 1.days -> {
-                val days = duration.inWholeDays
-                " (in $days day${if (days > 1) "s)" else ")"}"
-            }
-            duration >= 30.days -> {
-                val months = duration.inWholeDays / 30
-                " (in $months week${if (months > 1) "s)" else ")"}"
-            }
-            else -> {
-                "Today"
-            }
-        }
-    }
-    else {
-        return ""
-    }
+    val localDateTime = expiryDate.toLocalDateTime(zone).date
+    return localDateTime.pantryPlanExactFormat()
 }
 
 @Composable
@@ -214,12 +187,12 @@ fun PantryItemDetailsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = getFormattedExpiryDate(item.expiryDate, item.expiresAfter),
+                            text = getFormattedExpiryDate(item.expiryDate),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = getFormattedExpiresAfter(item.expiresAfter),
+                            text = " (${item.expiryDate.asRelativeFormattedDate()})",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

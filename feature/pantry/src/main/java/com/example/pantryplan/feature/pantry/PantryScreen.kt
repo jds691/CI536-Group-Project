@@ -163,6 +163,7 @@ private fun PantryContentList(
         items(pantryState.pantryItems) { item ->
             PantryItemCard(
                 item = item,
+                expiringSoonDuration = pantryState.expiringSoonDuration,
                 onClick = { onClickPantryItem(item.id) },
                 onDelete = { onDeletePantryItem(item) },
             )
@@ -178,7 +179,7 @@ private fun PantryPopulatedPreview(
     PantryPlanTheme {
         Surface {
             PantryContentList(
-                pantryState = PantryUiState(pantryItems),
+                pantryState = PantryUiState(pantryItems, 2.days),
                 onClickPantryItem = {},
                 onDeletePantryItem = {},
             )
