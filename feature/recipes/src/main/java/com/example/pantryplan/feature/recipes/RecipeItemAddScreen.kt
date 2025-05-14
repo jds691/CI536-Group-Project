@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -30,7 +31,6 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -70,10 +70,15 @@ import com.example.pantryplan.core.designsystem.component.ImageSelect
 import com.example.pantryplan.core.designsystem.text.getDisplayNameId
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
+import com.example.pantryplan.core.models.Ingredient
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.NutritionInfo
+import com.example.pantryplan.core.models.PantryItem
+import com.example.pantryplan.feature.recipes.ui.IngredientCard
 import java.io.File
 import java.util.EnumSet
 import java.util.UUID
+import kotlin.reflect.KSuspendFunction1
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -94,12 +99,15 @@ fun RecipeItemAddScreen(
         onChangeName = viewModel::updateName,
         onChangeDescription = viewModel::updateDescription,
         onChangeTags = viewModel::updateTags,
+        onRemoveTags = viewModel::removeTags,
         onChangeAllergens = viewModel::updateAllergens,
         onChangeInstructions = viewModel::updateInstructions,
-        //onChangeIngredients = viewModel::upIngredients,
+        onRemoveInstructions = viewModel::removeInstructions,
+        onChangeIngredients = viewModel::updateIngredients,
         onChangePrepTime = viewModel::updatePrepTime,
         onChangeCookTime = viewModel::updateCookTime,
-        onChangeNutritionalInfo = viewModel::updateNutritionalInfo
+        onChangeNutritionalInfo = viewModel::updateNutritionalInfo,
+        onCheckForPantryMatch = viewModel::checkForPantryMatch
     )
 }
 
@@ -287,12 +295,15 @@ fun RecipeItemAddScreen(
     onChangeName: (String) -> Unit,
     onChangeDescription: (String) -> Unit,
     onChangeTags: (String) -> Unit,
+    onRemoveTags: (String) -> Unit,
     onChangeAllergens: (EnumSet<Allergen>) -> Unit,
     onChangeInstructions: (String) -> Unit,
-    //onChangeIngredients: (String) -> Unit,
+    onRemoveInstructions: (String) -> Unit,
+    onChangeIngredients: (Ingredient) -> Unit,
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
     onChangeNutritionalInfo: (NutritionInfo) -> Unit,
+    onCheckForPantryMatch: KSuspendFunction1<String, PantryItem?>
 ) {
 
     val recipeItem = recipeItemAddUiState.recipeItem
@@ -327,7 +338,7 @@ fun RecipeItemAddScreen(
                 style = MaterialTheme.typography.bodySmall,
             )
 
-            //RecipeItemImageSelect()
+            RecipeItemImageSelect()
             RecipeItemEditForm(
                 name = recipeItem.title,
                 description = recipeItem.description,
@@ -342,12 +353,16 @@ fun RecipeItemAddScreen(
                 onChangeName = onChangeName,
                 onChangeDescription = onChangeDescription,
                 onChangeTags = onChangeTags,
+                onRemoveTags = onRemoveTags,
                 onChangeAllergens = onChangeAllergens,
                 onChangeInstructions = onChangeInstructions,
-                //onChangeIngredients = onChangeIngredients,
+                onChangeIngredients = onChangeIngredients,
+                onRemoveInstructions = onRemoveInstructions,
                 onChangePrepTime = onChangePrepTime,
                 onChangeCookTime = onChangeCookTime,
-                onChangeNutritionalInfo = onChangeNutritionalInfo
+                onChangeNutritionalInfo = onChangeNutritionalInfo,
+                onCheckForPantryMatch = onCheckForPantryMatch
+
 
 
             )
@@ -356,7 +371,6 @@ fun RecipeItemAddScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun RecipeItemEditForm(
     name: String,
@@ -364,7 +378,7 @@ private fun RecipeItemEditForm(
     tags: List<String>,
     allergens: EnumSet<Allergen>,
     instructions: List<String>,
-    ingredients: List<String>,
+    ingredients: List<Ingredient>,
     prepTime: Float,
     cookTime: Float,
     nutrition: NutritionInfo,
@@ -372,12 +386,15 @@ private fun RecipeItemEditForm(
     onChangeName: (String) -> Unit,
     onChangeDescription: (String) -> Unit,
     onChangeTags: (String) -> Unit,
+    onRemoveTags: (String) -> Unit,
     onChangeAllergens: (EnumSet<Allergen>) -> Unit,
     onChangeInstructions: (String) -> Unit,
-    //onChangeIngredients: (String) -> Unit,
+    onRemoveInstructions: (String) -> Unit,
+    onChangeIngredients: (Ingredient) -> Unit,
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
     onChangeNutritionalInfo: (NutritionInfo) -> Unit,
+    onCheckForPantryMatch: KSuspendFunction1<String, PantryItem?>
 ) {
     Column(
         modifier = Modifier
@@ -534,7 +551,7 @@ private fun RecipeItemEditForm(
             )
             for (tag in tags) {
                 AssistChip(
-                    onClick = {},
+                    onClick = { onRemoveTags(tag) },
                     label = { Text(tag) },
                 )
             }
@@ -547,6 +564,9 @@ private fun RecipeItemEditForm(
         )
 
         var ingredientText by remember { mutableStateOf("") }
+        var quantityAmount by remember { mutableStateOf(20f) }
+        var measurementOption by remember { mutableStateOf(Measurement.GRAMS) }
+
         OutlinedTextField(
             value = ingredientText,
             onValueChange = { ingredientText = it },
@@ -573,8 +593,7 @@ private fun RecipeItemEditForm(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            var quantityAmount by remember { mutableStateOf(20) }
-            OutlinedIntField(
+            OutlinedFloatField(
                 value = quantityAmount,
                 onValueChange = { quantityAmount = it },
                 modifier = Modifier
@@ -582,14 +601,15 @@ private fun RecipeItemEditForm(
             )
 
             val measurementOptions = mapOf(
-                QuantityUnit.GRAMS to "Grams",
-                QuantityUnit.KILOGRAMS to "Kilograms",
+                Measurement.GRAMS to "Grams",
+                Measurement.KILOGRAMS to "Kilograms",
+                Measurement.OTHER to "Other"
             )
 
             OutlinedEnumSelectField(
                 options = measurementOptions,
-                value = QuantityUnit.GRAMS,
-                onValueChange = { },
+                value = measurementOption,
+                onValueChange = { measurementOption = it },
                 modifier = Modifier
                     .weight(1f)
                     .align(Alignment.Bottom)
@@ -597,7 +617,16 @@ private fun RecipeItemEditForm(
         }
 
         OutlinedButton(
-            onClick = {},
+            onClick = {
+                onChangeIngredients(
+                    Ingredient(
+                        name = ingredientText,
+                        amount = quantityAmount,
+                        measurement = measurementOption,
+                        linkedPantryItem = null
+                    )
+                )
+            },
             shape = ButtonDefaults.outlinedShape,
             enabled = true,
             colors = ButtonColors(
@@ -621,6 +650,26 @@ private fun RecipeItemEditForm(
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleMedium,
         )
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            ingredients.forEach { ingredient ->
+                //TODO Did run blocking just to stop erroring im assuming this is not good practice.
+                //TODO Should work otherwise
+                //val pantryItem = runBlocking{ onCheckForPantryMatch(ingredient.name) }
+                IngredientCard(
+                    modifier = Modifier,
+                    Ingredient(
+                        name = ingredient.name,
+                        amount = ingredient.amount,
+                        measurement = ingredient.measurement,
+                        linkedPantryItem = ingredient.linkedPantryItem
+                    ),
+                )
+            }
+        }
 
         HorizontalDivider(
             modifier = Modifier
@@ -682,7 +731,11 @@ private fun RecipeItemEditForm(
             instructions.forEach { instruction ->
                 Text(
                     text = "Step $stepNum - $instruction",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .clickable {
+                            onRemoveInstructions(instruction)
+                        }
                 )
                 stepNum++
             }

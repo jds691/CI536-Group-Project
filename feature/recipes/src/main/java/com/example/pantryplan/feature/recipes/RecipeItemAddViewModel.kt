@@ -4,15 +4,19 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.example.pantryplan.core.data.access.repository.PantryItemRepository
 import com.example.pantryplan.core.data.access.repository.RecipeRepository
 import com.example.pantryplan.core.models.Allergen
+import com.example.pantryplan.core.models.Ingredient
 import com.example.pantryplan.core.models.NutritionInfo
+import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.navigation.RecipeItemAdd
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.EnumSet
@@ -23,6 +27,7 @@ import javax.inject.Inject
 class RecipeItemAddViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val recipeItemRepository: RecipeRepository,
+    private val pantryItemRepository: PantryItemRepository
 ) : ViewModel() {
     private val existingId = savedStateHandle
         .toRoute<RecipeItemAdd>()
@@ -51,8 +56,6 @@ class RecipeItemAddViewModel @Inject constructor(
         ),
     )
 
-    private var quantityUnit = QuantityUnit.GRAMS
-
     private val _uiState = MutableStateFlow(
         RecipeItemAddUiState(
             recipeItem = recipeItem,
@@ -75,6 +78,11 @@ class RecipeItemAddViewModel @Inject constructor(
         _uiState.update { it.copy(recipeItem = recipeItem) }
     }
 
+    fun removeTags(tag: String) {
+        recipeItem = recipeItem.copy(tags = recipeItem.tags.minus(tag))
+        _uiState.update { it.copy(recipeItem = recipeItem) }
+    }
+
     fun updateAllergens(allergenSet: EnumSet<Allergen>) {
         recipeItem = recipeItem.copy(allergens = allergenSet)
         _uiState.update { it.copy(recipeItem = recipeItem) }
@@ -85,9 +93,15 @@ class RecipeItemAddViewModel @Inject constructor(
         _uiState.update { it.copy(recipeItem = recipeItem) }
     }
 
-    /* TODO: Update ingredients when more are added
-    fun updateIngredients(ingredient: )
-     */
+    fun removeInstructions(instruction: String) {
+        recipeItem = recipeItem.copy(instructions = recipeItem.instructions.minus(instruction))
+        _uiState.update { it.copy(recipeItem = recipeItem) }
+    }
+
+    fun updateIngredients(ingredient: Ingredient) {
+        recipeItem = recipeItem.copy(ingredients = recipeItem.ingredients.plus(ingredient))
+        _uiState.update { it.copy(recipeItem = recipeItem) }
+    }
 
     fun updatePrepTime(prepMins: Float) {
         recipeItem = recipeItem.copy(prepTime = prepMins)
@@ -102,6 +116,15 @@ class RecipeItemAddViewModel @Inject constructor(
     fun updateNutritionalInfo(nutritionalInfo: NutritionInfo) {
         recipeItem = recipeItem.copy(nutrition = nutritionalInfo)
         _uiState.update { it.copy(recipeItem = recipeItem) }
+    }
+
+    suspend fun checkForPantryMatch(possibleName: String): PantryItem? {
+        val itemList = pantryItemRepository.searchForItemsByName(possibleName)
+        if (itemList != emptyList<PantryItem>()) {
+            return itemList.first().first()
+        } else {
+            return null
+        }
     }
 
     fun saveRecipeItem() {
@@ -121,7 +144,3 @@ class RecipeItemAddViewModel @Inject constructor(
 data class RecipeItemAddUiState(
     val recipeItem: Recipe,
 )
-
-enum class QuantityUnit {
-    GRAMS, KILOGRAMS
-}

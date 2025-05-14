@@ -2,6 +2,7 @@
 
 package com.example.pantryplan.feature.recipes.ui
 
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,18 +29,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import com.example.pantryplan.core.models.Ingredient
+import com.example.pantryplan.core.models.Measurement
+import com.example.pantryplan.core.models.PantryItem
+import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.recipes.R
+import kotlinx.datetime.Clock
+import java.util.UUID
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
 @Composable
 fun RecipeIngredientCard(
     modifier: Modifier = Modifier,
+    ingredientData: Ingredient,
 
     onClick: () -> Unit = {},
 ) {
 
-    //TODO Will pass in recipe ingredient amount and pantry item amount
-    val gramsNeeded = 100
-    val gramsOfItem = 600
+    val measurementSignifier: String = when (ingredientData.measurement) {
+        Measurement.GRAMS -> "g"
+        Measurement.KILOGRAMS -> "kg"
+        Measurement.OTHER -> ""
+    }
 
     ElevatedCard(
         modifier = Modifier
@@ -55,9 +67,8 @@ fun RecipeIngredientCard(
             horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            //if (item.imageUrl != null) {
-            //TODO: Place recipe ingredient image in card when there is an active image passed in
-            //} else {
+            if (ingredientData.linkedPantryItem!!.imageUrl != null) {
+            } else {
             Image(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -66,7 +77,7 @@ fun RecipeIngredientCard(
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
-            //}
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -75,21 +86,27 @@ fun RecipeIngredientCard(
                 horizontalAlignment = Alignment.Start,
             ) {
 
-                val progressAmount = gramsNeeded.toFloat() / gramsOfItem.toFloat()
+                val progressAmount =
+                    ingredientData.amount / ingredientData.linkedPantryItem!!.quantity.toFloat()
                 var progressColor = Color.Green
 
+                val displayAmount = DecimalFormat("#.##")
                 Text(
-                    text = "Beef Burger",
+                    text = ingredientData.name,
                     style = MaterialTheme.typography.titleMedium
                 )
                 if (progressAmount < 1.0f) {
                     Text(
-                        text = "In pantry: " + gramsOfItem + "g - Uses: " + gramsNeeded + "g",
+                        text = "In pantry: " + ingredientData.linkedPantryItem!!.quantity + measurementSignifier + " - Uses: " + displayAmount.format(
+                            ingredientData.amount
+                        ) + measurementSignifier,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 } else {
                     Text(
-                        text = "! Not enough | In pantry: " + gramsOfItem + "g - Uses: " + gramsNeeded + "g",
+                        text = "! Not enough | In pantry: " + ingredientData.linkedPantryItem!!.quantity + measurementSignifier + " - Uses: " + displayAmount.format(
+                            ingredientData.amount
+                        ) + measurementSignifier,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error
                     )
@@ -112,6 +129,24 @@ fun RecipeIngredientCard(
 @Composable
 fun RecipeIngredientCardPreview() {
     PantryPlanTheme {
-        RecipeIngredientCard()
+        RecipeIngredientCard(
+            modifier = Modifier,
+            Ingredient(
+                name = "Beef Burgers",
+                amount = 500f,
+                measurement = Measurement.GRAMS,
+                linkedPantryItem = PantryItem(
+                    id = UUID.randomUUID(),
+                    name = "Beef Burgers",
+                    quantity = 600,
+                    expiryDate = Clock.System.now() + 7.days,
+                    expiresAfter = Duration.ZERO,
+                    inStateSince = Clock.System.now(),
+                    state = PantryItemState.SEALED,
+                    imageUrl = null,
+                    barcode = null,
+                )
+            )
+        )
     }
 }
