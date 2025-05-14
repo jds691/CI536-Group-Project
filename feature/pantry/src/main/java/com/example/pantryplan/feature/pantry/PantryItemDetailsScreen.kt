@@ -3,7 +3,6 @@
 package com.example.pantryplan.feature.pantry
 
 import android.icu.text.DecimalFormat
-import android.text.format.DateUtils
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,14 +45,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.example.pantryplan.core.designsystem.text.asRelativeFormattedDate
 import com.example.pantryplan.core.designsystem.text.pantryPlanExactFormat
 import com.example.pantryplan.core.models.PantryItemState
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.util.UUID
-import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.days
 
 fun getFormattedExpiryDate(expiryDate: Instant): String {
@@ -61,22 +59,6 @@ fun getFormattedExpiryDate(expiryDate: Instant): String {
 
     val localDateTime = expiryDate.toLocalDateTime(zone).date
     return localDateTime.pantryPlanExactFormat()
-}
-
-private fun getRelativeExpiryDate(expiry: Instant): String {
-    val now = Clock.System.now()
-
-    val minResolution = if ((expiry - now).inWholeDays.absoluteValue < 7) {
-        DateUtils.DAY_IN_MILLIS
-    } else {
-        DateUtils.WEEK_IN_MILLIS
-    }
-
-    return DateUtils.getRelativeTimeSpanString(
-        expiry.toEpochMilliseconds(),
-        now.toEpochMilliseconds(),
-        minResolution,
-    ).toString().lowercase()
 }
 
 @Composable
@@ -203,7 +185,7 @@ fun PantryItemDetailsScreen(
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = " (${getRelativeExpiryDate(item.expiryDate)})",
+                            text = " (${item.expiryDate.asRelativeFormattedDate()})",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

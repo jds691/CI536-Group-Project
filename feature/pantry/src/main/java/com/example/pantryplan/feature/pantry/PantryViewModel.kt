@@ -49,9 +49,7 @@ private fun pantryUiState(
 
     val preferencesFlow: Flow<UserPreferences> = userPreferencesRepository.preferences
 
-    return combine(pantryItemsFlow, preferencesFlow, ::Pair).map { mergedFlow ->
-        val (pantryItems, preferences) = mergedFlow
-
+    return combine(pantryItemsFlow, preferencesFlow, ::Pair).map { (pantryItems, preferences) ->
         PantryUiState(
             pantryItems = pantryItems,
             expiringSoonDuration = preferences.expiringSoonAmount

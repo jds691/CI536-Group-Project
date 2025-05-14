@@ -2,7 +2,6 @@
 
 package com.example.pantryplan.feature.pantry.ui
 
-import android.text.format.DateUtils
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -50,31 +49,16 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.example.pantryplan.core.designsystem.text.asRelativeFormattedDate
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.R
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import java.util.UUID
-import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
-
-private fun humanReadableTimestamp(time: Instant, now: Instant): String {
-    val minResolution = if ((time - now).inWholeDays.absoluteValue < 7) {
-        DateUtils.DAY_IN_MILLIS
-    } else {
-        DateUtils.WEEK_IN_MILLIS
-    }
-
-    return DateUtils.getRelativeTimeSpanString(
-        time.toEpochMilliseconds(),
-        now.toEpochMilliseconds(),
-        minResolution,
-    ).toString().lowercase()
-}
 
 fun createStatus(
     item: PantryItem,
@@ -86,7 +70,7 @@ fun createStatus(
     return when (item.state) {
         PantryItemState.SEALED, PantryItemState.OPENED -> {
             val expiry = item.expiryDate
-            val timestamp = humanReadableTimestamp(expiry, now)
+            val timestamp = expiry.asRelativeFormattedDate()
 
             val expiringSoon = (expiry - now) <= expiringSoonDuration
             val color = if (expiringSoon) Color(255, 102, 0) else Color.Green
@@ -96,14 +80,14 @@ fun createStatus(
 
         PantryItemState.FROZEN -> {
             val frozen = item.inStateSince
-            val timestamp = humanReadableTimestamp(frozen, now)
+            val timestamp = frozen.asRelativeFormattedDate()
 
             Pair("Frozen ${timestamp}.", Color.Cyan)
         }
 
         PantryItemState.EXPIRED -> {
             val expiry = item.expiryDate
-            val timestamp = humanReadableTimestamp(expiry, now)
+            val timestamp = expiry.asRelativeFormattedDate()
             
             Pair("Expired ${timestamp}.", Color.Red)
         }
