@@ -3,9 +3,11 @@ package com.example.pantryplan.feature.pantry
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.example.pantryplan.core.data.access.repository.PantryItemRepository
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
+import com.example.pantryplan.feature.pantry.navigation.PantryItemDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,9 +25,9 @@ class PantryItemDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val pantryItemRepository: PantryItemRepository,
 ) : ViewModel() {
-
-    private val id: UUID =
-        UUID.fromString(savedStateHandle.get<String>("id")!!)
+    private val id = UUID.fromString(
+        savedStateHandle.toRoute<PantryItemDetails>().id
+    )
 
     private val pantryItem: MutableStateFlow<PantryItem> =
         MutableStateFlow(

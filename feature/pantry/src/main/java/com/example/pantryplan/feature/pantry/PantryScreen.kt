@@ -123,8 +123,13 @@ private fun PantryFABs(
         }
         ExtendedFloatingActionButton(
             onClick = onCreatePantryItem,
-            icon = { Icon(Icons.Default.Add, "") },
-            text = { Text("Add") }
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.feature_pantry_back)
+                )
+            },
+            text = { Text("Add") },
         )
     }
 }
