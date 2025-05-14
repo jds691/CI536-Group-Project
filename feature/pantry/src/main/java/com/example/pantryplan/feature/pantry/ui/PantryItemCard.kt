@@ -67,8 +67,8 @@ private fun humanReadableTimestamp(time: Instant, now: Instant): String {
         DateUtils.DAY_IN_MILLIS
     } else {
         DateUtils.WEEK_IN_MILLIS
-
     }
+
     return DateUtils.getRelativeTimeSpanString(
         time.toEpochMilliseconds(),
         now.toEpochMilliseconds(),
@@ -76,23 +76,26 @@ private fun humanReadableTimestamp(time: Instant, now: Instant): String {
     ).toString().lowercase()
 }
 
-fun createStatus(item: PantryItem): Pair<String, Color> {
+fun createStatus(
+    item: PantryItem,
+    expiringSoonDuration: Duration
+): Pair<String, Color> {
     // TODO: When Theme.kt is updated to support the extended colours, replace the status colour
 
     val now = Clock.System.now()
     return when (item.state) {
         PantryItemState.SEALED, PantryItemState.OPENED -> {
-            val expiry = item.expiryDate + item.expiresAfter!!
+            val expiry = item.expiryDate
             val timestamp = humanReadableTimestamp(expiry, now)
 
-            val expiringSoon = item.expiresAfter!!.inWholeDays <= 2
+            val expiringSoon = (expiry - now) <= expiringSoonDuration
             val color = if (expiringSoon) Color(255, 102, 0) else Color.Green
 
             Pair("Expires ${timestamp}.", color)
         }
 
         PantryItemState.FROZEN -> {
-            val frozen = item.expiryDate - (item.expiresAfter ?: Duration.ZERO)
+            val frozen = item.inStateSince
             val timestamp = humanReadableTimestamp(frozen, now)
 
             Pair("Frozen ${timestamp}.", Color.Cyan)
@@ -110,13 +113,14 @@ fun createStatus(item: PantryItem): Pair<String, Color> {
 @Composable
 fun PantryItemCard(
     item: PantryItem,
+    expiringSoonDuration: Duration,
     modifier: Modifier = Modifier,
 
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     onDelete: () -> Unit = {},
 ) {
-    val (status, statusColour) = createStatus(item)
+    val (status, statusColour) = createStatus(item, expiringSoonDuration)
 
     var refreshToggle by remember { mutableStateOf(false) }
 
@@ -319,7 +323,10 @@ internal fun DeleteAlertDialog(
 @Composable
 fun PantryItemCardPreviews(@PreviewParameter(SamplePantryItemProvider::class) pantryItem: PantryItem) {
     PantryPlanTheme {
-        PantryItemCard(item = pantryItem)
+        PantryItemCard(
+            item = pantryItem,
+            expiringSoonDuration = 2.days
+        )
     }
 }
 
@@ -329,7 +336,7 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
             quantity = 1000,
-            expiryDate = Clock.System.now(),
+            expiryDate = Clock.System.now().plus(3.days),
             expiresAfter = 1.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
@@ -340,7 +347,7 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
             quantity = 1000,
-            expiryDate = Clock.System.now(),
+            expiryDate = Clock.System.now().plus(1.days),
             expiresAfter = 3.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.OPENED,
@@ -353,7 +360,7 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             quantity = 1000,
             expiryDate = Clock.System.now(),
             expiresAfter = null,
-            inStateSince = Clock.System.now(),
+            inStateSince = Clock.System.now().minus(1.days),
             state = PantryItemState.FROZEN,
             imageUrl = null,
             barcode = null
@@ -362,7 +369,7 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
             quantity = 1000,
-            expiryDate = Clock.System.now(),
+            expiryDate = Clock.System.now().minus(1.days),
             expiresAfter = null,
             inStateSince = Clock.System.now(),
             state = PantryItemState.EXPIRED,
