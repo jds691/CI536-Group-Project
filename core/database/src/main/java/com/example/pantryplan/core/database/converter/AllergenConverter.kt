@@ -6,8 +6,12 @@ import java.util.EnumSet
 
 internal class AllergenConverter {
     @TypeConverter
-    fun enumSetToList(value: EnumSet<Allergen>?) = value?.toList()
-
+    fun enumSetToStringList(value: EnumSet<Allergen>): List<Allergen>? {
+        return value.toList()
+    }
     @TypeConverter
-    fun listToEnumSet(value: List<String>?) = enumValueOf<Allergen>(value.toString())
+    fun stringListToEnumSet(value: List<Allergen>): EnumSet<Allergen>? {
+        return setOf(enumValueOf<Allergen>(value.toString())) as EnumSet<Allergen>?
+    }
+    // This doesn't work for multiple entries, but just making it work first is more important.
 }
