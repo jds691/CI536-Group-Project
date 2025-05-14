@@ -137,7 +137,7 @@ private fun PantryItemEditScreen(
                 .padding(vertical = 8.dp)
         ) {
             Text(
-                text = "Image",
+                text = stringResource(R.string.feature_pantry_image),
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)
                 ),
@@ -184,14 +184,14 @@ private fun PantryItemEditTopBar(
         },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
-                Icon(Icons.Default.Clear, "")
+                Icon(Icons.Default.Clear, stringResource(R.string.feature_pantry_cancel))
             }
         },
         actions = {
             TextButton(
                 onClick = onSaveClick
             ) {
-                Text("Save")
+                Text(stringResource(R.string.feature_pantry_save))
             }
         }
     )
@@ -289,24 +289,24 @@ private fun PantryItemEditForm(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        val stateOptions = PantryItemState.entries.associate {
-            it to stringResource(it.getDisplayNameId())
+        val stateOptions = PantryItemState.entries.associateWith {
+            stringResource(it.getDisplayNameId())
         }
         OutlinedEnumSelectField(
             options = stateOptions,
             value = state,
             onValueChange = onChangeState,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("State") },
+            label = { Text(stringResource(R.string.feature_pantry_state)) },
         )
 
         Text(
-            text = "Quantity",
+            text = stringResource(R.string.feature_pantry_quantity),
             color = MaterialTheme.colorScheme.outline,
             style = MaterialTheme.typography.bodySmall,
         )
 
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -330,7 +330,7 @@ private fun PantryItemEditForm(
         }
 
         Text(
-            text = "When opened, expires in",
+            text = stringResource(R.string.feature_pantry_expires_in),
             color = MaterialTheme.colorScheme.outline,
             style = MaterialTheme.typography.bodySmall,
         )
