@@ -1,5 +1,6 @@
 package com.example.pantryplan.core.database.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.pantryplan.core.models.Measurement
@@ -21,6 +22,8 @@ data class PantryStock(
     val itemState: PantryItemState,
     val imageRefURL: String?, // TODO: Path once camera is functional
     val barcode: String?,
+    // defaultValue has to be compile time constant which lead to this, for the love of god lets hope this never breaks
+    @ColumnInfo(defaultValue = "GRAMS")
     val measurement: Measurement
 )
 
