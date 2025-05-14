@@ -270,7 +270,7 @@ internal fun DeleteAlertDialog(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "",
+                    contentDescription = null,
                     tint = AlertDialogDefaults.iconContentColor
                 )
 

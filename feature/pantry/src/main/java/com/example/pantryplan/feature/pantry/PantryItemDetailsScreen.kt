@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
@@ -93,12 +94,18 @@ fun PantryItemDetailsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.feature_pantry_back),
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = {showDeleteDialog = true}) {
-                        Icon(Icons.Outlined.Delete, "")
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = stringResource(R.string.feature_pantry_delete),
+                        )
                     }
                 }
             )
@@ -143,7 +150,7 @@ fun PantryItemDetailsScreen(
                         containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                     ) {
-                        Icon(Icons.Outlined.Edit, "")
+                        Icon(Icons.Outlined.Edit, stringResource(R.string.feature_pantry_edit))
                     }
                 }
             )
@@ -267,7 +274,7 @@ fun PantryItemDetailsScreen(
                         dismissButton = {
                             TextButton(onClick = { showDeleteDialog = false }) {
                                 Text(
-                                    text ="Cancel",
+                                    text = "Cancel",
                                     color = MaterialTheme.colorScheme.primary,
                                     style = MaterialTheme.typography.labelLarge
                                 )
