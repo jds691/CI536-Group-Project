@@ -177,7 +177,7 @@ fun PantryItemCard(
                     modifier = Modifier
                         .fillMaxHeight()
                         .aspectRatio(1.0f),
-                    fallback = painterResource(R.drawable.beefburger),
+                    fallback = painterResource(R.drawable.default_pantry_item_thumbnail),
                     contentDescription = null,
                     contentScale = ContentScale.Crop
                 )

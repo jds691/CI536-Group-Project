@@ -72,7 +72,7 @@ fun RecipeIngredientCard(
                 modifier = Modifier
                     .fillMaxHeight()
                     .aspectRatio(1.0f),
-                fallback = painterResource(R.drawable.beefburgers),
+                fallback = painterResource(R.drawable.default_recipe_thumbnail),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )

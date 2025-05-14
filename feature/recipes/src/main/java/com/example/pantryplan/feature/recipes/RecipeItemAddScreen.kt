@@ -148,7 +148,7 @@ private fun RecipeItemImageSelect() {
 
     val painter = rememberAsyncImagePainter(
         model = uri,
-        fallback = painterResource(R.drawable.cheeseburger),
+        fallback = painterResource(R.drawable.default_recipe_thumbnail),
     )
 
     val context = LocalContext.current
