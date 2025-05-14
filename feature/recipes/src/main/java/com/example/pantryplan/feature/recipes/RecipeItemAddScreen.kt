@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalUuidApi::class)
+
 package com.example.pantryplan.feature.recipes
 
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -73,12 +74,10 @@ import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.Ingredient
 import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.NutritionInfo
-import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.feature.recipes.ui.IngredientCard
 import java.io.File
 import java.util.EnumSet
 import java.util.UUID
-import kotlin.reflect.KSuspendFunction1
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -107,7 +106,6 @@ fun RecipeItemAddScreen(
         onChangePrepTime = viewModel::updatePrepTime,
         onChangeCookTime = viewModel::updateCookTime,
         onChangeNutritionalInfo = viewModel::updateNutritionalInfo,
-        onCheckForPantryMatch = viewModel::checkForPantryMatch
     )
 }
 
@@ -303,7 +301,6 @@ fun RecipeItemAddScreen(
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
     onChangeNutritionalInfo: (NutritionInfo) -> Unit,
-    onCheckForPantryMatch: KSuspendFunction1<String, PantryItem?>
 ) {
 
     val recipeItem = recipeItemAddUiState.recipeItem
@@ -361,10 +358,6 @@ fun RecipeItemAddScreen(
                 onChangePrepTime = onChangePrepTime,
                 onChangeCookTime = onChangeCookTime,
                 onChangeNutritionalInfo = onChangeNutritionalInfo,
-                onCheckForPantryMatch = onCheckForPantryMatch
-
-
-
             )
         }
 
@@ -394,7 +387,6 @@ private fun RecipeItemEditForm(
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
     onChangeNutritionalInfo: (NutritionInfo) -> Unit,
-    onCheckForPantryMatch: KSuspendFunction1<String, PantryItem?>
 ) {
     Column(
         modifier = Modifier
@@ -656,9 +648,6 @@ private fun RecipeItemEditForm(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             ingredients.forEach { ingredient ->
-                //TODO Did run blocking just to stop erroring im assuming this is not good practice.
-                //TODO Should work otherwise
-                //val pantryItem = runBlocking{ onCheckForPantryMatch(ingredient.name) }
                 IngredientCard(
                     modifier = Modifier,
                     Ingredient(
@@ -926,9 +915,6 @@ private fun RecipeItemEditForm(
                 label = { Text("Sodium") },
             )
         }
-
-
-
     }
 }
 

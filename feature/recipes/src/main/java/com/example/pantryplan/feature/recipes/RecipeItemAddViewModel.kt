@@ -9,14 +9,12 @@ import com.example.pantryplan.core.data.access.repository.RecipeRepository
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.Ingredient
 import com.example.pantryplan.core.models.NutritionInfo
-import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.navigation.RecipeItemAdd
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -126,15 +124,6 @@ class RecipeItemAddViewModel @Inject constructor(
     fun updateNutritionalInfo(nutritionalInfo: NutritionInfo) {
         recipeItem = recipeItem.copy(nutrition = nutritionalInfo)
         _uiState.update { it.copy(recipeItem = recipeItem) }
-    }
-
-    suspend fun checkForPantryMatch(possibleName: String): PantryItem? {
-        val itemList = pantryItemRepository.searchForItemsByName(possibleName)
-        if (itemList != emptyList<PantryItem>()) {
-            return itemList.first().first()
-        } else {
-            return null
-        }
     }
 
     fun saveRecipeItem() {
