@@ -1,6 +1,8 @@
 package com.example.pantryplan.settings
 
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.snapshots.SnapshotStateSet
@@ -28,7 +30,8 @@ class SettingsViewModel @Inject constructor(
         .map { preferences ->
             val settings = UserSettings(
                 showRelativeDates = mutableStateOf(preferences.useRelativeDates),
-                expiringSoonAmount = mutableStateOf(preferences.expiringSoonAmount)
+                expiringSoonAmount = mutableStateOf(preferences.expiringSoonAmount),
+                expectedMealCount = mutableIntStateOf(preferences.expectedMealCount)
             )
             settings.allergies.addAll(preferences.allergies)
 
@@ -59,6 +62,12 @@ class SettingsViewModel @Inject constructor(
             userPreferencesRepository.setAllergies(allergies)
         }
     }
+
+    fun updateExpectedMealCount(expectedMeals: Int) {
+        viewModelScope.launch {
+            userPreferencesRepository.setExpectedMealsCount(expectedMeals)
+        }
+    }
 }
 
 data class UserSettings(
@@ -66,6 +75,8 @@ data class UserSettings(
     val expiringSoonAmount: MutableState<Duration> = mutableStateOf(2.days),
 
     val allergies: SnapshotStateSet<Allergen> = mutableStateSetOf(),
+
+    val expectedMealCount: MutableIntState = mutableIntStateOf(3)
 )
 
 data class SettingsUiState(

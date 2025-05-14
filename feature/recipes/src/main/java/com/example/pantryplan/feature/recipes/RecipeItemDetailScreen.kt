@@ -12,18 +12,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ChipColors
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -36,7 +40,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldLabelScope
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,10 +58,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
+import com.example.pantryplan.core.models.Ingredient
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.NutritionInfo
+import com.example.pantryplan.core.models.PantryItem
+import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.core.models.Recipe
+import com.example.pantryplan.feature.recipes.ui.IngredientCard
+import com.example.pantryplan.feature.recipes.ui.RecipeIngredientCard
+import kotlinx.datetime.Clock
 import java.util.EnumSet
 import java.util.UUID
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
 
 internal fun cleanUpAllergenText(allergenName: String): String {
@@ -80,13 +93,17 @@ fun RecipeItemDetailsScreen(
 
 ) {
     val recipeDetailUiState: RecipePreferencesUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val servingAmount by viewModel.servingAmount.collectAsStateWithLifecycle()
+
     RecipeItemDetailsScreen(
         recipeDetailUiState = recipeDetailUiState,
         item = item,
         id = id,
 
         onBackClick = onBackClick,
-        onEditItem = onEditItem
+        onEditItem = onEditItem,
+        servingAmount = servingAmount,
+        onServingChange = viewModel::changeServingAmount
     )
 
 }
@@ -98,8 +115,13 @@ internal fun RecipeItemDetailsScreen(
     id: UUID,
 
     onBackClick: () -> Unit,
-    onEditItem: (UUID) -> Unit
+    onEditItem: (UUID) -> Unit,
+    servingAmount: Int,
+    onServingChange: (Int) -> Unit
 ) {
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -112,7 +134,7 @@ internal fun RecipeItemDetailsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = { showDeleteDialog = true }) {
                         Icon(Icons.Outlined.Delete, "")
                     }
                 }
@@ -139,6 +161,7 @@ internal fun RecipeItemDetailsScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
+                .verticalScroll(rememberScrollState())
                 .consumeWindowInsets(innerPadding)
                 .padding(innerPadding)
         ) {
@@ -219,7 +242,7 @@ internal fun RecipeItemDetailsScreen(
                             .fillMaxWidth()
                             .padding(32.dp, 0.dp, 32.dp, 0.dp)
                     ) {
-                        val recipeTime = DecimalFormat("#")
+                        val recipeTime = DecimalFormat("#.##")
                         val timeColor = MaterialTheme.colorScheme.onSurfaceVariant
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -288,14 +311,47 @@ internal fun RecipeItemDetailsScreen(
                             val servingAmountList = List(10) { "${it + 1}" }
                             OutlinedSelectField(
                                 modifier = Modifier
-                                    .width(80.dp),
+                                    .width(125.dp),
                                 options = servingAmountList,
+                                initialSelectedIndex = 0,
+                                onUpdate = {
+                                    onServingChange(it.toInt())
+                                }
+
                             )
                             Text(
                                 text = "Serving(s)",
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                        }
+                    }
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        item.ingredients.forEach { ingredient ->
+                            if (ingredient.linkedPantryItem == null) {
+                                IngredientCard(
+                                    modifier = Modifier,
+                                    Ingredient(
+                                        name = ingredient.name,
+                                        amount = (ingredient.amount * servingAmount),
+                                        measurement = ingredient.measurement,
+                                        linkedPantryItem = ingredient.linkedPantryItem
+                                    ),
+                                )
+                            } else {
+                                RecipeIngredientCard(
+                                    ingredientData = Ingredient(
+                                        name = ingredient.name,
+                                        amount = (ingredient.amount * servingAmount),
+                                        measurement = ingredient.measurement,
+                                        linkedPantryItem = ingredient.linkedPantryItem
+                                    )
+                                )
+                            }
                         }
                     }
 
@@ -346,6 +402,53 @@ internal fun RecipeItemDetailsScreen(
                         }
                     }
 
+                    if (showDeleteDialog) {
+                        AlertDialog(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            onDismissRequest = { showDeleteDialog = false },
+                            title = {
+                                Text(
+                                    text = "Delete '${item.title}'?",
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = "This recipe cannot be restored. Are you sure you want to delete it?",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        //TODO: add functionality to delete recipe
+                                        showDeleteDialog = false
+
+                                        onBackClick() // pops back to pantry screen when item is deleted
+                                    }
+                                ) {
+                                    Text(
+                                        text = "Delete",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showDeleteDialog = false }) {
+                                    Text(
+                                        text = "Cancel",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+
+                                }
+                            }
+                        )
+                    }
+
                 }
             }
 
@@ -356,21 +459,22 @@ internal fun RecipeItemDetailsScreen(
 @Composable
 private fun OutlinedSelectField(
     modifier: Modifier = Modifier,
-    label: @Composable (TextFieldLabelScope.() -> Unit)? = null,
     options: List<String>,
+    initialSelectedIndex: Int = 0,
+    onUpdate: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val textFieldState = rememberTextFieldState(options[0])
+    val textFieldState = rememberTextFieldState(options[initialSelectedIndex])
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it },
-        modifier = modifier,
+        modifier = modifier
     ) {
         OutlinedTextField(
             readOnly = true,
             state = textFieldState,
-            modifier = Modifier,
-            label = label,
+            modifier = Modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
         )
@@ -381,6 +485,7 @@ private fun OutlinedSelectField(
                     onClick = {
                         textFieldState.setTextAndPlaceCursorAtEnd(selectionOption)
                         expanded = false
+                        onUpdate(selectionOption)
                     }
                 )
             }
@@ -401,12 +506,28 @@ fun RecipesDetailPreview() {
         imageUrl = null,
         instructions = listOf("Cook Burger", "Eat burger"),
         ingredients = listOf(
-            "Beef Burger",
-            "Burger Buns",
-            "American Cheese",
-            "Lettuce",
-            "Red Onion",
-            "Bacon"
+            Ingredient(
+                name = "American Cheese",
+                amount = 200f,
+                measurement = Measurement.GRAMS,
+                linkedPantryItem = PantryItem(
+                    id = UUID.randomUUID(),
+                    name = "Beef Burgers",
+                    quantity = 600,
+                    expiryDate = Clock.System.now() + 7.days,
+                    expiresAfter = Duration.ZERO,
+                    inStateSince = Clock.System.now(),
+                    state = PantryItemState.SEALED,
+                    imageUrl = null,
+                    barcode = null,
+                )
+            ),
+            Ingredient(
+                name = "American Cheese",
+                amount = 200f,
+                measurement = Measurement.GRAMS,
+                linkedPantryItem = null
+            )
         ),
         prepTime = 10f,
         cookTime = 15f,
@@ -424,7 +545,7 @@ fun RecipesDetailPreview() {
     PantryPlanTheme {
         Surface {
             RecipeItemDetailsScreen(
-                recipeDetailUiState = RecipePreferencesUiState(),
+                //recipeDetailUiState = RecipePreferencesUiState(),
                 item = recipe,
                 id = UUID.randomUUID(),
                 onBackClick = {},

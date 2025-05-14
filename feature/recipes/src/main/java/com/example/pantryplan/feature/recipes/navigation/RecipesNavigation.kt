@@ -59,14 +59,7 @@ fun NavGraphBuilder.recipeSection(
                 allergens = EnumSet.of(Allergen.MILK, Allergen.GLUTEN, Allergen.SESAME),
                 imageUrl = null,
                 instructions = listOf("Cook Burger", "Eat burger"),
-                ingredients = listOf(
-                    "Beef Burger",
-                    "Burger Buns",
-                    "American Cheese",
-                    "Lettuce",
-                    "Red Onion",
-                    "Bacon"
-                ),
+                ingredients = emptyList(),
                 prepTime = 10f,
                 cookTime = 15f,
                 nutrition = NutritionInfo(

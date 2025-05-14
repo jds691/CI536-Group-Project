@@ -2,11 +2,12 @@
 
 package com.example.pantryplan.feature.meals
 
-import androidx.compose.foundation.Image
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -26,6 +27,7 @@ import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,14 +43,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.example.pantryplan.core.designsystem.recipes.RecipeItemCard
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.meals.ui.MacrosCard
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.DayOfWeekNames
+import kotlinx.datetime.toLocalDateTime
 import java.util.EnumSet
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
 import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
@@ -66,7 +76,6 @@ fun MealPlannerScreen(
         onMacroCardClick = onMacroCardClick,
 
         modifier = modifier
-
     )
 }
 
@@ -96,15 +105,17 @@ fun MealPlannerScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             TodaysMeals(
+                uiState = mealPlannerUiState,
                 onRecipeClick = onRecipeClick
             )
 
             Macros(
+                uiState = mealPlannerUiState,
                 onMacroCardClick = onMacroCardClick
             )
 
             NextThreeDays(
-                mealPlannerUiState = mealPlannerUiState,
+                uiState = mealPlannerUiState,
                 onRecipeClick = onRecipeClick
             )
 
@@ -115,6 +126,7 @@ fun MealPlannerScreen(
 
 @Composable
 private fun Macros(
+    uiState: MealPlannerUiState,
     onMacroCardClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -128,16 +140,7 @@ private fun Macros(
         )
 
         MacrosCard(
-            item = NutritionInfo(
-                calories = 500,
-                fats = 13.35f,
-                saturatedFats = 22f,
-                carbohydrates = 65f,
-                sugar = 12f,
-                fiber = 34f,
-                protein = 30f,
-                sodium = 12f
-            ),
+            item = uiState.dailyNutrition.value,
             onClick = onMacroCardClick
         )
     }
@@ -145,6 +148,7 @@ private fun Macros(
 
 @Composable
 private fun TodaysMeals(
+    uiState: MealPlannerUiState,
     onRecipeClick: (UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -172,13 +176,10 @@ private fun TodaysMeals(
     )
 
     // TODO: Create this list from the recommender system
-    val meals = listOf(
-        previewMeal,
-        previewMeal,
-        previewMeal
-    )
+    val meals = List(uiState.expectedMealCount.intValue) { _ -> previewMeal }
+    val mealsEaten = uiState.mealsEatenToday.intValue - 1
 
-    val carouselState = rememberCarouselState { meals.size }
+    val carouselState = rememberCarouselState(if (mealsEaten < 0) 0 else mealsEaten) { meals.size }
 
     Column(
         modifier = modifier
@@ -221,33 +222,30 @@ private fun CarouselMealCard(
         modifier = modifier
             .clickable(onClick = onClick)
     ){
-        if (meal.imageUrl != null) {
-            // TODO: Show image async loaded (afaik not supported by Compose natively)
-        } else {
-            Image(
-                painter = painterResource(R.drawable.default_recipe_thumbnail),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(316.dp)
-                    .height(205.dp)
+        AsyncImage(
+            model = meal.imageUrl,
+            modifier = Modifier
+                .width(316.dp)
+                .height(205.dp)
 
-                    // Slight gradient overlay as shown in Figma
-                    .drawWithContent {
-                        drawContent()
+                // Slight gradient overlay as shown in Figma
+                .drawWithContent {
+                    drawContent()
 
-                        drawRect(
-                            Brush.linearGradient(
-                                listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent),
+                    drawRect(
+                        Brush.linearGradient(
+                            listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent),
 
-                                // Rotates the gradient by 90 degrees
-                                start = Offset(0f, Float.POSITIVE_INFINITY),
-                                end = Offset(0f, 0f)
-                            )
+                            // Rotates the gradient by 90 degrees
+                            start = Offset(0f, Float.POSITIVE_INFINITY),
+                            end = Offset(0f, 0f)
                         )
-                    }
-            )
-        }
+                    )
+                },
+            fallback = painterResource(R.drawable.default_recipe_thumbnail),
+            contentDescription = null,
+            contentScale = ContentScale.Crop
+        )
 
         Column(
             modifier = Modifier
@@ -271,7 +269,7 @@ private fun CarouselMealCard(
 
 @Composable
 private fun NextThreeDays(
-    mealPlannerUiState: MealPlannerUiState,
+    uiState: MealPlannerUiState,
     onRecipeClick: (UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -299,14 +297,16 @@ private fun NextThreeDays(
     )
 
     // TODO: Create this list from the recommender system
-    val meals = listOf(
-        previewMeal,
-        previewMeal,
-        previewMeal
-    )
+    val meals = List(uiState.expectedMealCount.intValue) { _ -> previewMeal }
+
+    val format = LocalDate.Format {
+        dayOfWeek(DayOfWeekNames.ENGLISH_FULL)
+    }
+    val twoDaysAwayDayName = Clock.System.now().plus(2.days)
+        .toLocalDateTime(TimeZone.currentSystemDefault()).date.format(format)
 
     var selectedIndex by remember { mutableIntStateOf(0) }
-    val options = listOf("Today", "Tomorrow", "Wednesday")
+    val options = listOf("Today", "Tomorrow", twoDaysAwayDayName)
 
     Column(
         modifier = modifier,
@@ -318,7 +318,10 @@ private fun NextThreeDays(
             color = MaterialTheme.colorScheme.primary
         )
 
-        SingleChoiceSegmentedButtonRow {
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
             options.forEachIndexed { index, label ->
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(
@@ -345,7 +348,7 @@ private fun NextThreeDays(
                 onClick = {
                     onRecipeClick(meal.id)
                 },
-                userAllergies = mealPlannerUiState.allergies
+                userAllergies = uiState.allergies
             )
         }
     }
@@ -375,10 +378,14 @@ private fun Tips(modifier: Modifier = Modifier) {
 @Composable
 private fun TodaysMealsPreview() {
     PantryPlanTheme {
-        TodaysMeals(onRecipeClick = {})
+        TodaysMeals(
+            uiState = MealPlannerUiState(),
+            onRecipeClick = {}
+        )
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Preview(
     group = "Macros",
     showBackground = true
@@ -386,7 +393,23 @@ private fun TodaysMealsPreview() {
 @Composable
 private fun MacrosPreview() {
     PantryPlanTheme {
-        Macros(onMacroCardClick = {})
+        Macros(
+            uiState = MealPlannerUiState(
+                dailyNutrition = mutableStateOf(
+                    NutritionInfo(
+                        calories = 500,
+                        fats = 13.35f,
+                        saturatedFats = 22f,
+                        carbohydrates = 65f,
+                        sugar = 12f,
+                        fiber = 34f,
+                        protein = 30f,
+                        sodium = 12f
+                    )
+                )
+            ),
+            onMacroCardClick = {}
+        )
     }
 }
 
@@ -399,7 +422,7 @@ private fun NextThreeDaysPreview() {
     PantryPlanTheme {
         NextThreeDays(
             onRecipeClick = {},
-            mealPlannerUiState = MealPlannerUiState(),
+            uiState = MealPlannerUiState(),
         )
     }
 }

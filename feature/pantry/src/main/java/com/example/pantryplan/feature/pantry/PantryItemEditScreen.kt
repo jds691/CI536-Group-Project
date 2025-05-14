@@ -61,15 +61,15 @@ import coil3.compose.rememberAsyncImagePainter
 import com.example.pantryplan.core.designsystem.component.ImageSelect
 import com.example.pantryplan.core.models.PantryItemState
 import kotlinx.datetime.Instant
+import java.io.File
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import com.example.pantryplan.core.designsystem.R as designSystemR
-import java.io.File
-import kotlin.time.Duration
 
 @Composable
 fun PantryItemEditScreen(
@@ -320,6 +320,7 @@ private fun PantryItemEditForm(
             val measurementOptions = mapOf(
                 QuantityUnit.GRAMS to "Grams",
                 QuantityUnit.KILOGRAMS to "Kilograms",
+                QuantityUnit.OTHER to "Other"
             )
             OutlinedEnumSelectField(
                 options = measurementOptions,

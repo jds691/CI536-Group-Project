@@ -55,6 +55,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.tooling.preview)
 
+    implementation(libs.coil.kt.compose)
+
     //Hilt dependencies
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)

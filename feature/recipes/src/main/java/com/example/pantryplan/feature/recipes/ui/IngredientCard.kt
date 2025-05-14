@@ -2,8 +2,8 @@
 
 package com.example.pantryplan.feature.recipes.ui
 
+import android.icu.text.DecimalFormat
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,24 +39,30 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.pantryplan.core.designsystem.component.DeleteAlertDialog
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import com.example.pantryplan.core.models.Ingredient
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.feature.recipes.R
 
 @Composable
 fun IngredientCard(
     modifier: Modifier = Modifier,
+    ingredientData: Ingredient,
 
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     onDelete: () -> Unit = {},
 ) {
-    //TODO Get name and gram amount specified when created
-    val ingredientName = "American Cheese"
-    val gramAmount = 20
-
     val showDeleteAlert = remember { mutableStateOf(false) }
     val isResetting = remember { mutableStateOf(false) }
+
+    val measurementSignifier: String = when (ingredientData.measurement) {
+        Measurement.GRAMS -> "g"
+        Measurement.KILOGRAMS -> "kg"
+        Measurement.OTHER -> ""
+    }
 
     val dismissState = rememberSwipeToDismissBoxState()
     SwipeToDismissBox(
@@ -118,18 +124,15 @@ fun IngredientCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                //if (null == false) {
-                //TODO: Place recipe item image in card when there is an active image passed in
-                //} else {
-                Image(
+                AsyncImage(
+                    model = ingredientData.linkedPantryItem?.imageUrl,
                     modifier = Modifier
                         .fillMaxHeight()
                         .aspectRatio(1.0f),
-                    painter = painterResource(R.drawable.americancheese),
+                    fallback = painterResource(R.drawable.americancheese),
                     contentDescription = null,
                     contentScale = ContentScale.Crop
                 )
-                //}
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
                     horizontalAlignment = Alignment.Start,
@@ -137,11 +140,12 @@ fun IngredientCard(
 
 
                     Text(
-                        text = ingredientName,
+                        text = ingredientData.name,
                         style = MaterialTheme.typography.titleMedium
                     )
+                    val displayAmount = DecimalFormat("#.##")
                     Text(
-                        text = "Uses: " + gramAmount + "g",
+                        text = "Uses: " + displayAmount.format(ingredientData.amount) + measurementSignifier,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -151,7 +155,7 @@ fun IngredientCard(
 
     if (showDeleteAlert.value) {
         DeleteAlertDialog(
-            itemName = ingredientName,
+            itemName = ingredientData.name,
             showAlert = showDeleteAlert,
             onDelete = onDelete
         )
@@ -188,6 +192,14 @@ fun IngredientCard(
 @Composable
 fun IngredientCardPreview() {
     PantryPlanTheme {
-        IngredientCard()
+        IngredientCard(
+            modifier = Modifier,
+            Ingredient(
+                name = "American Cheese",
+                amount = 200.5f,
+                measurement = Measurement.GRAMS,
+                linkedPantryItem = null
+            )
+        )
     }
 }
