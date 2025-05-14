@@ -1,0 +1,76 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "a627295a32a2b0d14d720bfd542e5833",
+    "entities": [
+      {
+        "tableName": "PantryStock",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemID` TEXT NOT NULL, `itemName` TEXT NOT NULL, `dateExpiring` INTEGER NOT NULL, `expiresAfter` INTEGER, `quantity` INTEGER NOT NULL, `inStateSince` INTEGER NOT NULL, `itemState` TEXT NOT NULL, `imageRefURL` TEXT, `barcode` TEXT, PRIMARY KEY(`itemID`))",
+        "fields": [
+          {
+            "fieldPath": "itemID",
+            "columnName": "itemID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemName",
+            "columnName": "itemName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateExpiring",
+            "columnName": "dateExpiring",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expiresAfter",
+            "columnName": "expiresAfter",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inStateSince",
+            "columnName": "inStateSince",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemState",
+            "columnName": "itemState",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imageRefURL",
+            "columnName": "imageRefURL",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "barcode",
+            "columnName": "barcode",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "itemID"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a627295a32a2b0d14d720bfd542e5833')"
+    ]
+  }
+}

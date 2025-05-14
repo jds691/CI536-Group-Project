@@ -2,6 +2,7 @@ package com.example.pantryplan.core.database
 
 import com.example.pantryplan.core.database.dao.PantryStockStateUpdate
 import com.example.pantryplan.core.database.model.PantryStock
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItemState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -205,9 +206,10 @@ private fun testPantryStock(
     itemName = name,
     dateExpiring = Clock.System.now().plus(7.days),
     expiresAfter = 2.days,
-    quantity = 0,
+    quantity = 0f,
     inStateSince = Clock.System.now(),
     itemState = state,
     imageRefURL = null,
-    barcode = barcode
+    barcode = barcode,
+    measurement = Measurement.GRAMS
 )

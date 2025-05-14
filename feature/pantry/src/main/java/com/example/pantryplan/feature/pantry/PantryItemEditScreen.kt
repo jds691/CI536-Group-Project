@@ -59,6 +59,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import com.example.pantryplan.core.designsystem.component.ImageSelect
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItemState
 import kotlinx.datetime.Instant
 import java.io.File
@@ -89,7 +90,7 @@ fun PantryItemEditScreen(
         onChangeExpiryDate = viewModel::updateExpiryDate,
         onChangeState = viewModel::updateState,
         onChangeQuantity = viewModel::updateQuantity,
-        onChangeQuantityUnit = viewModel::updateQuantityUnit,
+        onChangeMeasurementUnit = viewModel::updateMeasurementUnit,
         onChangeExpiresAfter = viewModel::updateExpiresAfter,
         onChangeExpiresAfterUnit = viewModel::updateExpiresAfterUnit
     )
@@ -105,8 +106,8 @@ private fun PantryItemEditScreen(
     onChangeName: (String) -> Unit,
     onChangeExpiryDate: (Instant) -> Unit,
     onChangeState: (PantryItemState) -> Unit,
-    onChangeQuantity: (Int) -> Unit,
-    onChangeQuantityUnit: (QuantityUnit) -> Unit,
+    onChangeQuantity: (Float) -> Unit,
+    onChangeMeasurementUnit: (Measurement) -> Unit,
     onChangeExpiresAfter: (Duration) -> Unit,
     onChangeExpiresAfterUnit: (ExpiresAfterUnit) -> Unit,
 ) {
@@ -151,14 +152,14 @@ private fun PantryItemEditScreen(
                 expiryDate = pantryItem.expiryDate,
                 state = pantryItem.state,
                 quantity = pantryItem.quantity,
-                quantityUnit = pantryItemEditUiState.quantityUnit,
+                measurementUnit = pantryItem.measurement,
                 expiresAfter = pantryItem.expiresAfter!!,
                 expiresAfterUnit = pantryItemEditUiState.expiresAfterUnit,
                 onChangeName = onChangeName,
                 onChangeExpiryDate = onChangeExpiryDate,
                 onChangeState = onChangeState,
                 onChangeQuantity = onChangeQuantity,
-                onChangeQuantityUnit = onChangeQuantityUnit,
+                onChangeMeasurementUnit = onChangeMeasurementUnit,
                 onChangeExpiresAfter = onChangeExpiresAfter,
                 onChangeExpiresAfterUnit = onChangeExpiresAfterUnit,
             )
@@ -251,15 +252,15 @@ private fun PantryItemEditForm(
     name: String,
     expiryDate: Instant,
     state: PantryItemState,
-    quantity: Int,
-    quantityUnit: QuantityUnit,
+    quantity: Float,
+    measurementUnit: Measurement,
     expiresAfter: Duration,
     expiresAfterUnit: ExpiresAfterUnit,
     onChangeName: (String) -> Unit,
     onChangeExpiryDate: (Instant) -> Unit,
     onChangeState: (PantryItemState) -> Unit,
-    onChangeQuantity: (Int) -> Unit,
-    onChangeQuantityUnit: (QuantityUnit) -> Unit,
+    onChangeQuantity: (Float) -> Unit,
+    onChangeMeasurementUnit: (Measurement) -> Unit,
     onChangeExpiresAfter: (Duration) -> Unit,
     onChangeExpiresAfterUnit: (ExpiresAfterUnit) -> Unit,
 ) {
@@ -311,21 +312,21 @@ private fun PantryItemEditForm(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            OutlinedIntField(
+            OutlinedFloatField(
                 value = quantity,
                 onValueChange = onChangeQuantity,
                 modifier = Modifier.weight(1f),
             )
 
             val measurementOptions = mapOf(
-                QuantityUnit.GRAMS to "Grams",
-                QuantityUnit.KILOGRAMS to "Kilograms",
-                QuantityUnit.OTHER to "Other"
+                Measurement.GRAMS to "Grams",
+                Measurement.KILOGRAMS to "Kilograms",
+                Measurement.OTHER to "Other"
             )
             OutlinedEnumSelectField(
                 options = measurementOptions,
-                value = quantityUnit,
-                onValueChange = onChangeQuantityUnit,
+                value = measurementUnit,
+                onValueChange = onChangeMeasurementUnit,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -485,6 +486,25 @@ private fun OutlinedIntField(
         onValueChange = {
             onValueChange(
                 runCatching { it.toInt() }.getOrDefault(0)
+            )
+        },
+        modifier = modifier,
+        label = label,
+    )
+}
+
+@Composable
+private fun OutlinedFloatField(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+) {
+    OutlinedNumberField(
+        value = value.toString(),
+        onValueChange = {
+            onValueChange(
+                runCatching { it.toFloat() }.getOrDefault(0f)
             )
         },
         modifier = modifier,
