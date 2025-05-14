@@ -53,6 +53,12 @@ fun RecipeIngredientCard(
         Measurement.OTHER -> ""
     }
 
+    val pantryMeasurementSignifier: String = when (ingredientData.linkedPantryItem!!.measurement) {
+        Measurement.GRAMS -> "g"
+        Measurement.KILOGRAMS -> "kg"
+        Measurement.OTHER -> ""
+    }
+
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -85,25 +91,22 @@ fun RecipeIngredientCard(
             ) {
 
                 var actualUseAmount = ingredientData.amount
+                var actualPantryAmount = ingredientData.linkedPantryItem!!.quantity
+
                 if (ingredientData.measurement == Measurement.KILOGRAMS) {
                     actualUseAmount *= 1000
                 }
+                if (ingredientData.linkedPantryItem!!.measurement == Measurement.KILOGRAMS) {
+                    actualPantryAmount *= 1000
+                }
 
                 val progressDecrease =
-                    actualUseAmount / ingredientData.linkedPantryItem!!.quantity.toFloat()
+                    actualUseAmount / actualPantryAmount
                 val progressAmount = 1.0f - progressDecrease
                 var progressColor = Color.Green
 
+                val displayPantryAmount = ingredientData.linkedPantryItem!!.quantity
                 val displayAmount = DecimalFormat("#.##")
-
-                var displayPantryAmount = ingredientData.linkedPantryItem!!.quantity.toFloat()
-                var pantryMeasurementSignifier = "g"
-
-                if (ingredientData.linkedPantryItem!!.quantity.toFloat() > 999) {
-                    displayPantryAmount =
-                        ingredientData.linkedPantryItem!!.quantity.toFloat() / 1000
-                    pantryMeasurementSignifier = "kg"
-                }
 
                 Text(
                     text = ingredientData.name,
@@ -149,12 +152,12 @@ fun RecipeIngredientCardPreview() {
             modifier = Modifier,
             Ingredient(
                 name = "Beef Burgers",
-                amount = 200f,
-                measurement = Measurement.GRAMS,
+                amount = 2f,
+                measurement = Measurement.KILOGRAMS,
                 linkedPantryItem = PantryItem(
                     id = UUID.randomUUID(),
                     name = "Beef Burgers",
-                    quantity = 1500f,
+                    quantity = 2500f,
                     expiryDate = Clock.System.now() + 7.days,
                     expiresAfter = Duration.ZERO,
                     inStateSince = Clock.System.now(),
