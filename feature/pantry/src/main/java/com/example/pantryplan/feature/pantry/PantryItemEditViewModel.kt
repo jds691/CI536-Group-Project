@@ -114,6 +114,7 @@ class PantryItemEditViewModel @Inject constructor(
             val newQuantity = pantryItem.value.quantity * when (quantityUnit.value) {
                 QuantityUnit.GRAMS -> 1
                 QuantityUnit.KILOGRAMS -> 1000
+                QuantityUnit.OTHER -> 1
             }
 
             // TODO: Replace with .weeks and .months when type is changed to DatePeriod.
@@ -144,7 +145,7 @@ data class PantryItemEditUiState(
 )
 
 enum class QuantityUnit {
-    GRAMS, KILOGRAMS
+    GRAMS, KILOGRAMS, OTHER
 }
 
 enum class ExpiresAfterUnit {
