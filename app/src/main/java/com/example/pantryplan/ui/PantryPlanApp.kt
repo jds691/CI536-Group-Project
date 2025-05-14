@@ -37,6 +37,7 @@ import com.example.pantryplan.feature.recipes.navigation.navigateToRecipeItemAdd
 import com.example.pantryplan.feature.recipes.navigation.recipeSection
 import com.example.pantryplan.navigation.TopLevelDestination
 import com.example.pantryplan.settings.navigation.navigateToAllergySettings
+import com.example.pantryplan.settings.navigation.navigateToMealPlannerSettings
 import com.example.pantryplan.settings.navigation.navigateToPantrySettings
 import com.example.pantryplan.settings.navigation.navigateToSettings
 import com.example.pantryplan.settings.navigation.settingsSection
@@ -134,7 +135,8 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
 
                 onBackClick = appState.navController::popBackStack,
                 onAllergySettingsClick = appState.navController::navigateToAllergySettings,
-                onPantrySettingsClick = appState.navController::navigateToPantrySettings
+                onPantrySettingsClick = appState.navController::navigateToPantrySettings,
+                onMealPlannerSettingsClick = appState.navController::navigateToMealPlannerSettings
             )
         }
     }

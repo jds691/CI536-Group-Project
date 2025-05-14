@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":core:data-access"))
     implementation(project(":core:design-system"))
 
+    implementation(libs.coil.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

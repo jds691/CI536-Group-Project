@@ -52,6 +52,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
@@ -59,31 +60,31 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import com.example.pantryplan.core.designsystem.component.ImageSelect
+import com.example.pantryplan.core.designsystem.text.getDisplayNameId
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItemState
 import kotlinx.datetime.Instant
+import java.io.File
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import com.example.pantryplan.core.designsystem.R as designSystemR
-import java.io.File
-import kotlin.time.Duration
 
 @Composable
 fun PantryItemEditScreen(
     viewModel: PantryItemEditViewModel = hiltViewModel(),
 
     existingId: UUID? = null,
-    barcode: String? = null,
     onBackClick: () -> Unit,
 ) {
     val pantryItemEditUiState by viewModel.uiState.collectAsStateWithLifecycle()
     PantryItemEditScreen(
         pantryItemEditUiState = pantryItemEditUiState,
         existingId = existingId,
-        barcode = barcode,
         onBackClick = onBackClick,
         onSaveClick = viewModel::savePantryItem,
         onChangeImageURI = viewModel::updateImageUri,
@@ -91,7 +92,7 @@ fun PantryItemEditScreen(
         onChangeExpiryDate = viewModel::updateExpiryDate,
         onChangeState = viewModel::updateState,
         onChangeQuantity = viewModel::updateQuantity,
-        onChangeQuantityUnit = viewModel::updateQuantityUnit,
+        onChangeMeasurementUnit = viewModel::updateMeasurementUnit,
         onChangeExpiresAfter = viewModel::updateExpiresAfter,
         onChangeExpiresAfterUnit = viewModel::updateExpiresAfterUnit
     )
@@ -101,15 +102,14 @@ fun PantryItemEditScreen(
 private fun PantryItemEditScreen(
     pantryItemEditUiState: PantryItemEditUiState,
     existingId: UUID?,
-    barcode: String? = null,
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
     onChangeImageURI: (String?) -> Unit,
     onChangeName: (String) -> Unit,
     onChangeExpiryDate: (Instant) -> Unit,
     onChangeState: (PantryItemState) -> Unit,
-    onChangeQuantity: (Int) -> Unit,
-    onChangeQuantityUnit: (QuantityUnit) -> Unit,
+    onChangeQuantity: (Float) -> Unit,
+    onChangeMeasurementUnit: (Measurement) -> Unit,
     onChangeExpiresAfter: (Duration) -> Unit,
     onChangeExpiresAfterUnit: (ExpiresAfterUnit) -> Unit,
 ) {
@@ -137,7 +137,7 @@ private fun PantryItemEditScreen(
                 .padding(vertical = 8.dp)
         ) {
             Text(
-                text = "Image",
+                text = stringResource(R.string.feature_pantry_image),
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(designSystemR.dimen.form_horizontal_margin)
                 ),
@@ -154,14 +154,14 @@ private fun PantryItemEditScreen(
                 expiryDate = pantryItem.expiryDate,
                 state = pantryItem.state,
                 quantity = pantryItem.quantity,
-                quantityUnit = pantryItemEditUiState.quantityUnit,
+                measurementUnit = pantryItem.measurement,
                 expiresAfter = pantryItem.expiresAfter!!,
                 expiresAfterUnit = pantryItemEditUiState.expiresAfterUnit,
                 onChangeName = onChangeName,
                 onChangeExpiryDate = onChangeExpiryDate,
                 onChangeState = onChangeState,
                 onChangeQuantity = onChangeQuantity,
-                onChangeQuantityUnit = onChangeQuantityUnit,
+                onChangeMeasurementUnit = onChangeMeasurementUnit,
                 onChangeExpiresAfter = onChangeExpiresAfter,
                 onChangeExpiresAfterUnit = onChangeExpiresAfterUnit,
             )
@@ -177,22 +177,21 @@ private fun PantryItemEditTopBar(
 ) {
     TopAppBar(
         title = {
-            if (name == null) {
-                Text("Add Item")
-            } else {
-                Text("Update ‘${name}’")
-            }
+            Text(
+                name?.let { stringResource(R.string.feature_pantry_update_item, name) }
+                    ?: stringResource(R.string.feature_pantry_add_item)
+            )
         },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
-                Icon(Icons.Default.Clear, "")
+                Icon(Icons.Default.Clear, stringResource(R.string.feature_pantry_cancel))
             }
         },
         actions = {
             TextButton(
                 onClick = onSaveClick
             ) {
-                Text("Save")
+                Text(stringResource(R.string.feature_pantry_save))
             }
         }
     )
@@ -254,15 +253,15 @@ private fun PantryItemEditForm(
     name: String,
     expiryDate: Instant,
     state: PantryItemState,
-    quantity: Int,
-    quantityUnit: QuantityUnit,
+    quantity: Float,
+    measurementUnit: Measurement,
     expiresAfter: Duration,
     expiresAfterUnit: ExpiresAfterUnit,
     onChangeName: (String) -> Unit,
     onChangeExpiryDate: (Instant) -> Unit,
     onChangeState: (PantryItemState) -> Unit,
-    onChangeQuantity: (Int) -> Unit,
-    onChangeQuantityUnit: (QuantityUnit) -> Unit,
+    onChangeQuantity: (Float) -> Unit,
+    onChangeMeasurementUnit: (Measurement) -> Unit,
     onChangeExpiresAfter: (Duration) -> Unit,
     onChangeExpiresAfterUnit: (ExpiresAfterUnit) -> Unit,
 ) {
@@ -275,7 +274,7 @@ private fun PantryItemEditForm(
             value = name,
             onValueChange = onChangeName,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Name") },
+            label = { Text(stringResource(R.string.feature_pantry_name)) },
             singleLine = true,
         )
 
@@ -286,54 +285,52 @@ private fun PantryItemEditForm(
                     Instant.fromEpochMilliseconds(expiryDateMillis!!)
                 )
             },
-            label = { Text("Expires") },
+            label = { Text(stringResource(R.string.feature_pantry_expires)) },
             modifier = Modifier.fillMaxWidth(),
         )
 
-        val stateOptions = mapOf(
-            PantryItemState.SEALED to "Sealed",
-            PantryItemState.OPENED to "Opened",
-            PantryItemState.FROZEN to "Frozen",
-            PantryItemState.EXPIRED to "Expired",
-        )
+        val stateOptions = PantryItemState.entries.associateWith {
+            stringResource(it.getDisplayNameId())
+        }
         OutlinedEnumSelectField(
             options = stateOptions,
             value = state,
             onValueChange = onChangeState,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("State") },
+            label = { Text(stringResource(R.string.feature_pantry_state)) },
         )
 
         Text(
-            text = "Quantity",
+            text = stringResource(R.string.feature_pantry_quantity),
             color = MaterialTheme.colorScheme.outline,
             style = MaterialTheme.typography.bodySmall,
         )
 
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            OutlinedIntField(
+            OutlinedFloatField(
                 value = quantity,
                 onValueChange = onChangeQuantity,
                 modifier = Modifier.weight(1f),
             )
 
             val measurementOptions = mapOf(
-                QuantityUnit.GRAMS to "Grams",
-                QuantityUnit.KILOGRAMS to "Kilograms",
+                Measurement.GRAMS to "Grams",
+                Measurement.KILOGRAMS to "Kilograms",
+                Measurement.OTHER to "Other"
             )
             OutlinedEnumSelectField(
                 options = measurementOptions,
-                value = quantityUnit,
-                onValueChange = onChangeQuantityUnit,
+                value = measurementUnit,
+                onValueChange = onChangeMeasurementUnit,
                 modifier = Modifier.weight(1f),
             )
         }
 
         Text(
-            text = "When opened, expires in",
+            text = stringResource(R.string.feature_pantry_expires_in),
             color = MaterialTheme.colorScheme.outline,
             style = MaterialTheme.typography.bodySmall,
         )
@@ -487,6 +484,25 @@ private fun OutlinedIntField(
         onValueChange = {
             onValueChange(
                 runCatching { it.toInt() }.getOrDefault(0)
+            )
+        },
+        modifier = modifier,
+        label = label,
+    )
+}
+
+@Composable
+private fun OutlinedFloatField(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+) {
+    OutlinedNumberField(
+        value = value.toString(),
+        onValueChange = {
+            onValueChange(
+                runCatching { it.toFloat() }.getOrDefault(0f)
             )
         },
         modifier = modifier,

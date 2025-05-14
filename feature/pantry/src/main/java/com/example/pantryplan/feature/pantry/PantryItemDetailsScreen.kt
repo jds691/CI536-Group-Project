@@ -2,6 +2,7 @@
 
 package com.example.pantryplan.feature.pantry
 
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,10 +29,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,58 +42,49 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
+import com.example.pantryplan.core.designsystem.text.asRelativeFormattedDate
 import com.example.pantryplan.core.designsystem.text.pantryPlanExactFormat
-import com.example.pantryplan.core.models.PantryItem
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItemState
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.util.UUID
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
-fun getFormattedExpiryDate(expiryDate: Instant, expiresAfter: Duration?): String {
-    val time = expiryDate + expiresAfter!!
+fun getFormattedExpiryDate(expiryDate: Instant): String {
     val zone = TimeZone.currentSystemDefault()
 
-    val localDateTime = time.toLocalDateTime(zone).date
-    val localDateFormatted = localDateTime.pantryPlanExactFormat()
-    return (localDateFormatted)
-}
-
-fun getFormattedExpiresAfter(duration: Duration?): String {
-    if (duration != null) {
-        return when {
-            duration >= 7.days -> {
-                val weeks = duration.inWholeDays / 7
-                " (in $weeks week${if (weeks > 1) "s)" else ")"}"
-            }
-            duration >= 1.days -> {
-                val days = duration.inWholeDays
-                " (in $days day${if (days > 1) "s)" else ")"}"
-            }
-            else -> {
-                "Today"
-            }
-        }
-    }
-    else {
-        return ""
-    }
+    val localDateTime = expiryDate.toLocalDateTime(zone).date
+    return localDateTime.pantryPlanExactFormat()
 }
 
 @Composable
 fun PantryItemDetailsScreen(
     id: UUID,
-    item: PantryItem,
 
-    onBackClick: () -> Unit,
     onEditItem: (UUID) -> Unit,
+    onBackClick: () -> Unit,
+    viewModel: PantryItemDetailsViewModel = hiltViewModel()
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val item by viewModel.item.collectAsState()
+
+    val formatter = DecimalFormat("#.##")
+
+    val measurementSignifier: String = when (item.measurement) {
+        Measurement.GRAMS -> "g"
+        Measurement.KILOGRAMS -> "kg"
+        Measurement.OTHER -> ""
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadItem()
+    }
 
     Scaffold(
         topBar = {
@@ -101,12 +94,18 @@ fun PantryItemDetailsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.feature_pantry_back),
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = {showDeleteDialog = true}) {
-                        Icon(Icons.Outlined.Delete, "")
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = stringResource(R.string.feature_pantry_delete),
+                        )
                     }
                 }
             )
@@ -115,26 +114,29 @@ fun PantryItemDetailsScreen(
             BottomAppBar(
                 actions = {
                     Row {
-                        if (item.state == PantryItemState.SEALED) { //TODO: change item state onClick
+                        if (item.state == PantryItemState.SEALED) {
                             //open
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = {viewModel.updateState(PantryItemState.OPENED)}) {
                                 Icon(painterResource(R.drawable.mark_as_opened), "Open")
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             //freeze
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = {viewModel.updateState(PantryItemState.FROZEN)}) {
                                 Icon(painterResource(R.drawable.freeze), "Freeze")
                             }
                         }
                         if (item.state == PantryItemState.OPENED) {
                             //freeze
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = {viewModel.updateState(PantryItemState.FROZEN)}) {
                                 Icon(painterResource(R.drawable.freeze), "Freeze")
                             }
                         }
                         if (item.state == PantryItemState.FROZEN) {
                             //unfreeze
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = {
+                                viewModel.updateState(PantryItemState.OPENED)
+                                viewModel.updateExpiresAfter(1.days)
+                            }) {
                                 Icon(painterResource(R.drawable.unfreeze), "Unfreeze")
                             }
                         }
@@ -148,7 +150,7 @@ fun PantryItemDetailsScreen(
                         containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                     ) {
-                        Icon(Icons.Outlined.Edit, "")
+                        Icon(Icons.Outlined.Edit, stringResource(R.string.feature_pantry_edit))
                     }
                 }
             )
@@ -163,11 +165,14 @@ fun PantryItemDetailsScreen(
                 modifier = Modifier
                     .height(200.dp)
                     .fillMaxWidth(),
-                painter = painterResource(R.drawable.smugcat), // will be item.imageURL later
+                painter = rememberAsyncImagePainter(
+                    item.imageUrl,
+                    fallback = painterResource(R.drawable.default_pantry_item_thumbnail)
+                ),
                 contentDescription = null,
-                contentScale = ContentScale.FillBounds
-
+                contentScale = ContentScale.Crop
             )
+
             Column (
                 modifier = Modifier
                     .padding(12.dp)
@@ -189,12 +194,12 @@ fun PantryItemDetailsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = getFormattedExpiryDate(item.expiryDate, item.expiresAfter),
+                            text = getFormattedExpiryDate(item.expiryDate),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = getFormattedExpiresAfter(item.expiresAfter),
+                            text = " (${item.expiryDate.asRelativeFormattedDate()})",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -231,7 +236,7 @@ fun PantryItemDetailsScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = (item.quantity).toString() + "g",
+                    text = "" + formatter.format(item.quantity) + "" + measurementSignifier,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -253,11 +258,11 @@ fun PantryItemDetailsScreen(
                         confirmButton = {
                             TextButton(
                                 onClick = {
-                                    //TODO: add functionality to delete item
                                     showDeleteDialog = false
-
-                                    onBackClick() // pops back to pantry screen when item is deleted
+                                    viewModel.deleteItem()
+                                    onBackClick()
                                 }
+
                             ) {
                                 Text(
                                     text = "Delete",
@@ -269,7 +274,7 @@ fun PantryItemDetailsScreen(
                         dismissButton = {
                             TextButton(onClick = { showDeleteDialog = false }) {
                                 Text(
-                                    text ="Cancel",
+                                    text = "Cancel",
                                     color = MaterialTheme.colorScheme.primary,
                                     style = MaterialTheme.typography.labelLarge
                                 )
@@ -280,29 +285,5 @@ fun PantryItemDetailsScreen(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PantryItemDetailsScreenPreview() {
-    Surface {
-        PantryItemDetailsScreen(
-            id = UUID.randomUUID(),
-            onBackClick = {},
-            onEditItem = {},
-
-            item = PantryItem (
-                id = UUID.randomUUID(),
-                name = "Bacon",
-                quantity = 250,
-                expiryDate = Clock.System.now(),
-                expiresAfter = 21.days,
-                inStateSince = Clock.System.now(),
-                imageUrl = null,
-                state = PantryItemState.SEALED,
-                barcode = null
-            )
-        )
     }
 }

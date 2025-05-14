@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import com.example.pantryplan.core.models.Allergen
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,8 @@ private val expiringSoonAmountPreferencesKey = longPreferencesKey("expiring_soon
 
 private val allergiesPreferencesKey = byteArrayPreferencesKey("allergies")
 
+private val expectedMealCountPreferencesKey = intPreferencesKey("expected_meal_count")
+
 class UserPreferencesDataSource @Inject constructor(
     private val userPreferences: DataStore<Preferences>,
 ) {
@@ -44,11 +47,16 @@ class UserPreferencesDataSource @Inject constructor(
         val useRelativeDates =
             preferences[useRelativeDatesPreferencesKey] ?: true
 
+        val expectedMealsCount =
+            preferences[expectedMealCountPreferencesKey] ?: 3
+
         UserPreferences(
             useRelativeDates = useRelativeDates,
             expiringSoonAmount = expiringSoon,
 
-            allergies = allergies!!
+            allergies = allergies!!,
+
+            expectedMealCount = expectedMealsCount
         )
     }
 
@@ -66,6 +74,12 @@ class UserPreferencesDataSource @Inject constructor(
 
     suspend fun setAllergies(allergies: EnumSet<Allergen>) {
         setJavaSerializablePreference(allergiesPreferencesKey, allergies)
+    }
+
+    suspend fun setExpectedMealsCount(expectedMeals: Int) {
+        userPreferences.edit { preferences ->
+            preferences[expectedMealCountPreferencesKey] = expectedMeals
+        }
     }
 
     private suspend inline fun <reified T> readJavaSerializablePreference(

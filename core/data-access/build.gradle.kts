@@ -5,6 +5,8 @@ plugins {
     // Hilt plugins.
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+
+    id("kotlinx-serialization")
 }
 
 android {
@@ -39,6 +41,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation(libs.kotlinx.serialization.json)
 
     // Hilt dependencies.
     implementation(libs.hilt.android)
