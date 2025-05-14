@@ -57,7 +57,7 @@ class PantryItemDetailsViewModel @Inject constructor(
 
     fun updateExpiresAfter(duration: Duration) {
         pantryItem.update {
-            it.copy(expiresAfter = duration)
+            it.copy(expiresAfter = duration, expiryDate = Clock.System.now()+ duration)
         }
 
         viewModelScope.launch {
