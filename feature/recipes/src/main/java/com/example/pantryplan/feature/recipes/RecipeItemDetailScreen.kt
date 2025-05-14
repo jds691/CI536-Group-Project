@@ -85,19 +85,17 @@ internal fun cleanUpAllergenText(allergenName: String): String {
 @Composable
 fun RecipeItemDetailsScreen(
     viewModel: RecipeDetailViewModel = hiltViewModel(),
-    item: Recipe,
     id: UUID,
 
     onBackClick: () -> Unit,
     onEditItem: (UUID) -> Unit
 
 ) {
-    val recipeDetailUiState: RecipePreferencesUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val recipeDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val servingAmount by viewModel.servingAmount.collectAsStateWithLifecycle()
 
     RecipeItemDetailsScreen(
         recipeDetailUiState = recipeDetailUiState,
-        item = item,
         id = id,
 
         onBackClick = onBackClick,
@@ -110,8 +108,7 @@ fun RecipeItemDetailsScreen(
 
 @Composable
 internal fun RecipeItemDetailsScreen(
-    recipeDetailUiState: RecipePreferencesUiState,
-    item: Recipe,
+    recipeDetailUiState: RecipeDetailsUiState,
     id: UUID,
 
     onBackClick: () -> Unit,
@@ -119,7 +116,7 @@ internal fun RecipeItemDetailsScreen(
     servingAmount: Int,
     onServingChange: (Int) -> Unit
 ) {
-
+    val recipe = recipeDetailUiState.recipe
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -181,7 +178,7 @@ internal fun RecipeItemDetailsScreen(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = item.title,
+                    text = recipe.title,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Row(
@@ -194,7 +191,7 @@ internal fun RecipeItemDetailsScreen(
                     )
                     val allergenSet = recipeDetailUiState.allergies
                     var chipEnabled = true
-                    item.allergens.forEach { allergen ->
+                    recipe.allergens.forEach { allergen ->
 
                         if (allergenSet.contains(allergen)) {
                             chipEnabled = false
@@ -222,7 +219,7 @@ internal fun RecipeItemDetailsScreen(
                     }
                 }
                 Text(
-                    text = item.description,
+                    text = recipe.description,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Column(
@@ -253,7 +250,7 @@ internal fun RecipeItemDetailsScreen(
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
-                                text = recipeTime.format(item.prepTime) + " Min",
+                                text = recipeTime.format(recipe.prepTime) + " Min",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = timeColor
                             )
@@ -267,7 +264,7 @@ internal fun RecipeItemDetailsScreen(
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
-                                text = recipeTime.format(item.cookTime) + " Min",
+                                text = recipeTime.format(recipe.cookTime) + " Min",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = timeColor
                             )
@@ -281,7 +278,7 @@ internal fun RecipeItemDetailsScreen(
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
-                                text = "" + item.nutrition.calories + " (Kcal)",
+                                text = "" + recipe.nutrition.calories + " (Kcal)",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = timeColor
                             )
@@ -331,7 +328,7 @@ internal fun RecipeItemDetailsScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        item.ingredients.forEach { ingredient ->
+                        recipe.ingredients.forEach { ingredient ->
                             if (ingredient.linkedPantryItem == null) {
                                 IngredientCard(
                                     modifier = Modifier,
@@ -371,7 +368,7 @@ internal fun RecipeItemDetailsScreen(
                         horizontalAlignment = Alignment.Start
                     ) {
                         var stepNum = 1
-                        item.instructions.forEach { instruction ->
+                        recipe.instructions.forEach { instruction ->
                             Text(
                                 text = "Step $stepNum - $instruction",
                                 style = MaterialTheme.typography.bodyMedium
@@ -394,7 +391,7 @@ internal fun RecipeItemDetailsScreen(
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
-                        item.tags.forEach { tag ->
+                        recipe.tags.forEach { tag ->
                             AssistChip(
                                 onClick = {},
                                 label = { Text(tag) }
@@ -408,7 +405,7 @@ internal fun RecipeItemDetailsScreen(
                             onDismissRequest = { showDeleteDialog = false },
                             title = {
                                 Text(
-                                    text = "Delete '${item.title}'?",
+                                    text = "Delete '${recipe.title}'?",
                                     color = MaterialTheme.colorScheme.onSurface,
                                     style = MaterialTheme.typography.headlineSmall
                                 )
@@ -546,7 +543,6 @@ fun RecipesDetailPreview() {
         Surface {
             RecipeItemDetailsScreen(
                 //recipeDetailUiState = RecipePreferencesUiState(),
-                item = recipe,
                 id = UUID.randomUUID(),
                 onBackClick = {},
                 onEditItem = {})
