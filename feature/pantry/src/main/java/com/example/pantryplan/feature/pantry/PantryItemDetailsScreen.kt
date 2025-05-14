@@ -153,12 +153,12 @@ fun PantryItemDetailsScreen(
                     .fillMaxWidth(),
                 painter = rememberAsyncImagePainter(
                     item.imageUrl,
-                    fallback = painterResource(R.drawable.smugcat)
+                    fallback = painterResource(R.drawable.default_pantry_item_thumbnail)
                 ),
                 contentDescription = null,
-                contentScale = ContentScale.FillBounds
-
+                contentScale = ContentScale.Crop
             )
+
             Column (
                 modifier = Modifier
                     .padding(12.dp)
