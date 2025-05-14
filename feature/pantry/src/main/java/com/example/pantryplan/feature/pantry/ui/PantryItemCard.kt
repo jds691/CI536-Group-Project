@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.pantryplan.core.designsystem.text.asRelativeFormattedDate
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.R
@@ -319,46 +320,50 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
         PantryItem(
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now().plus(3.days),
             expiresAfter = 1.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now().plus(1.days),
             expiresAfter = 3.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.OPENED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = null,
             inStateSince = Clock.System.now().minus(1.days),
             state = PantryItemState.FROZEN,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
             name = "Cheese With Hat",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now().minus(1.days),
             expiresAfter = null,
             inStateSince = Clock.System.now(),
             state = PantryItemState.EXPIRED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         )
     )
 }

@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.pantryplan.core.designsystem.text.asRelativeFormattedDate
 import com.example.pantryplan.core.designsystem.text.pantryPlanExactFormat
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItemState
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -72,7 +73,13 @@ fun PantryItemDetailsScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     val item by viewModel.item.collectAsState()
 
-    val formatter = DecimalFormat("0.#")
+    val formatter = DecimalFormat("#.##")
+
+    val measurementSignifier: String = when (item.measurement) {
+        Measurement.GRAMS -> "g"
+        Measurement.KILOGRAMS -> "kg"
+        Measurement.OTHER -> ""
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadItem()
@@ -222,11 +229,7 @@ fun PantryItemDetailsScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text =if (item.quantity > 999) {
-                        "${formatter.format(item.quantity/1000.0)}kg"
-                    } else {
-                        "${formatter.format(item.quantity)}g"
-                    },
+                    text = "" + formatter.format(item.quantity) + "" + measurementSignifier,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
