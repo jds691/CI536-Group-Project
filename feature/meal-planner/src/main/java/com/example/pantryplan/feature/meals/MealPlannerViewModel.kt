@@ -9,6 +9,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pantryplan.core.data.access.repository.NutritionRepository
+import com.example.pantryplan.core.data.access.repository.RecipeRepository
 import com.example.pantryplan.core.data.access.repository.UserPreferencesRepository
 import com.example.pantryplan.core.datastore.UserPreferences
 import com.example.pantryplan.core.models.Allergen
@@ -29,11 +30,13 @@ import kotlin.time.Duration.Companion.seconds
 @HiltViewModel
 class MealPlannerViewModel @Inject constructor(
     userPreferencesRepository: UserPreferencesRepository,
-    nutritionRepository: NutritionRepository
+    nutritionRepository: NutritionRepository,
+    recipesRepository: RecipeRepository
 ) : ViewModel() {
     val uiState: StateFlow<MealPlannerUiState> = mealPlannerUiState(
         userPreferencesRepository,
-        nutritionRepository
+        nutritionRepository,
+        recipesRepository
     )
         .stateIn(
             scope = viewModelScope,
@@ -44,7 +47,8 @@ class MealPlannerViewModel @Inject constructor(
 
 private fun mealPlannerUiState(
     userPreferencesRepository: UserPreferencesRepository,
-    nutritionRepository: NutritionRepository
+    nutritionRepository: NutritionRepository,
+    recipesRepository: RecipeRepository
 ): Flow<MealPlannerUiState> {
     val preferencesFlow: Flow<UserPreferences> = userPreferencesRepository.preferences
 
@@ -54,14 +58,18 @@ private fun mealPlannerUiState(
         ).date
     )
 
-    return combine(preferencesFlow, nutritionFlow, ::Pair)
+    val canUseMealPlannerFlow: Flow<Boolean> =
+        recipesRepository.getAllRecipes().map { it.isNotEmpty() }
+
+    return combine(preferencesFlow, nutritionFlow, canUseMealPlannerFlow, ::Triple)
         .map { mergedFlow ->
-            val (preferences, nutrition) = mergedFlow
+            val (preferences, nutrition, canUseMealPlanner) = mergedFlow
 
             val recipeAllergySet: SnapshotStateSet<Allergen> = mutableStateSetOf()
             recipeAllergySet.addAll(preferences.allergies)
 
             MealPlannerUiState(
+                canUseMealPlanner = mutableStateOf(canUseMealPlanner),
                 allergies = recipeAllergySet,
                 dailyNutrition = mutableStateOf(nutrition),
                 mealsEatenToday = mutableIntStateOf(0),
@@ -71,6 +79,7 @@ private fun mealPlannerUiState(
 }
 
 data class MealPlannerUiState(
+    val canUseMealPlanner: MutableState<Boolean> = mutableStateOf(false),
     val dailyNutrition: MutableState<NutritionInfo> = mutableStateOf(
         NutritionInfo(
             calories = 0,
