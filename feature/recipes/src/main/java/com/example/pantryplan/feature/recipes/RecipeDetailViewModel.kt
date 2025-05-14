@@ -7,8 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.pantryplan.core.data.access.repository.UserPreferencesRepository
 import com.example.pantryplan.core.models.Allergen
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -18,6 +20,14 @@ import kotlin.time.Duration.Companion.seconds
 class RecipeDetailViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
+
+    private val _servingAmount = MutableStateFlow(1)
+    var servingAmount = _servingAmount.asStateFlow()
+
+    fun changeServingAmount(serving: Int) {
+        _servingAmount.value = serving
+    }
+
     val uiState: StateFlow<RecipePreferencesUiState> = userPreferencesRepository.preferences
         .map { preferences ->
             val recipeAllergySet: SnapshotStateSet<Allergen> = mutableStateSetOf()
@@ -32,6 +42,7 @@ class RecipeDetailViewModel @Inject constructor(
             started = WhileSubscribed(1.seconds.inWholeMilliseconds),
             initialValue = RecipePreferencesUiState(),
         )
+
 
 }
 
