@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.pantryplan.core.data.access.repository.PantryItemRepository
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.navigation.PantryItemEdit
@@ -47,6 +48,7 @@ class PantryItemEditViewModel @Inject constructor(
         state = PantryItemState.SEALED,
         imageUrl = null,
         barcode = barcode,
+        measurement = Measurement.GRAMS
     )
 
     private var pantryItem: MutableStateFlow<PantryItem> =
@@ -62,19 +64,17 @@ class PantryItemEditViewModel @Inject constructor(
             }
         )
 
-    private var quantityUnit = MutableStateFlow(QuantityUnit.GRAMS)
     private var expiresAfterUnit = MutableStateFlow(ExpiresAfterUnit.DAYS)
 
     val uiState: StateFlow<PantryItemEditUiState> = combine(
         pantryItem,
-        quantityUnit,
         expiresAfterUnit,
-    ) { pantryItem, quantityUnit, expiresAfterUnit ->
-        PantryItemEditUiState(pantryItem, quantityUnit, expiresAfterUnit)
+    ) { pantryItem, expiresAfterUnit ->
+        PantryItemEditUiState(pantryItem, expiresAfterUnit)
     }.stateIn(
         scope = viewModelScope,
         started = WhileSubscribed(5.seconds.inWholeMilliseconds),
-        PantryItemEditUiState(pantryItem.value, quantityUnit.value, expiresAfterUnit.value)
+        PantryItemEditUiState(pantryItem.value, expiresAfterUnit.value)
     )
 
     fun updateImageUri(imageUri: String?) {
@@ -97,8 +97,8 @@ class PantryItemEditViewModel @Inject constructor(
         pantryItem.update { it.copy(quantity = quantity) }
     }
 
-    fun updateQuantityUnit(quantityUnit: QuantityUnit) {
-        this.quantityUnit.update { quantityUnit }
+    fun updateMeasurementUnit(measurementUnit: Measurement) {
+        pantryItem.update { it.copy(measurement = measurementUnit) }
     }
 
     fun updateExpiresAfter(expiresAfter: Duration) {
@@ -111,11 +111,6 @@ class PantryItemEditViewModel @Inject constructor(
 
     fun savePantryItem() {
         viewModelScope.launch {
-            val newQuantity = pantryItem.value.quantity * when (quantityUnit.value) {
-                QuantityUnit.GRAMS -> 1
-                QuantityUnit.KILOGRAMS -> 1000
-                QuantityUnit.OTHER -> 1
-            }
 
             // TODO: Replace with .weeks and .months when type is changed to DatePeriod.
             val newExpiresAfter = pantryItem.value.expiresAfter!! * when (expiresAfterUnit.value) {
@@ -125,7 +120,6 @@ class PantryItemEditViewModel @Inject constructor(
             }
 
             val pantryItem = pantryItem.value.copy(
-                quantity = newQuantity,
                 expiresAfter = newExpiresAfter,
             )
 
@@ -140,13 +134,8 @@ class PantryItemEditViewModel @Inject constructor(
 
 data class PantryItemEditUiState(
     val pantryItem: PantryItem,
-    val quantityUnit: QuantityUnit,
     val expiresAfterUnit: ExpiresAfterUnit,
 )
-
-enum class QuantityUnit {
-    GRAMS, KILOGRAMS, OTHER
-}
 
 enum class ExpiresAfterUnit {
     DAYS, WEEKS, MONTHS

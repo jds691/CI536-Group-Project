@@ -11,9 +11,3 @@ data class Ingredient(
     @Transient
     val linkedPantryItem: PantryItem? = null
 )
-
-enum class Measurement {
-    GRAMS,
-    KILOGRAMS,
-    OTHER
-}

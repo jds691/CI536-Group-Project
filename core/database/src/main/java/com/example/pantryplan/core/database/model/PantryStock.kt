@@ -2,6 +2,7 @@ package com.example.pantryplan.core.database.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import kotlinx.datetime.Instant
@@ -19,7 +20,8 @@ data class PantryStock(
     val inStateSince: Instant, // It just works ¯\_(ツ)_/¯
     val itemState: PantryItemState,
     val imageRefURL: String?, // TODO: Path once camera is functional
-    val barcode: String?
+    val barcode: String?,
+    val measurement: Measurement
 )
 
 fun PantryStock.asExternalModel() = PantryItem(
@@ -31,5 +33,6 @@ fun PantryStock.asExternalModel() = PantryItem(
     inStateSince = inStateSince,
     state = itemState,
     imageUrl = imageRefURL,
-    barcode = barcode
+    barcode = barcode,
+    measurement = measurement
 )

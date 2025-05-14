@@ -520,6 +520,7 @@ fun RecipesDetailPreview() {
                     state = PantryItemState.SEALED,
                     imageUrl = null,
                     barcode = null,
+                    measurement = Measurement.GRAMS
                 )
             ),
             Ingredient(

@@ -19,5 +19,6 @@ data class PantryItem(
     val inStateSince: Instant,
     val state: PantryItemState,
     val imageUrl: String?,
-    val barcode: String?
+    val barcode: String?,
+    val measurement: Measurement
 )

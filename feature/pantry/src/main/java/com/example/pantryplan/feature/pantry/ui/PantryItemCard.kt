@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.R
@@ -334,7 +335,8 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -345,7 +347,8 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             inStateSince = Clock.System.now(),
             state = PantryItemState.OPENED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -356,7 +359,8 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             inStateSince = Clock.System.now(),
             state = PantryItemState.FROZEN,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -367,7 +371,8 @@ class SamplePantryItemProvider : PreviewParameterProvider<PantryItem> {
             inStateSince = Clock.System.now(),
             state = PantryItemState.EXPIRED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         )
     )
 }

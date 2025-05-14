@@ -19,7 +19,6 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
-import coil.compose.rememberAsyncImagePainter
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -45,7 +44,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
 import com.example.pantryplan.core.designsystem.text.pantryPlanExactFormat
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItemState
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -99,7 +100,13 @@ fun PantryItemDetailsScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     val item by viewModel.item.collectAsState()
 
-    val formatter = DecimalFormat("0.#")
+    val formatter = DecimalFormat("#.##")
+
+    val measurementSignifier: String = when (item.measurement) {
+        Measurement.GRAMS -> "g"
+        Measurement.KILOGRAMS -> "kg"
+        Measurement.OTHER -> ""
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadItem()
@@ -249,11 +256,7 @@ fun PantryItemDetailsScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text =if (item.quantity > 999) {
-                        "${formatter.format(item.quantity/1000.0)}kg"
-                    } else {
-                        "${formatter.format(item.quantity)}g"
-                    },
+                    text = "" + formatter.format(item.quantity) + "" + measurementSignifier,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )

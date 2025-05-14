@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.component.ContentUnavailable
 import com.example.pantryplan.core.designsystem.component.MultiFAB
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.ui.PantryItemCard
@@ -206,7 +207,8 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -217,7 +219,8 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             inStateSince = Clock.System.now(),
             state = PantryItemState.OPENED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -228,7 +231,8 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             inStateSince = Clock.System.now(),
             state = PantryItemState.EXPIRED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -239,7 +243,8 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             inStateSince = Clock.System.now(),
             state = PantryItemState.FROZEN,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
@@ -250,7 +255,8 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
     ))
 }
