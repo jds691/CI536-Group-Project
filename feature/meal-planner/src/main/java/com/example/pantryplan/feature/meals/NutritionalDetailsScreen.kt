@@ -90,7 +90,7 @@ fun NutritionalDetailsScreen(
                 uiState = uiState
             )
 
-            Tips()
+            //Tips()
         }
     }
 }
@@ -281,7 +281,7 @@ private fun Nutrients(
     }
 }
 
-@Composable
+/*@Composable
 private fun Tips(
     modifier: Modifier = Modifier
 ) {
@@ -301,7 +301,7 @@ private fun Tips(
 
         // TODO: Show a list of cards that can navigate to various tips
     }
-}
+}*/
 
 @Preview
 @Composable

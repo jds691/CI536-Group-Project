@@ -160,7 +160,7 @@ private fun MealPlannerScreenContent(
             onRecipeClick = onRecipeClick
         )
 
-        Tips()
+        //Tips()
     }
 }
 
@@ -362,7 +362,7 @@ private fun NextThreeDays(
     }
 }
 
-@Composable
+/*@Composable
 private fun Tips(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
@@ -377,7 +377,7 @@ private fun Tips(modifier: Modifier = Modifier) {
 
         // TODO: Show a list of cards that can navigate to various tips
     }
-}
+}*/
 
 @SuppressLint("UnrememberedMutableState")
 @Preview(
@@ -436,7 +436,7 @@ private fun NextThreeDaysPreview() {
     }
 }
 
-@Preview(
+/*@Preview(
     group = "Tips",
     showBackground = true
 )
@@ -445,4 +445,4 @@ private fun TipsPreview() {
     PantryPlanTheme {
         Tips()
     }
-}
+}*/
