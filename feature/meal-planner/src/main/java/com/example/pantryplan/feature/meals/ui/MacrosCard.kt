@@ -43,7 +43,7 @@ fun MacrosCard(
     ) {
         Column (
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(MaterialTheme.colorScheme.tertiaryContainer)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
         ) {
@@ -61,7 +61,7 @@ private fun MacrosUnavailable() {
     Text(
         text = stringResource(R.string.feature_meals_macros_error_title),
         style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onPrimaryContainer
+        color = MaterialTheme.colorScheme.onTertiaryContainer
     )
     Box(
         modifier = Modifier
@@ -78,7 +78,7 @@ private fun MacrosUnavailable() {
     Text(
         text = stringResource(R.string.feature_meals_macros_error_body),
         style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onPrimaryContainer
+        color = MaterialTheme.colorScheme.onTertiaryContainer
     )
 }
 
@@ -100,7 +100,7 @@ private fun NutritionalContents(
         Text(
             text = "Protein",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(proteinPercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -110,7 +110,7 @@ private fun NutritionalContents(
         Text(
             text = "Carbs",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(carbohydratePercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -119,7 +119,7 @@ private fun NutritionalContents(
         Text(
             text = "Fats",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(fatPercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -143,7 +143,7 @@ private fun NutritionalContents(
         ) {
             Text(
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
                 text = "${formatter.format(proteinPercentage)}%"
             )
         }
@@ -156,7 +156,7 @@ private fun NutritionalContents(
         ) {
             Text(
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
                 text = "${formatter.format(carbohydratePercentage)}%"
             )
         }
@@ -169,7 +169,7 @@ private fun NutritionalContents(
         ) {
             Text(
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
                 text = "${formatter.format(fatPercentage)}%"
             )
         }
@@ -178,7 +178,7 @@ private fun NutritionalContents(
         Text(
             text = "${formatter.format(item.protein)}g",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(proteinPercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -187,7 +187,7 @@ private fun NutritionalContents(
         Text(
             text = "${formatter.format(item.carbohydrates)}g",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(carbohydratePercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -196,7 +196,7 @@ private fun NutritionalContents(
         Text(
             text = "${formatter.format(item.fats)}g",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(fatPercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
