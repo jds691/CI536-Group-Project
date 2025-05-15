@@ -106,6 +106,7 @@ fun RecipeItemAddScreen(
         onChangeInstructions = viewModel::updateInstructions,
         onRemoveInstructions = viewModel::removeInstructions,
         onChangeIngredients = viewModel::updateIngredients,
+        onRemoveIngredients = viewModel::removeIngredients,
         onChangePrepTime = viewModel::updatePrepTime,
         onChangeCookTime = viewModel::updateCookTime,
         onChangeNutritionalInfo = viewModel::updateNutritionalInfo,
@@ -301,6 +302,7 @@ fun RecipeItemAddScreen(
     onChangeInstructions: (String) -> Unit,
     onRemoveInstructions: (String) -> Unit,
     onChangeIngredients: (Ingredient) -> Unit,
+    onRemoveIngredients: (Ingredient) -> Unit,
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
     onChangeNutritionalInfo: (NutritionInfo) -> Unit,
@@ -362,6 +364,7 @@ fun RecipeItemAddScreen(
                 onChangeAllergens = onChangeAllergens,
                 onChangeInstructions = onChangeInstructions,
                 onChangeIngredients = onChangeIngredients,
+                onRemoveIngredients = onRemoveIngredients,
                 onRemoveInstructions = onRemoveInstructions,
                 onChangePrepTime = onChangePrepTime,
                 onChangeCookTime = onChangeCookTime,
@@ -392,6 +395,7 @@ private fun RecipeItemEditForm(
     onChangeInstructions: (String) -> Unit,
     onRemoveInstructions: (String) -> Unit,
     onChangeIngredients: (Ingredient) -> Unit,
+    onRemoveIngredients: (Ingredient) -> Unit,
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
     onChangeNutritionalInfo: (NutritionInfo) -> Unit,
@@ -626,14 +630,16 @@ private fun RecipeItemEditForm(
 
         OutlinedButton(
             onClick = {
-                onChangeIngredients(
-                    Ingredient(
-                        name = ingredientText,
-                        amount = quantityAmount,
-                        measurement = measurementOption,
-                        linkedPantryItem = null
+                if (ingredientText != "") {
+                    onChangeIngredients(
+                        Ingredient(
+                            name = ingredientText,
+                            amount = quantityAmount,
+                            measurement = measurementOption,
+                            linkedPantryItem = null
+                        )
                     )
-                )
+                }
             },
             shape = ButtonDefaults.outlinedShape,
             enabled = true,
@@ -666,6 +672,7 @@ private fun RecipeItemEditForm(
                         measurement = ingredient.measurement,
                         linkedPantryItem = ingredient.linkedPantryItem
                     ),
+                    onDelete = { onRemoveIngredients(ingredient) }
                 )
             }
         }
