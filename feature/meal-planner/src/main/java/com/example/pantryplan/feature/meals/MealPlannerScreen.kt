@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.example.pantryplan.core.designsystem.component.ContentUnavailable
 import com.example.pantryplan.core.designsystem.recipes.RecipeItemCard
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
@@ -96,31 +98,71 @@ fun MealPlannerScreen(
                 bottom = dimensionResource(designSystemR.dimen.bottom_app_bar_height)
             )
     ) { contentPadding ->
-        Column(
-            verticalArrangement = Arrangement
-                .spacedBy(4.dp),
-            modifier = modifier
-                .padding(contentPadding)
-                .padding(horizontal = dimensionResource(designSystemR.dimen.horizontal_margin))
-                .verticalScroll(rememberScrollState())
-        ) {
-            TodaysMeals(
-                uiState = mealPlannerUiState,
-                onRecipeClick = onRecipeClick
-            )
+        val commonModifier = modifier
+            .padding(contentPadding)
+            .padding(horizontal = dimensionResource(designSystemR.dimen.horizontal_margin))
 
-            Macros(
-                uiState = mealPlannerUiState,
-                onMacroCardClick = onMacroCardClick
+        if (mealPlannerUiState.canUseMealPlanner.value) {
+            MealPlannerScreenContent(
+                mealPlannerUiState = mealPlannerUiState,
+                onRecipeClick = onRecipeClick,
+                onMacroCardClick = onMacroCardClick,
+                modifier = commonModifier
             )
-
-            NextThreeDays(
-                uiState = mealPlannerUiState,
-                onRecipeClick = onRecipeClick
+        } else {
+            MealPlannerUnavailableView(
+                modifier = commonModifier
             )
-
-            Tips()
         }
+    }
+}
+
+@Composable
+private fun MealPlannerUnavailableView(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        ContentUnavailable(
+            painter = painterResource(designSystemR.drawable.feature_meal_planner_icon_outlined),
+            title = "Meal Planner Unavailable",
+            description = "You need at least 1 saved recipe to use the meal planner."
+        )
+    }
+}
+
+@Composable
+private fun MealPlannerScreenContent(
+    mealPlannerUiState: MealPlannerUiState,
+    onRecipeClick: (UUID) -> Unit,
+    onMacroCardClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement
+            .spacedBy(4.dp),
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+    ) {
+        TodaysMeals(
+            uiState = mealPlannerUiState,
+            onRecipeClick = onRecipeClick
+        )
+
+        Macros(
+            uiState = mealPlannerUiState,
+            onMacroCardClick = onMacroCardClick
+        )
+
+        NextThreeDays(
+            uiState = mealPlannerUiState,
+            onRecipeClick = onRecipeClick
+        )
+
+        Tips()
     }
 }
 
@@ -371,6 +413,7 @@ private fun Tips(modifier: Modifier = Modifier) {
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Preview(
     group = "Today's Meals",
     showBackground = true
@@ -379,7 +422,7 @@ private fun Tips(modifier: Modifier = Modifier) {
 private fun TodaysMealsPreview() {
     PantryPlanTheme {
         TodaysMeals(
-            uiState = MealPlannerUiState(),
+            uiState = MealPlannerUiState(canUseMealPlanner = mutableStateOf(true)),
             onRecipeClick = {}
         )
     }

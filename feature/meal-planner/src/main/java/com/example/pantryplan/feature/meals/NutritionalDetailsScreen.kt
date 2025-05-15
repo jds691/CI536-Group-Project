@@ -116,7 +116,7 @@ private fun Macros(
             item = uiState.nutrition
         )
 
-        Text(
+        /*Text(
             // TODO: Replace styled bold text with correct values
             buildAnnotatedString {
                 append("Your goal is to ")
@@ -153,7 +153,7 @@ private fun Macros(
                 }
                 append(".")
             }
-        )
+        )*/
     }
 }
 
