@@ -16,5 +16,5 @@ interface RecipeRepository {
 
     suspend fun getJsonForRecipe(recipe: Recipe): String?
 
-    suspend fun getRandomRecipe(): Recipe
+    suspend fun getRandomRecipe(): Recipe?
 }

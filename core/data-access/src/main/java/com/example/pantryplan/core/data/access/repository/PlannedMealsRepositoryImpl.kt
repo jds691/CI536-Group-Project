@@ -21,7 +21,7 @@ class PlannedMealsRepositoryImpl @Inject constructor(
             var itemsToAdd = limit - plannedMealsCount
 
             while (itemsToAdd != 0) {
-                val randRecipe = recipesRepository.getRandomRecipe()
+                val randRecipe = recipesRepository.getRandomRecipe() ?: break
 
                 plannedMealsDao.addPlannedMealForDate(
                     PlannedMeal(

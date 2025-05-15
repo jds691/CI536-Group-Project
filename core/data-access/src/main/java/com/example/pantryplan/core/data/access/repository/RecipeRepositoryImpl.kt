@@ -69,7 +69,8 @@ class RecipeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRandomRecipe(): Recipe {
-        return getAllRecipes().first().random()
+    override suspend fun getRandomRecipe(): Recipe? {
+        val recipes = getAllRecipes().first()
+        return if (recipes.isEmpty()) null else recipes.random()
     }
 }
