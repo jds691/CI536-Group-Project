@@ -25,7 +25,7 @@ interface RecipeDao {
      * Retrieve recipe with specified UUID or name
      */
     @Query("SELECT * FROM RecipeInformation WHERE :uuidSearched = recipeUUID")
-    fun searchById(uuidSearched: UUID): Flow<RecipeInformation>
+    fun searchById(uuidSearched: UUID): Flow<RecipeInformation?>
     fun searchDistinctByIdUntilChanged(id: UUID): Flow<RecipeInformation?> =
         searchById(id).distinctUntilChanged()
 
@@ -46,18 +46,12 @@ interface RecipeDao {
     @Update
     suspend fun updateRecipe(recipeInformation: RecipeInformation)
 
-    /**
-     * Deletes all items from a user selection
-     */
     @Delete
-    suspend fun removeRecipeByName(vararg recipeInformation: RecipeInformation)
-    @Delete
-    suspend fun removeRecipeById(vararg recipeInformation: RecipeInformation)
+    suspend fun removeRecipe(recipeInformation: RecipeInformation)
 
     /**
      * Create new recipe
      */
     @Insert
     suspend fun addRecipe(recipeInformation: RecipeInformation)
-    companion object
 }

@@ -4,6 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.pantryplan.core.models.Allergen
+import com.example.pantryplan.core.models.Ingredient
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
 import java.util.EnumSet
@@ -18,10 +19,10 @@ data class RecipeInformation(
     val recipePrepTime: Float,
     val recipeCookTime: Float,
     val recipeDesc: String,
-    val recipeIngredients: List<String>,
+    val recipeIngredients: List<Ingredient>,
     @Embedded val nutritionalInformation: NutritionInfo,
     val recipeTags: List<String>,
-    val imageUrl: String,
+    val imageUrl: String?,
     val recipeInstructions: List<String>
 )
 
