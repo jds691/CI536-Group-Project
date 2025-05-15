@@ -98,6 +98,7 @@ fun RecipeItemAddScreen(
         existingId = existingId,
         onBackClick = onBackClick,
         onSaveClick = viewModel::saveRecipeItem,
+        onChangeImageURI = viewModel::updateImageUri,
         onChangeName = viewModel::updateName,
         onChangeDescription = viewModel::updateDescription,
         onChangeTags = viewModel::updateTags,
@@ -145,11 +146,12 @@ private fun RecipeItemEditTopBar(
 }
 
 @Composable
-private fun RecipeItemImageSelect() {
-    var uri by remember { mutableStateOf<String?>(null) }
-
+private fun RecipeItemImageSelect(
+    imageUri: String?,
+    onChangeImageURI: (String?) -> Unit,
+) {
     val painter = rememberAsyncImagePainter(
-        model = uri,
+        model = imageUri,
         fallback = painterResource(R.drawable.default_recipe_thumbnail),
     )
 
@@ -166,14 +168,14 @@ private fun RecipeItemImageSelect() {
     )
     val takePicture = rememberLauncherForActivityResult(TakePicture()) { success ->
         if (success) {
-            uri = tempFileUri?.toString()
+            onChangeImageURI(tempFileUri?.toString())
         }
     }
 
     val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { picked ->
         picked?.let {
             context.contentResolver.openInputStream(it)!!.copyTo(tempFile.outputStream())
-            uri = tempFileUri?.toString()
+            onChangeImageURI(tempFileUri?.toString())
         }
     }
 
@@ -294,6 +296,7 @@ fun RecipeItemAddScreen(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
 
+    onChangeImageURI: (String?) -> Unit,
     onChangeName: (String) -> Unit,
     onChangeDescription: (String) -> Unit,
     onChangeTags: (String) -> Unit,
@@ -345,7 +348,10 @@ fun RecipeItemAddScreen(
                 style = MaterialTheme.typography.bodySmall,
             )
 
-            RecipeItemImageSelect()
+            RecipeItemImageSelect(
+                imageUri = recipeItem.imageUrl,
+                onChangeImageURI = onChangeImageURI,
+            )
             RecipeItemEditForm(
                 name = recipeItem.title,
                 description = recipeItem.description,
