@@ -98,6 +98,7 @@ fun RecipeItemDetailsScreen(
         recipeDetailUiState = recipeDetailUiState,
         id = id,
 
+        onDelete = viewModel::deleteRecipe,
         onBackClick = onBackClick,
         onEditItem = onEditItem,
         servingAmount = servingAmount,
@@ -111,6 +112,7 @@ internal fun RecipeItemDetailsScreen(
     recipeDetailUiState: RecipeDetailsUiState,
     id: UUID,
 
+    onDelete: (Recipe) -> Unit,
     onBackClick: () -> Unit,
     onEditItem: (UUID) -> Unit,
     servingAmount: Int,
@@ -420,9 +422,8 @@ internal fun RecipeItemDetailsScreen(
                             confirmButton = {
                                 TextButton(
                                     onClick = {
-                                        //TODO: add functionality to delete recipe
+                                        onDelete(recipe)
                                         showDeleteDialog = false
-
                                         onBackClick() // pops back to pantry screen when item is deleted
                                     }
                                 ) {
