@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.hilt)
 
     alias(libs.plugins.androidx.room)
+
+    id("kotlinx-serialization")
 }
 
 android {
@@ -60,4 +62,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.kotlinx.coroutines.test)
+
+    implementation(libs.kotlinx.serialization.json)
 }

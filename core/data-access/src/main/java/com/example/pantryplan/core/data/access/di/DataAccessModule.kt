@@ -1,9 +1,9 @@
 package com.example.pantryplan.core.data.access.di
 
-import com.example.pantryplan.core.data.access.repository.InMemoryRecipeRepository
 import com.example.pantryplan.core.data.access.repository.PantryItemRepository
 import com.example.pantryplan.core.data.access.repository.PantryItemRepositoryImpl
 import com.example.pantryplan.core.data.access.repository.RecipeRepository
+import com.example.pantryplan.core.data.access.repository.RecipeRepositoryImpl
 import com.example.pantryplan.core.data.access.repository.UserPreferencesRepository
 import com.example.pantryplan.core.data.access.repository.UserPreferencesRepositoryImpl
 import dagger.Binds
@@ -21,7 +21,7 @@ abstract class DataAccessModule {
 
     @Binds
     internal abstract fun bindRecipeRepository(
-        recipeRepository: InMemoryRecipeRepository
+        recipeRepository: RecipeRepositoryImpl
     ): RecipeRepository
 
     @Binds
