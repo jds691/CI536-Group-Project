@@ -1,5 +1,6 @@
 package com.example.pantryplan.core.data.access.repository
 
+import android.util.Log
 import com.example.pantryplan.core.database.dao.NutritionDao
 import com.example.pantryplan.core.database.model.NutritionEntity
 import com.example.pantryplan.core.models.NutritionInfo
@@ -27,6 +28,11 @@ class NutritionRepositoryImpl @Inject constructor(
     private val nutritionDao: NutritionDao
 ) : NutritionRepository {
     override suspend fun logNutrients(meal: Recipe) {
+        if (meal.nutrition.calories == 0) {
+            Log.e("NutritionRepositoryImpl", "Calories for meal '${meal.id}' = 0, will not log!")
+            return
+        }
+
         nutritionDao.addNutrition(meal.nutrition.asEntity(Clock.System.now()))
     }
 
