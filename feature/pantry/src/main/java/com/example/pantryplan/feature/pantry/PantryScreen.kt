@@ -1,6 +1,7 @@
 package com.example.pantryplan.feature.pantry
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -67,7 +68,9 @@ fun PantryScreen(
                 onScanBarcode = {
                     scanBarcode(
                         context = context,
-                        onSuccess = { onScanBarcode(it.rawValue.toString()) }
+                        onSuccess = { onScanBarcode(it.rawValue.toString()) },
+                        onCancelled = { Log.e("PantryScreen", "Cancelled") },
+                        onFailure = { it.printStackTrace() }
                     )
                 },
                 onCreatePantryItem = onCreatePantryItem
