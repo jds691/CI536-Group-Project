@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,7 +42,7 @@ fun MacrosCard(
     ) {
         Column (
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(MaterialTheme.colorScheme.tertiaryContainer)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
         ) {
@@ -61,7 +60,7 @@ private fun MacrosUnavailable() {
     Text(
         text = stringResource(R.string.feature_meals_macros_error_title),
         style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onPrimaryContainer
+        color = MaterialTheme.colorScheme.onTertiaryContainer
     )
     Box(
         modifier = Modifier
@@ -72,13 +71,13 @@ private fun MacrosUnavailable() {
             modifier = Modifier
                 .height(28.dp)
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.outlineVariant)
+                .background(MaterialTheme.colorScheme.onTertiaryContainer)
         )
     }
     Text(
         text = stringResource(R.string.feature_meals_macros_error_body),
         style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onPrimaryContainer
+        color = MaterialTheme.colorScheme.onTertiaryContainer
     )
 }
 
@@ -100,7 +99,7 @@ private fun NutritionalContents(
         Text(
             text = "Protein",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(proteinPercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -110,7 +109,7 @@ private fun NutritionalContents(
         Text(
             text = "Carbs",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(carbohydratePercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -119,7 +118,7 @@ private fun NutritionalContents(
         Text(
             text = "Fats",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(fatPercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -139,11 +138,11 @@ private fun NutritionalContents(
             modifier = Modifier
                 .weight(proteinPercentage)
                 .fillMaxHeight()
-                .background(Color(0xFFFFDAD6))
+                .background(PantryPlanTheme.colorScheme.protein.colorContainer)
         ) {
             Text(
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = PantryPlanTheme.colorScheme.protein.onColorContainer,
                 text = "${formatter.format(proteinPercentage)}%"
             )
         }
@@ -152,11 +151,11 @@ private fun NutritionalContents(
             modifier = Modifier
                 .weight(carbohydratePercentage)
                 .fillMaxHeight()
-                .background(Color(0xFFF9E287))
+                .background(PantryPlanTheme.colorScheme.carbohydrates.colorContainer)
         ) {
             Text(
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = PantryPlanTheme.colorScheme.carbohydrates.onColorContainer,
                 text = "${formatter.format(carbohydratePercentage)}%"
             )
         }
@@ -165,11 +164,11 @@ private fun NutritionalContents(
             modifier = Modifier
                 .weight(fatPercentage)
                 .fillMaxHeight()
-                .background(Color(0xFF9CF1ED))
+                .background(PantryPlanTheme.colorScheme.fats.colorContainer)
         ) {
             Text(
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = PantryPlanTheme.colorScheme.fats.onColorContainer,
                 text = "${formatter.format(fatPercentage)}%"
             )
         }
@@ -178,7 +177,7 @@ private fun NutritionalContents(
         Text(
             text = "${formatter.format(item.protein)}g",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(proteinPercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -187,7 +186,7 @@ private fun NutritionalContents(
         Text(
             text = "${formatter.format(item.carbohydrates)}g",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(carbohydratePercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -196,7 +195,7 @@ private fun NutritionalContents(
         Text(
             text = "${formatter.format(item.fats)}g",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.weight(fatPercentage),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
