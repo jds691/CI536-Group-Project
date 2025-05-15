@@ -1,7 +1,7 @@
 package com.example.pantryplan.core.data.access.di
 
-import com.example.pantryplan.core.data.access.repository.InMemoryNutritionRepository
 import com.example.pantryplan.core.data.access.repository.NutritionRepository
+import com.example.pantryplan.core.data.access.repository.NutritionRepositoryImpl
 import com.example.pantryplan.core.data.access.repository.PantryItemRepository
 import com.example.pantryplan.core.data.access.repository.PantryItemRepositoryImpl
 import com.example.pantryplan.core.data.access.repository.RecipeRepository
@@ -28,7 +28,7 @@ abstract class DataAccessModule {
 
     @Binds
     internal abstract fun bindNutritionRepository(
-        nutritionRepository: InMemoryNutritionRepository
+        nutritionRepository: NutritionRepositoryImpl
     ): NutritionRepository
 
     @Binds
