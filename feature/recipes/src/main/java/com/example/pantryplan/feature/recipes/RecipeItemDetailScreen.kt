@@ -2,7 +2,9 @@
 
 package com.example.pantryplan.feature.recipes
 
+import android.annotation.SuppressLint
 import android.icu.text.DecimalFormat
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +19,8 @@ import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
@@ -42,8 +46,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -66,6 +72,7 @@ import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.ui.IngredientCard
 import com.example.pantryplan.feature.recipes.ui.RecipeIngredientCard
+import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import java.util.EnumSet
 import java.util.UUID
@@ -87,7 +94,6 @@ fun RecipeItemDetailsScreen(
 
     onBackClick: () -> Unit,
     onEditItem: (UUID) -> Unit
-
 ) {
     val recipeDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val servingAmount by viewModel.servingAmount.collectAsStateWithLifecycle()
@@ -100,7 +106,8 @@ fun RecipeItemDetailsScreen(
         onBackClick = onBackClick,
         onEditItem = onEditItem,
         servingAmount = servingAmount,
-        onServingChange = viewModel::changeServingAmount
+        onServingChange = viewModel::changeServingAmount,
+        onLogRecipe = viewModel::logRecipe
     )
 }
 
@@ -113,7 +120,8 @@ internal fun RecipeItemDetailsScreen(
     onBackClick: () -> Unit,
     onEditItem: (UUID) -> Unit,
     servingAmount: Int,
-    onServingChange: (Int) -> Unit
+    onServingChange: (Int) -> Unit,
+    onLogRecipe: (Recipe) -> Unit
 ) {
     val recipe = recipeDetailUiState.recipe
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -139,17 +147,45 @@ internal fun RecipeItemDetailsScreen(
         bottomBar = {
             BottomAppBar(
                 actions = {
-
-                },
-                floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = {
-                            onEditItem(id)
-                        },
-                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+                    IconButton(
+                        onClick = { onEditItem(id) }
                     ) {
                         Icon(Icons.Outlined.Edit, "")
+                    }
+                },
+                floatingActionButton = {
+                    var didAddRecipe by remember { mutableStateOf(false) }
+
+                    LaunchedEffect(didAddRecipe) {
+                        if (!didAddRecipe) return@LaunchedEffect
+
+                        delay(2_000) // 2 seconds
+                        didAddRecipe = false
+                    }
+
+                    val fabColor by animateColorAsState(
+                        when (didAddRecipe) {
+                            true -> Color.Green
+                            false -> BottomAppBarDefaults.bottomAppBarFabColor
+                        }
+                    )
+
+                    val icon = when (didAddRecipe) {
+                        true -> Icons.Outlined.Check
+                        false -> Icons.Outlined.Add
+                    }
+
+                    FloatingActionButton(
+                        onClick = {
+                            if (!didAddRecipe) {
+                                didAddRecipe = true
+                                onLogRecipe(recipe)
+                            }
+                        },
+                        containerColor = fabColor,
+                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+                    ) {
+                        Icon(icon, "")
                     }
                 }
             )
@@ -484,6 +520,7 @@ private fun OutlinedSelectField(
 }
 
 
+@SuppressLint("UnrememberedMutableState")
 @Preview
 @Composable
 fun RecipesDetailPreview() {
@@ -536,10 +573,18 @@ fun RecipesDetailPreview() {
     PantryPlanTheme {
         Surface {
             RecipeItemDetailsScreen(
-                //recipeDetailUiState = RecipePreferencesUiState(),
-                id = UUID.randomUUID(),
+                recipeDetailUiState = RecipeDetailsUiState(
+                    recipe = recipe,
+                    allergies = mutableStateSetOf()
+                ),
+                id = recipe.id,
+                onDelete = {},
                 onBackClick = {},
-                onEditItem = {})
+                onEditItem = {},
+                servingAmount = 1,
+                onServingChange = {},
+                onLogRecipe = {}
+            )
         }
     }
 }
