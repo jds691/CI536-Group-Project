@@ -126,7 +126,7 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
             )
             mealPlannerScreen(
                 onBackClick = appState.navController::popBackStack,
-                onRecipeClick = {}, // TODO: Implement when we have recipe sub-navigation done
+                onRecipeClick = appState.navController::navigateToRecipeItem,
                 onMacroCardClick = appState.navController::navigateToNutritionalDetails
             )
 
