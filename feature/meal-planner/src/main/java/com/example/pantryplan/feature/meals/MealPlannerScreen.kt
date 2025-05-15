@@ -48,7 +48,6 @@ import coil3.compose.AsyncImage
 import com.example.pantryplan.core.designsystem.component.ContentUnavailable
 import com.example.pantryplan.core.designsystem.recipes.RecipeItemCard
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
-import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.NutritionInfo
 import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.meals.ui.MacrosCard
@@ -58,7 +57,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.toLocalDateTime
-import java.util.EnumSet
 import java.util.UUID
 import kotlin.time.Duration.Companion.days
 import com.example.pantryplan.core.designsystem.R as designSystemR
@@ -194,31 +192,8 @@ private fun TodaysMeals(
     onRecipeClick: (UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val previewMeal = Recipe(
-        id = UUID.randomUUID(),
-        title = "Egg wif Hat",
-        description = "The immortal one.",
-        tags = listOf(),
-        allergens = EnumSet.of(Allergen.EGGS),
-        imageUrl = null,
-        instructions = listOf(),
-        ingredients = listOf(),
-        prepTime = 0.0f,
-        cookTime = 0.0f,
-        nutrition = NutritionInfo(
-            calories = 1_000_000,
-            fats = 0.0f,
-            saturatedFats = 0.0f,
-            carbohydrates = 0.0f,
-            sugar = 0.0f,
-            fiber = 0.0f,
-            protein = 0.0f,
-            sodium = 0.0f
-        )
-    )
-
     // TODO: Create this list from the recommender system
-    val meals = List(uiState.expectedMealCount.intValue) { _ -> previewMeal }
+    val meals = uiState.todaysMeals
     val mealsEaten = uiState.mealsEatenToday.intValue - 1
 
     val carouselState = rememberCarouselState(if (mealsEaten < 0) 0 else mealsEaten) { meals.size }
@@ -315,32 +290,6 @@ private fun NextThreeDays(
     onRecipeClick: (UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val previewMeal = Recipe(
-        id = UUID.randomUUID(),
-        title = "Egg wif Hat",
-        description = "The immortal one.",
-        tags = listOf(),
-        allergens = EnumSet.of(Allergen.EGGS),
-        imageUrl = null,
-        instructions = listOf(),
-        ingredients = listOf(),
-        prepTime = 0.0f,
-        cookTime = 0.0f,
-        nutrition = NutritionInfo(
-            calories = 1_000_000,
-            fats = 0.0f,
-            saturatedFats = 0.0f,
-            carbohydrates = 0.0f,
-            sugar = 0.0f,
-            fiber = 0.0f,
-            protein = 0.0f,
-            sodium = 0.0f
-        )
-    )
-
-    // TODO: Create this list from the recommender system
-    val meals = List(uiState.expectedMealCount.intValue) { _ -> previewMeal }
-
     val format = LocalDate.Format {
         dayOfWeek(DayOfWeekNames.ENGLISH_FULL)
     }
@@ -377,21 +326,38 @@ private fun NextThreeDays(
             }
         }
 
-        /*when(selectedIndex) {
-            0 -> Text("Unable to retrieve upcoming meals for today.")
-            1 -> Text("Unable to retrieve upcoming meals for tomorrow.")
-            2 -> Text("Unable to retrieve upcoming meals for Wednesday.")
+        when (selectedIndex) {
+            0 -> for (item in uiState.todaysMeals) {
+                RecipeItemCard(
+                    item = item,
+                    onClick = {
+                        onRecipeClick(item.id)
+                    },
+                    userAllergies = uiState.allergies
+                )
+            }
+
+            1 -> for (item in uiState.tomorrowsMeals) {
+                RecipeItemCard(
+                    item = item,
+                    onClick = {
+                        onRecipeClick(item.id)
+                    },
+                    userAllergies = uiState.allergies
+                )
+            }
+
+            2 -> for (item in uiState.twoDaysAwayMeals) {
+                RecipeItemCard(
+                    item = item,
+                    onClick = {
+                        onRecipeClick(item.id)
+                    },
+                    userAllergies = uiState.allergies
+                )
+            }
 
             else -> Text("Unable to retrieve upcoming meals.")
-        }*/
-        for (meal: Recipe in meals) {
-            RecipeItemCard(
-                item = meal,
-                onClick = {
-                    onRecipeClick(meal.id)
-                },
-                userAllergies = uiState.allergies
-            )
         }
     }
 }

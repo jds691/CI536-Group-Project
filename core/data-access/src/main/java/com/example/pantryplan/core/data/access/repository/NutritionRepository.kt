@@ -7,7 +7,7 @@ import kotlinx.datetime.LocalDate
 
 interface NutritionRepository {
     suspend fun logNutrients(meal: Recipe)
-    fun getLoggedMealCount(): Flow<Int>
+    fun getLoggedMealCount(date: LocalDate): Flow<Int>
 
     fun getNutritionForDate(date: LocalDate): Flow<NutritionInfo>
 }

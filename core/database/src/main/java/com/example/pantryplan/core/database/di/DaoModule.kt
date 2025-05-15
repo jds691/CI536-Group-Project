@@ -1,7 +1,9 @@
 package com.example.pantryplan.core.database.di
 
 import com.example.pantryplan.core.database.PantryPlanDatabase
+import com.example.pantryplan.core.database.dao.NutritionDao
 import com.example.pantryplan.core.database.dao.PantryDao
+import com.example.pantryplan.core.database.dao.PlannedMealsDao
 import com.example.pantryplan.core.database.dao.RecipeDao
 import dagger.Module
 import dagger.Provides
@@ -19,4 +21,14 @@ internal object DaoModule {
     fun providesRecipeDao(
         database: PantryPlanDatabase,
     ): RecipeDao = database.recipeDao()
+
+    @Provides
+    fun providesNutritionDao(
+        database: PantryPlanDatabase,
+    ): NutritionDao = database.nutritionDao()
+
+    @Provides
+    fun providesPlannedMealsDao(
+        database: PantryPlanDatabase,
+    ): PlannedMealsDao = database.plannedMealsDao()
 }

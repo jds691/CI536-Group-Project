@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.example.pantryplan.core.data.access.repository.NutritionRepository
 import com.example.pantryplan.core.data.access.repository.PantryItemRepository
 import com.example.pantryplan.core.data.access.repository.RecipeRepository
 import com.example.pantryplan.core.data.access.repository.UserPreferencesRepository
@@ -34,6 +35,7 @@ class RecipeDetailViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val recipeItemRepository: RecipeRepository,
     private val pantryItemRepository: PantryItemRepository,
+    private val nutritionRepository: NutritionRepository
 ) : ViewModel() {
     private val recipeId = savedStateHandle
         .toRoute<RecipeItemDetails>()
@@ -87,6 +89,12 @@ class RecipeDetailViewModel @Inject constructor(
     fun deleteRecipe(recipe: Recipe) {
         viewModelScope.launch {
             recipeItemRepository.removeItem(recipe)
+        }
+    }
+
+    fun logRecipe(recipe: Recipe) {
+        viewModelScope.launch {
+            nutritionRepository.logNutrients(recipe)
         }
     }
 }
