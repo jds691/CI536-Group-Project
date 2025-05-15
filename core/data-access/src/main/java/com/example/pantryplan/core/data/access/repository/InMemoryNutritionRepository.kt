@@ -12,7 +12,18 @@ import javax.inject.Inject
 private const val FLOW_REFRESH_DELAY: Long = 5000
 
 class InMemoryNutritionRepository @Inject constructor() : NutritionRepository {
-    private var nutrition: MutableList<NutritionInfo> = mutableListOf()
+    private var nutrition: MutableList<NutritionInfo> = mutableListOf(
+        NutritionInfo(
+            calories = 600,
+            fats = 20f,
+            saturatedFats = 10f,
+            carbohydrates = 40f,
+            sugar = 8f,
+            fiber = 20f,
+            protein = 50f,
+            sodium = 15f
+        )
+    )
 
     override suspend fun logNutrients(meal: Recipe) {
         val mealNutrition = meal.nutrition
