@@ -136,9 +136,6 @@ class RecipeItemAddViewModel @Inject constructor(
 
     fun saveRecipeItem() {
         viewModelScope.launch {
-            val recipeItem = recipeItem.copy(
-            )
-
             if (existingId == null) {
                 recipeItemRepository.addRecipe(recipeItem)
             } else {

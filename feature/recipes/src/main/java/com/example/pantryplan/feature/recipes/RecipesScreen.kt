@@ -53,7 +53,8 @@ fun RecipesScreen(
     RecipesScreen(
         recipeUiState = recipeUiState,
         onClickRecipeItem = onClickRecipeItem,
-        onCreateRecipeItem = onCreateRecipeItem
+        onCreateRecipeItem = onCreateRecipeItem,
+        onDeleteRecipeItem = viewModel::deleteRecipe
     )
 }
 
@@ -61,7 +62,8 @@ fun RecipesScreen(
 internal fun RecipesScreen(
     recipeUiState: RecipeUiState,
     onClickRecipeItem: (UUID) -> Unit,
-    onCreateRecipeItem: () -> Unit
+    onCreateRecipeItem: () -> Unit,
+    onDeleteRecipeItem: (Recipe) -> Unit
 ) {
     Scaffold(
         modifier = Modifier
@@ -79,7 +81,8 @@ internal fun RecipesScreen(
             RecipesContentList(
                 recipeState = recipeUiState,
                 onClickRecipeItem = onClickRecipeItem,
-                modifier = Modifier.padding(contentPadding)
+                modifier = Modifier.padding(contentPadding),
+                onDeleteRecipeItem = onDeleteRecipeItem
             )
         }
     }
@@ -138,6 +141,7 @@ internal fun RecipesContentList(
     recipeState: RecipeUiState,
     onClickRecipeItem: (UUID) -> Unit,
     modifier: Modifier = Modifier,
+    onDeleteRecipeItem: (Recipe) -> Unit
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -151,7 +155,8 @@ internal fun RecipesContentList(
             RecipeItemCard(
                 item = item,
                 userAllergies = recipeState.allergies,
-                onClick = { onClickRecipeItem(item.id) }
+                onClick = { onClickRecipeItem(item.id) },
+                onDelete = { onDeleteRecipeItem(item) }
             )
         }
     }
@@ -200,7 +205,8 @@ fun RecipesScreenPreview() {
                     )
                 ),
                 onClickRecipeItem = {},
-                onCreateRecipeItem = {}
+                onCreateRecipeItem = {},
+                onDeleteRecipeItem = {}
             )
         }
     }
