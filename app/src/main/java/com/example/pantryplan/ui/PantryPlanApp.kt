@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -54,10 +53,10 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
         modifier = Modifier.fillMaxSize(),
         topBar = {
             if (destination != null) {
-                val shouldShowSearchButton = destination != TopLevelDestination.MEAL_PLANNER
+                //val shouldShowSearchButton = destination != TopLevelDestination.MEAL_PLANNER
 
                 CenterAlignedTopAppBar(
-                    navigationIcon = {
+                    /*navigationIcon = {
                         if (shouldShowSearchButton) {
                             IconButton(onClick = { /* TODO: Navigate to search. */ }) {
                                 Icon(
@@ -67,7 +66,7 @@ fun PantryPlanApp(appState: PantryPlanAppState) {
                                 )
                             }
                         }
-                    },
+                    },*/
                     title = { Text(stringResource(destination.titleTextId)) },
                     actions = {
                         IconButton(onClick = appState.navController::navigateToSettings) {
