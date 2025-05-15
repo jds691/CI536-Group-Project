@@ -14,9 +14,11 @@ import com.example.pantryplan.core.database.converter.LocalTimeConverter
 import com.example.pantryplan.core.database.converter.UUIDConverter
 import com.example.pantryplan.core.database.dao.NutritionDao
 import com.example.pantryplan.core.database.dao.PantryDao
+import com.example.pantryplan.core.database.dao.PlannedMealsDao
 import com.example.pantryplan.core.database.dao.RecipeDao
 import com.example.pantryplan.core.database.model.NutritionEntity
 import com.example.pantryplan.core.database.model.PantryStock
+import com.example.pantryplan.core.database.model.PlannedMeal
 import com.example.pantryplan.core.database.model.RecipeInformation
 
 // Create Database with supported entities
@@ -29,7 +31,8 @@ import com.example.pantryplan.core.database.model.RecipeInformation
     entities = [
         PantryStock::class,
         RecipeInformation::class,
-        NutritionEntity::class
+        NutritionEntity::class,
+        PlannedMeal::class
     ]
 )
 @TypeConverters(
@@ -46,4 +49,5 @@ internal abstract class PantryPlanDatabase : RoomDatabase() { //Database class
     abstract fun pantryDao(): PantryDao // Hook data entities up to interface
     abstract fun recipeDao(): RecipeDao
     abstract fun nutritionDao(): NutritionDao
+    abstract fun plannedMealsDao(): PlannedMealsDao
 }

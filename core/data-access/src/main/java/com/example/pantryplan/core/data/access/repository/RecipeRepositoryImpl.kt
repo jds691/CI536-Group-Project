@@ -6,6 +6,7 @@ import com.example.pantryplan.core.database.model.RecipeInformation
 import com.example.pantryplan.core.database.model.asExternalModel
 import com.example.pantryplan.core.models.Recipe
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -66,5 +67,9 @@ class RecipeRepositoryImpl @Inject constructor(
             Log.e("RecipeRepositoryImpl", "Unable to serialize recipe '${recipe.id}' to JSON")
             return null
         }
+    }
+
+    override suspend fun getRandomRecipe(): Recipe {
+        return getAllRecipes().first().random()
     }
 }
