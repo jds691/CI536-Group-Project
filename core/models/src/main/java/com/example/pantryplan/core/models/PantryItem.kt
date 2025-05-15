@@ -4,14 +4,10 @@ import kotlinx.datetime.Instant
 import java.util.UUID
 import kotlin.time.Duration
 
-enum class PantryItemState {
-    SEALED, OPENED, FROZEN, EXPIRED
-}
-
 data class PantryItem(
     val id: UUID,
     val name: String,
-    val quantity: Int,
+    val quantity: Float,
     val expiryDate: Instant,
     // How long until an item will expire
     val expiresAfter: Duration?,
@@ -19,5 +15,6 @@ data class PantryItem(
     val inStateSince: Instant,
     val state: PantryItemState,
     val imageUrl: String?,
-    val barcode: String?
+    val barcode: String?,
+    val measurement: Measurement
 )

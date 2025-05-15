@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -74,7 +75,9 @@ import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.Ingredient
 import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.NutritionInfo
+import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.ui.IngredientCard
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.util.EnumSet
 import java.util.UUID
@@ -103,6 +106,7 @@ fun RecipeItemAddScreen(
         onChangeInstructions = viewModel::updateInstructions,
         onRemoveInstructions = viewModel::removeInstructions,
         onChangeIngredients = viewModel::updateIngredients,
+        onRemoveIngredients = viewModel::removeIngredients,
         onChangePrepTime = viewModel::updatePrepTime,
         onChangeCookTime = viewModel::updateCookTime,
         onChangeNutritionalInfo = viewModel::updateNutritionalInfo,
@@ -146,7 +150,7 @@ private fun RecipeItemImageSelect() {
 
     val painter = rememberAsyncImagePainter(
         model = uri,
-        fallback = painterResource(R.drawable.cheeseburger),
+        fallback = painterResource(R.drawable.default_recipe_thumbnail),
     )
 
     val context = LocalContext.current
@@ -298,12 +302,18 @@ fun RecipeItemAddScreen(
     onChangeInstructions: (String) -> Unit,
     onRemoveInstructions: (String) -> Unit,
     onChangeIngredients: (Ingredient) -> Unit,
+    onRemoveIngredients: (Ingredient) -> Unit,
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
     onChangeNutritionalInfo: (NutritionInfo) -> Unit,
 ) {
 
     val recipeItem = recipeItemAddUiState.recipeItem
+    val allergens = recipeItemAddUiState
+        .jsonForAllergenSet
+        .let { Json.decodeFromString<Recipe>(it) }
+        .allergens
+
     Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
@@ -340,7 +350,7 @@ fun RecipeItemAddScreen(
                 name = recipeItem.title,
                 description = recipeItem.description,
                 tags = recipeItem.tags,
-                allergens = recipeItem.allergens,
+                allergens = allergens,
                 instructions = recipeItem.instructions,
                 ingredients = recipeItem.ingredients,
                 prepTime = recipeItem.prepTime,
@@ -354,6 +364,7 @@ fun RecipeItemAddScreen(
                 onChangeAllergens = onChangeAllergens,
                 onChangeInstructions = onChangeInstructions,
                 onChangeIngredients = onChangeIngredients,
+                onRemoveIngredients = onRemoveIngredients,
                 onRemoveInstructions = onRemoveInstructions,
                 onChangePrepTime = onChangePrepTime,
                 onChangeCookTime = onChangeCookTime,
@@ -384,6 +395,7 @@ private fun RecipeItemEditForm(
     onChangeInstructions: (String) -> Unit,
     onRemoveInstructions: (String) -> Unit,
     onChangeIngredients: (Ingredient) -> Unit,
+    onRemoveIngredients: (Ingredient) -> Unit,
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
     onChangeNutritionalInfo: (NutritionInfo) -> Unit,
@@ -441,17 +453,12 @@ private fun RecipeItemEditForm(
                 FilterChip(
                     selected = selected,
                     onClick = {
-                        if (selected)
-                            allergenSet.remove(allergy)
-                        else
-                            allergenSet.add(allergy)
-
-                        try {
-                            onChangeAllergens(EnumSet.copyOf(allergenSet))
-                        } catch (e: IllegalArgumentException) {
-                            // Thrown if set is empty when calling copyOf
-                            onChangeAllergens(EnumSet.noneOf(Allergen::class.java))
+                        // Toggle the allergen on or off.
+                        if (!allergens.add(allergy)) {
+                            allergens.remove(allergy)
                         }
+
+                        onChangeAllergens(allergens)
                     },
                     label = { Text(stringResource(allergy.getDisplayNameId())) },
                     leadingIcon = {
@@ -507,7 +514,7 @@ private fun RecipeItemEditForm(
             singleLine = true,
             trailingIcon = {
                 IconButton(
-                    onClick = { tagText = "" }
+                    onClick = { tagText = "" },
                 ) {
                     Icon(Icons.Default.Clear, contentDescription = "Clear Field")
                 }
@@ -545,6 +552,13 @@ private fun RecipeItemEditForm(
                 AssistChip(
                     onClick = { onRemoveTags(tag) },
                     label = { Text(tag) },
+                    trailingIcon = {
+                        Icon(
+                            Icons.Default.Delete,
+                            tint = Color.Red,
+                            contentDescription = ""
+                        )
+                    }
                 )
             }
 
@@ -558,6 +572,12 @@ private fun RecipeItemEditForm(
         var ingredientText by remember { mutableStateOf("") }
         var quantityAmount by remember { mutableStateOf(20f) }
         var measurementOption by remember { mutableStateOf(Measurement.GRAMS) }
+
+        Text(
+            text = "Ingredients",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
+        )
 
         OutlinedTextField(
             value = ingredientText,
@@ -610,14 +630,16 @@ private fun RecipeItemEditForm(
 
         OutlinedButton(
             onClick = {
-                onChangeIngredients(
-                    Ingredient(
-                        name = ingredientText,
-                        amount = quantityAmount,
-                        measurement = measurementOption,
-                        linkedPantryItem = null
+                if (ingredientText != "") {
+                    onChangeIngredients(
+                        Ingredient(
+                            name = ingredientText,
+                            amount = quantityAmount,
+                            measurement = measurementOption,
+                            linkedPantryItem = null
+                        )
                     )
-                )
+                }
             },
             shape = ButtonDefaults.outlinedShape,
             enabled = true,
@@ -637,12 +659,6 @@ private fun RecipeItemEditForm(
             }
         )
 
-        Text(
-            text = "Ingredients",
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleMedium,
-        )
-
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -656,6 +672,7 @@ private fun RecipeItemEditForm(
                         measurement = ingredient.measurement,
                         linkedPantryItem = ingredient.linkedPantryItem
                     ),
+                    onDelete = { onRemoveIngredients(ingredient) }
                 )
             }
         }
@@ -663,6 +680,12 @@ private fun RecipeItemEditForm(
         HorizontalDivider(
             modifier = Modifier
                 .padding(0.dp, 4.dp, 0.dp, 4.dp)
+        )
+
+        Text(
+            text = "Instructions",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
         )
 
         var stepText by remember { mutableStateOf("") }
@@ -706,12 +729,6 @@ private fun RecipeItemEditForm(
             }
         )
 
-        Text(
-            text = "Instructions",
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleMedium,
-        )
-
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start
@@ -724,7 +741,7 @@ private fun RecipeItemEditForm(
                     modifier = Modifier
                         .clickable {
                             onRemoveInstructions(instruction)
-                        }
+                        },
                 )
                 stepNum++
             }

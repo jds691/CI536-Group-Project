@@ -4,4 +4,17 @@
     <string name="feature_pantry_empty_error">No Items</string>
     <string name="feature_pantry_empty_description">Your pantry is empty. Add some items to get started.</string>
     <string name="feature_pantry_scan_barcode">Scan barcode</string>
+    <string name="feature_pantry_add_item">Add Item</string>
+    <string name="feature_pantry_update_item">Update ‘%1$s’</string>
+    <string name="feature_pantry_name">Name</string>
+    <string name="feature_pantry_expires">Expires</string>
+    <string name="feature_pantry_state">State</string>
+    <string name="feature_pantry_quantity">Quantity</string>
+    <string name="feature_pantry_save">Save</string>
+    <string name="feature_pantry_expires_in">When opened, expires in</string>
+    <string name="feature_pantry_cancel">Cancel</string>
+    <string name="feature_pantry_back">Back</string>
+    <string name="feature_pantry_image">Image</string>
+    <string name="feature_pantry_delete">Delete</string>
+    <string name="feature_pantry_edit">Edit</string>
 </resources>

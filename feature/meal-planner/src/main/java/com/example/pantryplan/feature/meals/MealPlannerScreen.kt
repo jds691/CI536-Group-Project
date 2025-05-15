@@ -286,7 +286,7 @@ private fun CarouselMealCard(
                         )
                     )
                 },
-            fallback = painterResource(R.drawable.default_recipe_thumbnail),
+            fallback = painterResource(designSystemR.drawable.default_recipe_thumbnail),
             contentDescription = null,
             contentScale = ContentScale.Crop
         )

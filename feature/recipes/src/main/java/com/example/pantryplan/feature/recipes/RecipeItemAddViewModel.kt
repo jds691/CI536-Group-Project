@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import java.util.EnumSet
 import java.util.UUID
 import javax.inject.Inject
@@ -58,6 +59,7 @@ class RecipeItemAddViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(
         RecipeItemAddUiState(
             recipeItem = recipeItem,
+            jsonForAllergenSet = Json.encodeToString(recipeItem),
         )
     )
     val uiState: StateFlow<RecipeItemAddUiState> = _uiState.asStateFlow()
@@ -84,7 +86,13 @@ class RecipeItemAddViewModel @Inject constructor(
 
     fun updateAllergens(allergenSet: EnumSet<Allergen>) {
         recipeItem = recipeItem.copy(allergens = allergenSet)
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+
+        _uiState.update {
+            it.copy(
+                recipeItem = recipeItem,
+                jsonForAllergenSet = Json.encodeToString(recipeItem)
+            )
+        }
     }
 
     fun updateInstructions(instruction: String) {
@@ -111,6 +119,13 @@ class RecipeItemAddViewModel @Inject constructor(
         }
     }
 
+    fun removeIngredients(ingredient: Ingredient) {
+        viewModelScope.launch {
+            recipeItem = recipeItem.copy(ingredients = recipeItem.ingredients.minus(ingredient))
+            _uiState.update { it.copy(recipeItem = recipeItem) }
+        }
+    }
+
     fun updatePrepTime(prepMins: Float) {
         recipeItem = recipeItem.copy(prepTime = prepMins)
         _uiState.update { it.copy(recipeItem = recipeItem) }
@@ -128,9 +143,6 @@ class RecipeItemAddViewModel @Inject constructor(
 
     fun saveRecipeItem() {
         viewModelScope.launch {
-            val recipeItem = recipeItem.copy(
-            )
-
             if (existingId == null) {
                 recipeItemRepository.addRecipe(recipeItem)
             } else {
@@ -142,4 +154,5 @@ class RecipeItemAddViewModel @Inject constructor(
 
 data class RecipeItemAddUiState(
     val recipeItem: Recipe,
+    val jsonForAllergenSet: String,
 )

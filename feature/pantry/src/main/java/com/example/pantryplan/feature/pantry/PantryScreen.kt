@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.component.ContentUnavailable
 import com.example.pantryplan.core.designsystem.component.MultiFAB
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
+import com.example.pantryplan.core.models.Measurement
 import com.example.pantryplan.core.models.PantryItem
 import com.example.pantryplan.core.models.PantryItemState
 import com.example.pantryplan.feature.pantry.ui.PantryItemCard
@@ -122,8 +123,13 @@ private fun PantryFABs(
         }
         ExtendedFloatingActionButton(
             onClick = onCreatePantryItem,
-            icon = { Icon(Icons.Default.Add, "") },
-            text = { Text("Add") }
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.feature_pantry_back)
+                )
+            },
+            text = { Text("Add") },
         )
     }
 }
@@ -162,6 +168,7 @@ private fun PantryContentList(
         items(pantryState.pantryItems) { item ->
             PantryItemCard(
                 item = item,
+                expiringSoonDuration = pantryState.expiringSoonDuration,
                 onClick = { onClickPantryItem(item.id) },
                 onDelete = { onDeletePantryItem(item) },
             )
@@ -177,7 +184,7 @@ private fun PantryPopulatedPreview(
     PantryPlanTheme {
         Surface {
             PantryContentList(
-                pantryState = PantryUiState(pantryItems),
+                pantryState = PantryUiState(pantryItems, 2.days),
                 onClickPantryItem = {},
                 onDeletePantryItem = {},
             )
@@ -200,57 +207,62 @@ private class SamplePantryItemProvider : PreviewParameterProvider<List<PantryIte
         PantryItem(
             id = UUID.randomUUID(),
             name = "Bacon",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = 7.5.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
             name = "Cheese",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = 1.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.OPENED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
             name = "Milk",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = 1.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.EXPIRED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
             name = "Pasta Bake",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = 7.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.FROZEN,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
         PantryItem(
             id = UUID.randomUUID(),
             name = "Egg",
-            quantity = 1000,
+            quantity = 1000f,
             expiryDate = Clock.System.now(),
             expiresAfter = Int.MAX_VALUE.days,
             inStateSince = Clock.System.now(),
             state = PantryItemState.SEALED,
             imageUrl = null,
-            barcode = null
+            barcode = null,
+            measurement = Measurement.GRAMS
         ),
     ))
 }

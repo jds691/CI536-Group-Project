@@ -5,6 +5,10 @@ plugins {
     // Hilt plugins.
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+
+    alias(libs.plugins.androidx.room)
+
+    id("kotlinx-serialization")
 }
 
 android {
@@ -24,6 +28,10 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 dependencies {
@@ -54,4 +62,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.kotlinx.coroutines.test)
+
+    implementation(libs.kotlinx.serialization.json)
 }

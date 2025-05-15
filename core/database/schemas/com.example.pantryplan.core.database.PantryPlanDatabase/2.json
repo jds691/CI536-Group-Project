@@ -1,0 +1,202 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "c1d3d76bcbe97d62716c185d5ec7b0c8",
+    "entities": [
+      {
+        "tableName": "PantryStock",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemID` TEXT NOT NULL, `itemName` TEXT NOT NULL, `dateExpiring` INTEGER NOT NULL, `expiresAfter` INTEGER, `quantity` REAL NOT NULL, `inStateSince` INTEGER NOT NULL, `itemState` TEXT NOT NULL, `imageRefURL` TEXT, `barcode` TEXT, `measurement` TEXT NOT NULL DEFAULT 'GRAMS', PRIMARY KEY(`itemID`))",
+        "fields": [
+          {
+            "fieldPath": "itemID",
+            "columnName": "itemID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemName",
+            "columnName": "itemName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateExpiring",
+            "columnName": "dateExpiring",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expiresAfter",
+            "columnName": "expiresAfter",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inStateSince",
+            "columnName": "inStateSince",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemState",
+            "columnName": "itemState",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imageRefURL",
+            "columnName": "imageRefURL",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "barcode",
+            "columnName": "barcode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "measurement",
+            "columnName": "measurement",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'GRAMS'"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "itemID"
+          ]
+        }
+      },
+      {
+        "tableName": "RecipeInformation",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`recipeUUID` TEXT NOT NULL, `recipeName` TEXT NOT NULL, `recipeAllergens` TEXT NOT NULL, `recipePrepTime` REAL NOT NULL, `recipeCookTime` REAL NOT NULL, `recipeDesc` TEXT NOT NULL, `recipeIngredients` TEXT NOT NULL, `recipeTags` TEXT NOT NULL, `imageUrl` TEXT, `recipeInstructions` TEXT NOT NULL, `calories` INTEGER NOT NULL, `fats` REAL NOT NULL, `saturatedFats` REAL NOT NULL, `carbohydrates` REAL NOT NULL, `sugar` REAL NOT NULL, `fiber` REAL NOT NULL, `protein` REAL NOT NULL, `sodium` REAL NOT NULL, PRIMARY KEY(`recipeUUID`))",
+        "fields": [
+          {
+            "fieldPath": "recipeUUID",
+            "columnName": "recipeUUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipeName",
+            "columnName": "recipeName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipeAllergens",
+            "columnName": "recipeAllergens",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipePrepTime",
+            "columnName": "recipePrepTime",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipeCookTime",
+            "columnName": "recipeCookTime",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipeDesc",
+            "columnName": "recipeDesc",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipeIngredients",
+            "columnName": "recipeIngredients",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipeTags",
+            "columnName": "recipeTags",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imageUrl",
+            "columnName": "imageUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "recipeInstructions",
+            "columnName": "recipeInstructions",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nutritionalInformation.calories",
+            "columnName": "calories",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nutritionalInformation.fats",
+            "columnName": "fats",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nutritionalInformation.saturatedFats",
+            "columnName": "saturatedFats",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nutritionalInformation.carbohydrates",
+            "columnName": "carbohydrates",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nutritionalInformation.sugar",
+            "columnName": "sugar",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nutritionalInformation.fiber",
+            "columnName": "fiber",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nutritionalInformation.protein",
+            "columnName": "protein",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nutritionalInformation.sodium",
+            "columnName": "sodium",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "recipeUUID"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c1d3d76bcbe97d62716c185d5ec7b0c8')"
+    ]
+  }
+}
