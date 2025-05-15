@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.EnumSet
 import java.util.UUID
@@ -52,28 +53,42 @@ class RecipeDetailViewModel @Inject constructor(
         recipe,
         preferences
     ) { recipe, preferences ->
-        val linkedIngredients = runBlocking {
-            recipe!!.ingredients.map {
-                val linkedPantryItem = pantryItemRepository.searchForItemsByName(it.name)
-                    .firstOrNull()
-                    ?.firstOrNull()
-                it.copy(linkedPantryItem = linkedPantryItem)
+        if (recipe == null) {
+            RecipeDetailsUiState(
+                recipe = placeholderMeal,
+                allergies = mutableStateSetOf()
+            )
+        } else {
+            val linkedIngredients = runBlocking {
+                recipe.ingredients.map {
+                    val linkedPantryItem = pantryItemRepository.searchForItemsByName(it.name)
+                        .firstOrNull()
+                        ?.firstOrNull()
+                    it.copy(linkedPantryItem = linkedPantryItem)
+                }
             }
-        }
-        val linkedRecipe = recipe!!.copy(ingredients = linkedIngredients)
+            val linkedRecipe = recipe.copy(ingredients = linkedIngredients)
 
-        val recipeAllergySet: SnapshotStateSet<Allergen> = mutableStateSetOf()
-        recipeAllergySet.addAll(preferences.allergies)
-        RecipeDetailsUiState(
-            recipe = linkedRecipe,
-            allergies = recipeAllergySet
-        )
+            val recipeAllergySet: SnapshotStateSet<Allergen> = mutableStateSetOf()
+            recipeAllergySet.addAll(preferences.allergies)
+            RecipeDetailsUiState(
+                recipe = linkedRecipe,
+                allergies = recipeAllergySet
+            )
+        }
+
     }
         .stateIn(
             scope = viewModelScope,
             started = WhileSubscribed(5.seconds.inWholeMilliseconds),
             initialValue = RecipeDetailsUiState(recipe = placeholderMeal),
         )
+
+    fun deleteRecipe(recipe: Recipe) {
+        viewModelScope.launch {
+            recipeItemRepository.removeItem(recipe)
+        }
+    }
 }
 
 data class RecipeDetailsUiState(

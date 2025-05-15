@@ -13,15 +13,19 @@ import com.example.pantryplan.core.models.Recipe
 import com.example.pantryplan.feature.recipes.navigation.RecipeItemAdd
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import java.util.EnumSet
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class RecipeItemAddViewModel @Inject constructor(
@@ -33,7 +37,7 @@ class RecipeItemAddViewModel @Inject constructor(
         .toRoute<RecipeItemAdd>()
         .id?.let(UUID::fromString)
 
-    private var recipeItem = Recipe(
+    private var newRecipeItem = Recipe(
         id = UUID.randomUUID(),
         title = "",
         description = "",
@@ -56,53 +60,71 @@ class RecipeItemAddViewModel @Inject constructor(
         ),
     )
 
+    private var recipeItem: MutableStateFlow<Recipe> =
+        MutableStateFlow(
+            if (existingId != null) {
+                runBlocking { recipeItemRepository.getRecipeById(existingId).first()!! }
+            } else {
+                newRecipeItem
+            }
+        )
+
+
+
     private val _uiState = MutableStateFlow(
         RecipeItemAddUiState(
-            recipeItem = recipeItem,
-            jsonForAllergenSet = Json.encodeToString(recipeItem),
+            recipeItem = recipeItem.value,
+            jsonForAllergenSet = Json.encodeToString(recipeItem.value),
         )
     )
-    val uiState: StateFlow<RecipeItemAddUiState> = _uiState.asStateFlow()
+
+    val uiState = recipeItem.map {
+        RecipeItemAddUiState(
+            recipeItem = it,
+            jsonForAllergenSet = Json.encodeToString(it)
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = WhileSubscribed(5.seconds.inWholeMilliseconds),
+        RecipeItemAddUiState(
+            recipeItem.value,
+            jsonForAllergenSet = Json.encodeToString(recipeItem.value)
+        )
+    )
 
     fun updateName(title: String) {
-        recipeItem = recipeItem.copy(title = title)
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+        recipeItem.update { it.copy(title = title) }
     }
 
     fun updateDescription(description: String) {
-        recipeItem = recipeItem.copy(description = description)
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+        recipeItem.update { it.copy(description = description) }
     }
 
     fun updateTags(tag: String) {
-        recipeItem = recipeItem.copy(tags = recipeItem.tags.plus(tag))
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+        recipeItem.update { it.copy(tags = it.tags.plus(tag)) }
     }
 
     fun removeTags(tag: String) {
-        recipeItem = recipeItem.copy(tags = recipeItem.tags.minus(tag))
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+        recipeItem.update { it.copy(tags = it.tags.minus(tag)) }
     }
 
     fun updateAllergens(allergenSet: EnumSet<Allergen>) {
-        recipeItem = recipeItem.copy(allergens = allergenSet)
+        recipeItem.update { it.copy(allergens = allergenSet) }
 
         _uiState.update {
             it.copy(
-                recipeItem = recipeItem,
-                jsonForAllergenSet = Json.encodeToString(recipeItem)
+                recipeItem = recipeItem.value,
+                jsonForAllergenSet = Json.encodeToString(recipeItem.value)
             )
         }
     }
 
     fun updateInstructions(instruction: String) {
-        recipeItem = recipeItem.copy(instructions = recipeItem.instructions.plus(instruction))
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+        recipeItem.update { it.copy(instructions = it.instructions.plus(instruction)) }
     }
 
     fun removeInstructions(instruction: String) {
-        recipeItem = recipeItem.copy(instructions = recipeItem.instructions.minus(instruction))
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+        recipeItem.update { it.copy(instructions = it.instructions.minus(instruction)) }
     }
 
     fun updateIngredients(ingredient: Ingredient) {
@@ -110,36 +132,38 @@ class RecipeItemAddViewModel @Inject constructor(
             val itemList = pantryItemRepository.searchForItemsByName(ingredient.name)
             val linkedPantryItem = itemList.firstOrNull()?.firstOrNull()
 
-            recipeItem = recipeItem.copy(
-                ingredients = recipeItem.ingredients.plus(
-                    ingredient.copy(linkedPantryItem = linkedPantryItem)
+            recipeItem.update {
+                it.copy(
+                    ingredients = it.ingredients.plus(
+                        ingredient.copy(
+                            linkedPantryItem = linkedPantryItem
+                        )
+                    )
                 )
-            )
-            _uiState.update { it.copy(recipeItem = recipeItem) }
+            }
+
+            _uiState.update { it.copy(recipeItem = recipeItem.value) }
         }
     }
 
     fun updatePrepTime(prepMins: Float) {
-        recipeItem = recipeItem.copy(prepTime = prepMins)
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+        recipeItem.update { it.copy(prepTime = prepMins) }
     }
 
     fun updateCookTime(cookMins: Float) {
-        recipeItem = recipeItem.copy(cookTime = cookMins)
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+        recipeItem.update { it.copy(cookTime = cookMins) }
     }
 
     fun updateNutritionalInfo(nutritionalInfo: NutritionInfo) {
-        recipeItem = recipeItem.copy(nutrition = nutritionalInfo)
-        _uiState.update { it.copy(recipeItem = recipeItem) }
+        recipeItem.update { it.copy(nutrition = nutritionalInfo) }
     }
 
     fun saveRecipeItem() {
         viewModelScope.launch {
             if (existingId == null) {
-                recipeItemRepository.addRecipe(recipeItem)
+                recipeItemRepository.addRecipe(recipeItem.value)
             } else {
-                recipeItemRepository.updateRecipe(recipeItem)
+                recipeItemRepository.updateRecipe(recipeItem.value)
             }
         }
     }
