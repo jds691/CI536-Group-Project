@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -129,7 +127,7 @@ private fun MealPlannerUnavailableView(
             .fillMaxSize()
     ) {
         ContentUnavailable(
-            icon = Icons.Outlined.Notifications,
+            painter = painterResource(designSystemR.drawable.feature_meal_planner_icon_outlined),
             title = "Meal Planner Unavailable",
             description = "You need at least 1 saved recipe to use the meal planner."
         )
