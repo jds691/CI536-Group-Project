@@ -92,6 +92,10 @@ class RecipeItemAddViewModel @Inject constructor(
         )
     )
 
+    fun updateImageUri(imageUri: String?) {
+        recipeItem.update { it.copy(imageUrl = imageUri) }
+    }
+
     fun updateName(title: String) {
         recipeItem.update { it.copy(title = title) }
     }

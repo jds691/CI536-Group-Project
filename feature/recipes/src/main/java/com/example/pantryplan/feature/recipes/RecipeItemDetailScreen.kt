@@ -3,13 +3,12 @@
 package com.example.pantryplan.feature.recipes
 
 import android.icu.text.DecimalFormat
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -56,6 +55,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.core.models.Allergen
 import com.example.pantryplan.core.models.Ingredient
@@ -72,7 +72,6 @@ import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
-
 internal fun cleanUpAllergenText(allergenName: String): String {
     var newAllergenName = allergenName.replace("_", " ")
     newAllergenName = newAllergenName.lowercase()
@@ -80,7 +79,6 @@ internal fun cleanUpAllergenText(allergenName: String): String {
         newAllergenName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
     return newAllergenName
 }
-
 
 @Composable
 fun RecipeItemDetailsScreen(
@@ -104,7 +102,6 @@ fun RecipeItemDetailsScreen(
         servingAmount = servingAmount,
         onServingChange = viewModel::changeServingAmount
     )
-
 }
 
 @Composable
@@ -164,14 +161,14 @@ internal fun RecipeItemDetailsScreen(
                 .consumeWindowInsets(innerPadding)
                 .padding(innerPadding)
         ) {
-            Image(
+            AsyncImage(
+                model = recipe.imageUrl,
                 modifier = Modifier
-                    .height(200.dp)
-                    .fillMaxWidth(),
-                painter = painterResource(R.drawable.default_recipe_thumbnail),
+                    .fillMaxWidth()
+                    .aspectRatio(1.8f),
+                fallback = painterResource(R.drawable.default_recipe_thumbnail),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
-
             )
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
@@ -194,12 +191,7 @@ internal fun RecipeItemDetailsScreen(
                     val allergenSet = recipeDetailUiState.allergies
                     var chipEnabled = true
                     recipe.allergens.forEach { allergen ->
-
-                        if (allergenSet.contains(allergen)) {
-                            chipEnabled = false
-                        } else {
-                            chipEnabled = true
-                        }
+                        chipEnabled = !allergenSet.contains(allergen)
 
                         var curAllergen = allergen.toString()
                         curAllergen = cleanUpAllergenText(curAllergen)
@@ -338,7 +330,7 @@ internal fun RecipeItemDetailsScreen(
                                         name = ingredient.name,
                                         amount = (ingredient.amount * servingAmount),
                                         measurement = ingredient.measurement,
-                                        linkedPantryItem = ingredient.linkedPantryItem
+                                        linkedPantryItem = null,
                                     ),
                                 )
                             } else {
@@ -347,7 +339,7 @@ internal fun RecipeItemDetailsScreen(
                                         name = ingredient.name,
                                         amount = (ingredient.amount * servingAmount),
                                         measurement = ingredient.measurement,
-                                        linkedPantryItem = ingredient.linkedPantryItem
+                                        linkedPantryItem = ingredient.linkedPantryItem,
                                     )
                                 )
                             }
