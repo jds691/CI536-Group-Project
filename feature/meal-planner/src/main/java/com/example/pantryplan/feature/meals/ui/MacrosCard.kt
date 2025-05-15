@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -72,7 +71,7 @@ private fun MacrosUnavailable() {
             modifier = Modifier
                 .height(28.dp)
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.outlineVariant)
+                .background(MaterialTheme.colorScheme.onTertiaryContainer)
         )
     }
     Text(
@@ -139,11 +138,11 @@ private fun NutritionalContents(
             modifier = Modifier
                 .weight(proteinPercentage)
                 .fillMaxHeight()
-                .background(Color(0xFFFFDAD6))
+                .background(PantryPlanTheme.colorScheme.protein.colorContainer)
         ) {
             Text(
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                color = PantryPlanTheme.colorScheme.protein.onColorContainer,
                 text = "${formatter.format(proteinPercentage)}%"
             )
         }
@@ -152,11 +151,11 @@ private fun NutritionalContents(
             modifier = Modifier
                 .weight(carbohydratePercentage)
                 .fillMaxHeight()
-                .background(Color(0xFFF9E287))
+                .background(PantryPlanTheme.colorScheme.carbohydrates.colorContainer)
         ) {
             Text(
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                color = PantryPlanTheme.colorScheme.carbohydrates.onColorContainer,
                 text = "${formatter.format(carbohydratePercentage)}%"
             )
         }
@@ -165,11 +164,11 @@ private fun NutritionalContents(
             modifier = Modifier
                 .weight(fatPercentage)
                 .fillMaxHeight()
-                .background(Color(0xFF9CF1ED))
+                .background(PantryPlanTheme.colorScheme.fats.colorContainer)
         ) {
             Text(
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                color = PantryPlanTheme.colorScheme.fats.onColorContainer,
                 text = "${formatter.format(fatPercentage)}%"
             )
         }

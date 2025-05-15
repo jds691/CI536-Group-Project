@@ -8,7 +8,9 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
@@ -533,12 +535,24 @@ val unspecified_scheme = ColorFamily(
     Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
 )
 
+val LocalExtendedColors = staticCompositionLocalOf {
+    ExtendedColorScheme(
+        protein = unspecified_scheme,
+        carbohydrates = unspecified_scheme,
+        fats = unspecified_scheme,
+        itemStatusOk = unspecified_scheme,
+        itemStatusExpiringSoon = unspecified_scheme,
+        itemStatusExpired = unspecified_scheme,
+        itemStatusFrozen = unspecified_scheme
+    )
+}
+
 @Composable
 fun PantryPlanTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false, // TODO: Restore dynamic colour after done testing
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -549,11 +563,23 @@ fun PantryPlanTheme(
         darkTheme -> darkScheme
         else -> lightScheme
     }
+    val extendedColors = when {
+        darkTheme -> extendedDark
+        else -> extendedLight
+    }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = AppTypography,
-        content = content
-    )
+    CompositionLocalProvider(LocalExtendedColors provides extendedColors) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = AppTypography,
+            content = content
+        )
+    }
+}
+
+object PantryPlanTheme {
+    val colorScheme: ExtendedColorScheme
+        @Composable
+        get() = LocalExtendedColors.current
 }
 

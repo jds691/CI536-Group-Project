@@ -61,6 +61,7 @@ import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
+@Composable
 fun createStatus(
     item: PantryItem,
     expiringSoonDuration: Duration
@@ -74,7 +75,8 @@ fun createStatus(
             val timestamp = expiry.asRelativeFormattedDate()
 
             val expiringSoon = (expiry - now) <= expiringSoonDuration
-            val color = if (expiringSoon) Color(255, 102, 0) else Color.Green
+            val color =
+                if (expiringSoon) PantryPlanTheme.colorScheme.itemStatusExpiringSoon.color else PantryPlanTheme.colorScheme.itemStatusOk.color
 
             Pair("Expires ${timestamp}.", color)
         }
@@ -83,14 +85,14 @@ fun createStatus(
             val frozen = item.inStateSince
             val timestamp = frozen.asRelativeFormattedDate()
 
-            Pair("Frozen ${timestamp}.", Color.Cyan)
+            Pair("Frozen ${timestamp}.", PantryPlanTheme.colorScheme.itemStatusFrozen.color)
         }
 
         PantryItemState.EXPIRED -> {
             val expiry = item.expiryDate
             val timestamp = expiry.asRelativeFormattedDate()
-            
-            Pair("Expired ${timestamp}.", Color.Red)
+
+            Pair("Expired ${timestamp}.", PantryPlanTheme.colorScheme.itemStatusExpired.color)
         }
     }
 }
