@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pantryplan.core.designsystem.theme.PantryPlanTheme
 import com.example.pantryplan.settings.ui.SettingsRow
+import com.example.pantryplan.core.designsystem.R as designSystemR
 
 @Composable
 internal fun SettingsScreen(
@@ -83,12 +84,14 @@ internal fun SettingsScreen(
             SettingsRow(
                 title = "Pantry",
                 description = "Pantry Settings",
+                icon = designSystemR.drawable.feature_pantry_icon_outlined,
                 onClick = onPantrySettingsClick
             )
 
             SettingsRow(
                 title = "Meal Planner",
                 description = "Meal Planner Settings",
+                icon = designSystemR.drawable.feature_meal_planner_icon_outlined,
                 onClick = onMealPlannerSettingsClick
             )
         }

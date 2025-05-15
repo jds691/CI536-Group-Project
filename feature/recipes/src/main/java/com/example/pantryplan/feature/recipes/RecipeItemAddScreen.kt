@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -105,6 +106,7 @@ fun RecipeItemAddScreen(
         onChangeInstructions = viewModel::updateInstructions,
         onRemoveInstructions = viewModel::removeInstructions,
         onChangeIngredients = viewModel::updateIngredients,
+        onRemoveIngredients = viewModel::removeIngredients,
         onChangePrepTime = viewModel::updatePrepTime,
         onChangeCookTime = viewModel::updateCookTime,
         onChangeNutritionalInfo = viewModel::updateNutritionalInfo,
@@ -300,6 +302,7 @@ fun RecipeItemAddScreen(
     onChangeInstructions: (String) -> Unit,
     onRemoveInstructions: (String) -> Unit,
     onChangeIngredients: (Ingredient) -> Unit,
+    onRemoveIngredients: (Ingredient) -> Unit,
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
     onChangeNutritionalInfo: (NutritionInfo) -> Unit,
@@ -361,6 +364,7 @@ fun RecipeItemAddScreen(
                 onChangeAllergens = onChangeAllergens,
                 onChangeInstructions = onChangeInstructions,
                 onChangeIngredients = onChangeIngredients,
+                onRemoveIngredients = onRemoveIngredients,
                 onRemoveInstructions = onRemoveInstructions,
                 onChangePrepTime = onChangePrepTime,
                 onChangeCookTime = onChangeCookTime,
@@ -391,6 +395,7 @@ private fun RecipeItemEditForm(
     onChangeInstructions: (String) -> Unit,
     onRemoveInstructions: (String) -> Unit,
     onChangeIngredients: (Ingredient) -> Unit,
+    onRemoveIngredients: (Ingredient) -> Unit,
     onChangePrepTime: (Float) -> Unit,
     onChangeCookTime: (Float) -> Unit,
     onChangeNutritionalInfo: (NutritionInfo) -> Unit,
@@ -509,7 +514,7 @@ private fun RecipeItemEditForm(
             singleLine = true,
             trailingIcon = {
                 IconButton(
-                    onClick = { tagText = "" }
+                    onClick = { tagText = "" },
                 ) {
                     Icon(Icons.Default.Clear, contentDescription = "Clear Field")
                 }
@@ -547,6 +552,13 @@ private fun RecipeItemEditForm(
                 AssistChip(
                     onClick = { onRemoveTags(tag) },
                     label = { Text(tag) },
+                    trailingIcon = {
+                        Icon(
+                            Icons.Default.Delete,
+                            tint = Color.Red,
+                            contentDescription = ""
+                        )
+                    }
                 )
             }
 
@@ -560,6 +572,12 @@ private fun RecipeItemEditForm(
         var ingredientText by remember { mutableStateOf("") }
         var quantityAmount by remember { mutableStateOf(20f) }
         var measurementOption by remember { mutableStateOf(Measurement.GRAMS) }
+
+        Text(
+            text = "Ingredients",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
+        )
 
         OutlinedTextField(
             value = ingredientText,
@@ -612,14 +630,16 @@ private fun RecipeItemEditForm(
 
         OutlinedButton(
             onClick = {
-                onChangeIngredients(
-                    Ingredient(
-                        name = ingredientText,
-                        amount = quantityAmount,
-                        measurement = measurementOption,
-                        linkedPantryItem = null
+                if (ingredientText != "") {
+                    onChangeIngredients(
+                        Ingredient(
+                            name = ingredientText,
+                            amount = quantityAmount,
+                            measurement = measurementOption,
+                            linkedPantryItem = null
+                        )
                     )
-                )
+                }
             },
             shape = ButtonDefaults.outlinedShape,
             enabled = true,
@@ -639,12 +659,6 @@ private fun RecipeItemEditForm(
             }
         )
 
-        Text(
-            text = "Ingredients",
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleMedium,
-        )
-
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -658,6 +672,7 @@ private fun RecipeItemEditForm(
                         measurement = ingredient.measurement,
                         linkedPantryItem = ingredient.linkedPantryItem
                     ),
+                    onDelete = { onRemoveIngredients(ingredient) }
                 )
             }
         }
@@ -665,6 +680,12 @@ private fun RecipeItemEditForm(
         HorizontalDivider(
             modifier = Modifier
                 .padding(0.dp, 4.dp, 0.dp, 4.dp)
+        )
+
+        Text(
+            text = "Instructions",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
         )
 
         var stepText by remember { mutableStateOf("") }
@@ -708,12 +729,6 @@ private fun RecipeItemEditForm(
             }
         )
 
-        Text(
-            text = "Instructions",
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleMedium,
-        )
-
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start
@@ -726,7 +741,7 @@ private fun RecipeItemEditForm(
                     modifier = Modifier
                         .clickable {
                             onRemoveInstructions(instruction)
-                        }
+                        },
                 )
                 stepNum++
             }

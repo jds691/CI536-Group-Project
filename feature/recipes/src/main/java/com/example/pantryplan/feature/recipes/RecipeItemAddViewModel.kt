@@ -146,6 +146,13 @@ class RecipeItemAddViewModel @Inject constructor(
         }
     }
 
+    fun removeIngredients(ingredient: Ingredient) {
+        viewModelScope.launch {
+            recipeItem = recipeItem.copy(ingredients = recipeItem.ingredients.minus(ingredient))
+            _uiState.update { it.copy(recipeItem = recipeItem) }
+        }
+    }
+
     fun updatePrepTime(prepMins: Float) {
         recipeItem.update { it.copy(prepTime = prepMins) }
     }
