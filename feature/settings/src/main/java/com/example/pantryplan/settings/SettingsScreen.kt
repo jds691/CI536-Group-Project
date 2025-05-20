@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +33,8 @@ internal fun SettingsScreen(
     onBackClick: () -> Unit,
     onAllergySettingsClick: () -> Unit,
     onPantrySettingsClick: () -> Unit,
-    onMealPlannerSettingsClick: () -> Unit
+    onMealPlannerSettingsClick: () -> Unit,
+    onDebugSettingsClick: () -> Unit
 ) {
     val settingsUiState: SettingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -41,7 +43,8 @@ internal fun SettingsScreen(
         onBackClick = onBackClick,
         onAllergySettingsClick = onAllergySettingsClick,
         onPantrySettingsClick = onPantrySettingsClick,
-        onMealPlannerSettingsClick = onMealPlannerSettingsClick
+        onMealPlannerSettingsClick = onMealPlannerSettingsClick,
+        onDebugSettingsClick = onDebugSettingsClick
     )
 }
 
@@ -52,7 +55,8 @@ internal fun SettingsScreen(
     onBackClick: () -> Unit,
     onAllergySettingsClick: () -> Unit,
     onPantrySettingsClick: () -> Unit,
-    onMealPlannerSettingsClick: () -> Unit
+    onMealPlannerSettingsClick: () -> Unit,
+    onDebugSettingsClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -94,6 +98,12 @@ internal fun SettingsScreen(
                 icon = designSystemR.drawable.feature_meal_planner_icon_outlined,
                 onClick = onMealPlannerSettingsClick
             )
+
+            SettingsRow(
+                title = "Debug Settings",
+                icon = Icons.Outlined.BugReport,
+                onClick = onDebugSettingsClick
+            )
         }
     }
 }
@@ -107,7 +117,8 @@ private fun SettingsScreenPreview() {
             onBackClick = {},
             onAllergySettingsClick = {},
             onPantrySettingsClick = {},
-            onMealPlannerSettingsClick = {}
+            onMealPlannerSettingsClick = {},
+            onDebugSettingsClick = {}
         )
     }
 }
