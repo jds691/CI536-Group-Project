@@ -22,7 +22,7 @@ kotlinxCoroutines = "1.10.2"
 kotlinxDatetime = "0.6.2"
 kotlinxSerializationJson = "1.8.1"
 hilt = "2.56.2"
-ksp = "2.1.20-2.0.1"
+ksp = "2.1.21-2.0.1"
 room = "2.7.1"
 coilCompose = "2.4.0"
 
