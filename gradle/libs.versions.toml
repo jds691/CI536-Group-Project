@@ -2,7 +2,7 @@
 agp = "8.10.0"
 androidxHiltNavigationCompose = "1.2.0"
 androidxComposeMaterial3 = "1.4.0-alpha14"
-androidxDataStore = "1.1.6"
+androidxDataStore = "1.1.7"
 androidxTestCore = "1.6.1"
 androidxTestRunner = "1.6.2"
 kotlin = "2.1.20"
